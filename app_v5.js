@@ -101,8 +101,8 @@ async function init() {
         if (!DataService.isDemoMode()) {
             const { data: { session }, error } = await DataService.getSession();
             if (error || !session) {
-                // Redirection vers la page de connexion
-                window.location.href = 'Landing/connexion/index.html';
+                alert('Vous avez été déconnecté.');
+                window.location.href = '/connexion/index.html';
                 return; // On arrête l'initialisation du dashboard
             }
             
@@ -169,10 +169,8 @@ async function init() {
 }
 
 async function logoutUser() {
-    if (typeof DataService !== 'undefined' && !DataService.isDemoMode()) {
-        await DataService.signOut();
-    }
-    window.location.href = 'Landing/connexion/index.html';
+    await window.SupabaseService.signOut();
+    window.location.href = '/connexion/index.html';
 }
 
 function showGlobalLoader() {
