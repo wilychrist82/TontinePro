@@ -183,6 +183,27 @@ function hideGlobalLoader() {
 }
 
 // --- 5. DYNAMIC DATA & CALCULATION ---
+function renderSkeletons() {
+    const tBody = document.getElementById('tontines-table-body');
+    if (tBody) {
+        let skels = '';
+        for(let i=0; i<3; i++) skels += `<tr><td colspan="7" style="padding:15px;"><div class="skeleton" style="height:30px;width:100%;border-radius:4px;"></div></td></tr>`;
+        tBody.innerHTML = skels;
+    }
+    const mBody = document.getElementById('extended-members-list');
+    if (mBody) {
+        let skels = '';
+        for(let i=0; i<3; i++) skels += `<div style="padding:15px;"><div class="skeleton" style="height:50px;width:100%;border-radius:8px;"></div></div>`;
+        mBody.innerHTML = skels;
+    }
+    const txBody = document.getElementById('master-registry-table-body');
+    if (txBody) {
+        let skels = '';
+        for(let i=0; i<3; i++) skels += `<tr><td colspan="7" style="padding:15px;"><div class="skeleton" style="height:30px;width:100%;border-radius:4px;"></div></td></tr>`;
+        txBody.innerHTML = skels;
+    }
+}
+
 async function loadDynamicData() {
     if (typeof DataService !== 'undefined') {
         if (typeof getSupabaseClient === 'function') {
@@ -196,6 +217,8 @@ async function loadDynamicData() {
                 } catch (e) {}
             }
         }
+
+        renderSkeletons();
 
         const tontines = await DataService.getTontines().catch(() => []);
         if (tontines && tontines.length > 0) state.activeTontines = tontines;
@@ -1093,7 +1116,21 @@ function renderTontinesTable() {
     tBody.innerHTML = '';
 
     if (!state.activeTontines || state.activeTontines.length === 0) {
-        tBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Aucune tontine active</td></tr>';
+        tBody.innerHTML = `<tr><td colspan="7" style="padding: 60px 20px; text-align: center;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+                <div style="background:rgba(92, 96, 245, 0.1); color:var(--primary); width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <i data-feather="folder-plus" style="width:32px; height:32px;"></i>
+                </div>
+                <div>
+                    <h3 style="color:var(--text-1); font-size:18px; font-weight:700; margin-bottom:4px;">Aucune tontine active</h3>
+                    <p style="color:var(--text-3); font-size:14px; max-width:300px; margin:0 auto;">Créez votre première tontine pour commencer à inviter des membres et gérer les cotisations.</p>
+                </div>
+                <button onclick="document.querySelector('[data-tab=\\'circle\\']').click()" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(92,96,245,0.3); transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    Créer ma première tontine
+                </button>
+            </div>
+        </td></tr>`;
+        setTimeout(() => feather.replace(), 0);
         return;
     }
 
@@ -1562,7 +1599,18 @@ async function renderRegistreTab() {
     const transactions = state.transactions || [];
     
     if (transactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--color-text-muted)">Aucune transaction trouvée.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="7" style="padding: 60px 20px; text-align: center;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+                <div style="background:rgba(245, 158, 11, 0.1); color:#F59E0B; width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <i data-feather="activity" style="width:32px; height:32px;"></i>
+                </div>
+                <div>
+                    <h3 style="color:var(--text-1); font-size:18px; font-weight:700; margin-bottom:4px;">Aucune transaction</h3>
+                    <p style="color:var(--text-3); font-size:14px; max-width:300px; margin:0 auto;">L'historique des cotisations et des retraits apparaîtra ici une fois que votre tontine sera active.</p>
+                </div>
+            </div>
+        </td></tr>`;
+        setTimeout(() => feather.replace(), 0);
         return;
     }
 
