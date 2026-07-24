@@ -6,6 +6,8 @@
     <title>Tontine Pro | Gérez vos tontines en toute confiance</title>
     <!-- Tailwind CSS via CDN pour l'intégration sans build -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS CSS for Scroll Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -264,7 +266,7 @@
 
     <!-- BANDEAU FONCTIONNALITÉS -->
     <div id="fonctionnalites" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-10 mb-20">
-        <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-6 flex flex-wrap lg:flex-nowrap justify-between gap-6 border border-slate-100">
+        <div data-aos="fade-up" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-6 flex flex-wrap lg:flex-nowrap justify-between gap-6 border border-slate-100">
             <div data-feature="gestion" class="open-feature-modal flex items-center gap-4 flex-1 min-w-[200px] p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
                 <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-indigo-100 text-indigo-600 group-hover:scale-110 transition-transform"><i data-feather="grid" class="w-5 h-5"></i></div>
                 <div><h4 class="text-sm font-bold text-slate-800">Gestion simple</h4><p class="text-xs text-slate-500 leading-snug">Créez et gérez vos tontines en quelques clics</p></div>
@@ -289,8 +291,12 @@
     </div>
 
     <!-- TARIFS -->
-    <section id="tarifs" class="py-20 relative">
-        <div class="max-w-7xl mx-auto px-4 text-center">
+    <section id="tarifs" class="py-20 relative overflow-hidden">
+        <!-- Blobs animés pour le fond -->
+        <div class="absolute top-1/4 left-0 md:left-1/4 w-72 h-72 bg-yellow/10 rounded-full blur-3xl -z-10 animate-float"></div>
+        <div class="absolute bottom-1/4 right-0 md:right-1/4 w-96 h-96 bg-navy/5 rounded-full blur-3xl -z-10 animate-float-delayed"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
             <h2 class="text-3xl md:text-4xl font-heading font-extrabold text-navy mb-4">Des tarifs simples et transparents</h2>
             <p class="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">Choisissez l'offre qui correspond à la taille de votre tontine.</p>
             
@@ -313,7 +319,7 @@
                 </div>
 
                 <!-- Premium -->
-                <div class="bg-navy rounded-3xl p-8 border border-navy shadow-2xl relative overflow-hidden hover:-translate-y-2 transition-transform duration-300">
+                <div data-aos="fade-up" data-aos-delay="200" class="bg-navy/95 backdrop-blur-xl rounded-3xl p-8 border border-yellow/30 shadow-[0_0_30px_rgba(245,179,1,0.15)] relative overflow-hidden hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_0_50px_rgba(245,179,1,0.3)] hover:border-yellow/60">
                     <div class="absolute top-0 right-0 bg-yellow text-navy text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">Le plus populaire</div>
                     <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
                     
@@ -984,6 +990,15 @@
                 }
             });
         }
+    </script>
+    <!-- AOS JS for Scroll Animations -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
     </script>
 </body>
 </html>
