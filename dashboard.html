@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tontine Pro - Dashboard &amp; Cercles</title>
+    <meta name="description" content="Gerez vos cercles de tontine avec Tontine Pro.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="global-loader" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p>Connexion sécurisée en cours...</p>
+</div>
+<div class="app-layout" id="app-container">
+<aside class="sidebar" id="sidebar-menu-container">
+    <div class="sb-brand">
+        <div class="sb-logo">
+            <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+                <circle cx="20" cy="24" r="14" fill="#6366F1" fill-opacity="0.9"/>
+                <circle cx="28" cy="24" r="14" fill="#3B82F6" fill-opacity="0.85"/>
+                <path d="M24 16C26.21 16 28 17.79 28 20C28 22.21 26.21 24 24 24C21.79 24 20 22.21 20 20C20 17.79 21.79 16 24 16Z" fill="white"/>
+                <path d="M16 34C16 29.58 19.58 26 24 26C28.42 26 32 29.58 32 34" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="sb-brand-text">
+            <span class="sb-name">Tontine Pro</span>
+            <span class="sb-tag">La confiance, notre priorite</span>
+        </div>
+    </div>
+    <nav class="sb-nav">
+        <button class="nav-item active" data-tab="home">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            <span>Tableau de bord</span>
+        </button>
+        <button class="nav-item" data-tab="circle">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Mes Tontines</span>
+        </button>
+        <button class="nav-item" data-tab="register" id="btn-show-splash">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>
+            <span>Historique des tours</span>
+        </button>
+        <div class="nav-group">
+            <button class="nav-item" id="btn-menu-payments">
+                <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                <span>Paiements</span>
+                <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="nav-submenu hidden" id="payments-submenu">
+                <button class="nav-subitem" id="btn-submenu-send-payment">Envoyer un paiement</button>
+                <button class="nav-subitem" data-tab="register" id="btn-submenu-history">Historique</button>
+            </div>
+        </div>
+        <button class="nav-item" data-tab="members">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <span>Membres</span>
+        </button>
+        <button class="nav-item" data-tab="messages">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Messages</span><span class="menu-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-item" data-tab="notifications">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Notifications</span><span class="menu-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-item" data-tab="calendar">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Calendrier</span>
+        </button>
+        <button class="nav-item" data-tab="reports">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Rapports</span>
+        </button>
+        <button class="nav-item" data-tab="audit">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Audit Trail</span>
+        </button>
+        <button class="nav-item" data-tab="profile">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Parametres</span>
+        </button>
+        <button class="nav-item" data-tab="security">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Securite</span>
+        </button>
+        <button class="nav-item" data-tab="support">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="12" r="10"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Aide</span>
+        </button>
+        <button class="nav-item" style="color: #ef4444; margin-top: 15px;" onclick="if(confirm('Voulez-vous vraiment vous déconnecter ?')) { logoutUser(); }">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Déconnecter</span>
+        </button>
+    </nav>
+    <div class="sb-footer">
+        <div class="sb-user" id="btn-user-profile-toggle" style="cursor: pointer;" onclick="switchTab('profile')">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Utilisateur" class="sb-avatar">
+            <div class="sb-user-info"><span class="sb-uname">Utilisateur</span><span class="sb-urole">-</span></div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="sb-premium">
+            <div class="sp-top">
+                <span class="sp-crown">&#x1F451;</span>
+                <div><div class="sp-title">Passez a Premium</div><div class="sp-sub">Plus de fonctionnalites, plus de securite</div></div>
+            </div>
+            <button class="btn-premium" id="btn-discover-premium" onclick="alert('Fonctionnalités Premium à venir très bientôt !')">Decouvrir</button>
+        </div>
+    </div>
+</aside>
+<main class="main-content">
+<header class="topbar">
+    <div class="tb-left">
+        <button class="hamburger-btn" id="btn-toggle-sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="tb-greeting">
+            <h1 class="tb-title" id="dashboard-greeting">Bienvenue ! &#x1F44B;</h1>
+            <p class="tb-sub">Voici ce qui se passe dans vos tontines aujourd&apos;hui</p>
+        </div>
+    </div>
+    <div class="tb-search" style="flex: 1; max-width: 280px; margin: 0 20px; position: relative;">
+        <svg style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="global-search-input" placeholder="Rechercher un membre, une tontine..." style="width: 100%; padding: 8px 12px 8px 35px; border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); background: var(--bg-card, #fff); color: var(--text-main, #1e293b); outline: none; transition: all 0.2s;" onfocus="this.style.boxShadow='0 0 0 2px rgba(79, 70, 229, 0.2)'" onblur="setTimeout(() => { document.getElementById('search-results-dropdown').style.display='none'; this.style.boxShadow='none'; }, 200)">
+        <div id="search-results-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 50; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+    <div class="tb-right">
+        <button class="tb-btn" id="btn-notifications-toggle" onclick="switchTab('notifications')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="tb-badge" style="display:none">0</span>
+        </button>
+        <button class="tb-btn" id="btn-theme-toggle">
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-help-toggle" onclick="switchTab('support')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+    </div>
+</header>
+<div class="content-scroll">
+<section id="tab-home" class="tab-pane active">
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon s-purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="stats-active-tontines">0</div><div class="stat-lbl">Tontines actives</div><div class="stat-sub">Sur 0 tontines creees</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon s-green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 4v16"/><path d="M2 10h20"/></svg></div>
+            <div class="stat-info"><div class="stat-val val-green" id="stats-total-pool-label">0 <span class="stat-cur">FCFA</span></div><div class="stat-lbl">Montant total en jeu</div><div class="stat-sub">Toutes vos tontines</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon s-yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="stats-current-rounds">0</div><div class="stat-lbl">Tours en cours</div><div class="stat-sub">En attente de cloture</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon s-blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div class="stat-info"><div class="stat-val val-blue" id="stats-validated-payments">0</div><div class="stat-lbl">Paiements valides</div><div class="stat-sub">Aujourd'hui</div></div>
+        </div>
+    </div>
+    <div class="mid-grid">
+        <div class="card donut-card">
+            <h3 class="card-title">Vue d&apos;ensemble</h3>
+            <div class="donut-layout">
+                <div class="donut-wrap">
+                    <svg width="155" height="155" viewBox="0 0 36 36" class="donut-svg">
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#E8ECEF" stroke-width="3.5"/>
+                        <circle id="donut-seg-received" cx="18" cy="18" r="15.915" fill="none" stroke="#5C60F5" stroke-width="3.5" stroke-dasharray="78 22" stroke-dashoffset="25"/>
+                        <circle id="donut-seg-pending" cx="18" cy="18" r="15.915" fill="none" stroke="#A78BFA" stroke-width="3.5" stroke-dasharray="18 82" stroke-dashoffset="-53"/>
+                        <circle id="donut-seg-delayed" cx="18" cy="18" r="15.915" fill="none" stroke="#EF4444" stroke-width="3.5" stroke-dasharray="4 96" stroke-dashoffset="-71"/>
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-pct" id="donut-completion-percent">0%</div>
+                        <div class="donut-lbl-c">Complete</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div class="lg-item"><span class="lg-dot ld-blue"></span><div><div class="lg-name">Paiements recus</div><div class="lg-val" id="legend-val-received"><strong>0%</strong> (0 FCFA)</div></div></div>
+                    <div class="lg-item"><span class="lg-dot ld-purple"></span><div><div class="lg-name">En attente</div><div class="lg-val" id="legend-val-pending"><strong>0%</strong> (0 FCFA)</div></div></div>
+                    <div class="lg-item"><span class="lg-dot ld-red"></span><div><div class="lg-name">Retards</div><div class="lg-val" id="legend-val-delayed"><strong>0%</strong> (0 FCFA)</div></div></div>
+                </div>
+            </div>
+            <a href="#" class="card-link btn-go-to-reports" onclick="switchTab('reports'); return false;">Voir le rapport detaille &rarr;</a>
+        </div>
+        <div class="card next-rd-card">
+            <h3 class="card-title"><span class="t-emoji">&#x1F3C6;</span> Prochain tour a venir</h3>
+            <div class="ben-row">
+                <img id="next-round-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80" alt="" class="ben-av">
+                <div class="ben-info">
+                    <div class="ben-name" id="next-round-name">-</div>
+                    <div class="ben-role" id="next-round-role">Doit recevoir</div>
+                    <div class="ben-amount" id="next-round-payout-amount">0 <span class="payout-currency">FCFA</span></div>
+                </div>
+                <span class="time-badge" id="next-round-time-badge">-</span>
+            </div>
+            <div class="rd-details">
+                <div class="rd-row"><span class="rd-lbl">Tontine</span><span class="rd-val font-semibold" id="next-round-tontine-name">-</span></div>
+                <div class="rd-row"><span class="rd-lbl">Tour</span><span class="rd-val" id="next-round-tour-count">-</span></div>
+                <div class="rd-row"><span class="rd-lbl">Date prevue</span><span class="rd-val" id="next-round-date">-</span></div>
+            </div>
+            <button class="btn-primary btn-block" id="btn-close-current-round">Cloturer ce tour</button>
+        </div>
+        <div class="card pay-card">
+            <h3 class="card-title">Statut des paiements aujourd&apos;hui</h3>
+            <div class="status-list">
+                <div class="status-row"><div class="s-left"><span class="s-ico s-ico-green"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="s-name">Paiements recus</span></div><span class="s-count c-green" id="status-count-received">0</span></div>
+                <div class="status-row"><div class="s-left"><span class="s-ico s-ico-yellow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span><span class="s-name">En attente</span></div><span class="s-count c-yellow" id="status-count-pending">0</span></div>
+                <div class="status-row"><div class="s-left"><span class="s-ico s-ico-red"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="s-name">Retards</span></div><span class="s-count c-red" id="status-count-delayed">0</span></div>
+                <div class="status-row"><div class="s-left"><span class="s-ico s-ico-blue"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><span class="s-name">Total membres</span></div><span class="s-count c-blue" id="status-count-total">0</span></div>
+            </div>
+            <div class="participation"><div class="part-hd"><span>Taux de participation</span><span class="font-bold" id="participation-rate-value">0%</span></div><div class="prog-track"><div class="prog-fill pf-green" id="participation-rate-bar" style="width:0%"></div></div></div>
+        </div>
+    </div>
+    <div class="bot-grid">
+        <div class="card tontines-card">
+            <div class="card-hd"><h3 class="card-title">Mes tontines actives</h3></div>
+            <div class="tbl-wrap"><table class="data-tbl"><thead><tr><th>Nom de la tontine</th><th>Montant</th><th>Frequence</th><th>Membres</th><th>Progression</th><th>Santé (Score)</th><th style="width: 40px;"></th></tr></thead><tbody id="tontines-table-body"></tbody></table></div>
+            <a href="#" class="card-link btn-go-to-tontines" onclick="switchTab('circle'); return false;">Voir toutes mes tontines &rarr;</a>
+        </div>
+        <div class="right-col">
+            <div class="card activity-card">
+                <div class="card-hd"><h3 class="card-title">Fil d'actualité</h3></div>
+                <div class="activity-feed" id="dashboard-activity-feed">
+                    <!-- Activities will be rendered here by JS -->
+                </div>
+            </div>
+            <div class="card msg-card">
+                <div class="card-hd"><h3 class="card-title">Messages recents</h3><a href="#" class="link-all btn-go-to-messages" onclick="switchTab('messages'); return false;">Voir tout</a></div>
+                <div class="msg-list" id="dashboard-recent-messages"></div>
+            </div>
+            <div class="card qa-card">
+                <h3 class="card-title">Actions rapides</h3>
+                <div class="qa-grid">
+                    <button class="qa-btn qa-purple" id="btn-quick-create-tontine"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span>Creer une tontine</span></button>
+                    <button class="qa-btn qa-green" id="btn-quick-send-msg"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span>Envoyer message</span></button>
+                    <button class="qa-btn qa-yellow" id="btn-quick-validate-pay"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>Valider paiement</span></button>
+                    <button class="qa-btn qa-blue" id="btn-quick-view-reports"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><span>Voir rapports</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="tab-circle" class="tab-pane">
+    <div class="group-switcher-container"><label for="circle-group-select">Choisir le groupe :</label><select id="circle-group-select" class="premium-select"></select></div>
+    <div class="card" style="padding:16px">
+        <div class="circle-header"><div><h2 id="circle-title-label">-</h2><div class="circle-meta-row"><span id="circle-beneficiary-label">-</span> &middot; <span>Part: <strong id="circle-individual-share-label">0 FCFA</strong></span></div></div><span id="circle-badge" class="badge-status badge-green">-</span></div>
+        <div style="font-size:13px;color:#64748B;margin:10px 0" id="circle-amount-status">0 / 0 FCFA</div>
+        <div class="prog-track"><div id="circle-prog-fill" class="prog-fill" style="width:0%;background:#3B82F6"></div></div>
+    </div>
+    <div id="members-trust-container"></div>
+</section>
+<section id="tab-register" class="tab-pane">
+    <div class="card"><div class="card-hd"><h3 class="card-title">Registre general des transactions</h3></div><div class="tbl-wrap"><table class="data-tbl"><thead><tr><th>Date</th><th>Tontine</th><th>Membre</th><th>Type</th><th>Montant</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="master-registry-table-body"></tbody></table></div></div>
+</section>
+<section id="tab-members" class="tab-pane">
+    <div class="members-ph" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 class="page-title" style="margin-bottom: 0;">Gestion des membres</h2>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="members-search" class="search-input" placeholder="Rechercher un membre..." style="width: 250px;">
+            <button class="btn-primary" id="btn-quick-add-member" style="display:flex; align-items:center; gap:5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Ajouter
+            </button>
+        </div>
+    </div>
+    <div id="members-full-grid" class="members-grid"></div>
+</section>
+<section id="tab-messages" class="tab-pane">
+    <div class="msg-layout">
+        <div class="conv-sidebar"><div class="conv-hd"><h3>Conversations</h3><button class="btn-new-conv">+</button></div><div class="conv-list" id="conversations-list"></div></div>
+        <div class="chat-area"><div class="chat-hd"><div class="chat-name" id="chat-title">Groupe Developpement 2024</div><div class="chat-status" id="chat-members-count">10 membres &middot; En ligne</div></div><div class="chat-msgs" id="chat-messages-area"></div><div class="chat-input-bar"><input type="text" id="chat-message-input" class="chat-input" placeholder="Ecrire un message..."><button id="btn-send-chat-message" class="btn-primary">Envoyer</button></div></div>
+    </div>
+</section>
+<section id="tab-notifications" class="tab-pane">
+    <div class="notif-ph"><h2 class="page-title">Notifications</h2><div class="notif-tabs"><button class="notif-tab-btn active" data-filter="all">Tout</button><button class="notif-tab-btn" data-filter="payment">Paiements</button><button class="notif-tab-btn" data-filter="round">Tours</button><button class="notif-tab-btn" data-filter="system">Systeme</button></div><button id="btn-mark-all-read" class="btn-sec-sm">Tout marquer lu</button></div>
+    <div id="notifications-feed" class="notif-feed"></div>
+</section>
+<section id="tab-calendar" class="tab-pane">
+    <div class="cal-layout">
+        <div class="card cal-card"><div class="cal-nav"><button id="btn-cal-prev" class="cal-nav-btn">&#8249;</button><h3 id="cal-month-title">Juillet 2026</h3><button id="btn-cal-next" class="cal-nav-btn">&#8250;</button></div><div class="cal-days-hd"><span>Dim</span><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span></div><div class="cal-grid" id="calendar-grid"></div></div>
+        <div class="card upcoming-card"><h3 class="card-title">Evenements a venir</h3><div id="upcoming-events-list"></div></div>
+    </div>
+</section>
+<section id="tab-reports" class="tab-pane">
+    <h2 class="page-title">Rapports &amp; Analyses</h2>
+    <div class="reports-grid">
+        <div class="card"><h3 class="card-title">Evolution mensuelle (FCFA)</h3><div class="bar-chart-container" id="bar-chart-monthly"></div></div>
+        <div class="card"><h3 class="card-title">Repartition par tontine</h3><div id="tontine-breakdown-list"></div></div>
+        <div class="card" style="grid-column:span 2"><h3 class="card-title">Top Performers</h3><div class="performers-grid" id="top-performers-grid"></div></div>
+    </div>
+</section>
+<section id="tab-profile" class="tab-pane">
+    <h2 class="page-title">Paramètres du compte</h2>
+    <div class="settings-grid">
+        <!-- Configuration du compte (Onboarding) -->
+        <div class="card settings-card" style="grid-column: 1 / -1; margin-bottom: 8px;">
+            <h3 class="card-title">Configuration de votre compte Tontine Pro</h3>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
+                <span style="font-size:13px; color:var(--text-3);">Complétez ces étapes pour tirer le meilleur de votre tableau de bord.</span>
+                <span style="font-size:14px; font-weight:700; color:var(--primary);">66% complété</span>
+            </div>
+            <div class="prog-track" style="height:8px; margin-bottom:20px; border-radius:10px;">
+                <div class="prog-fill" style="width:66%; background:var(--primary); border-radius:10px;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:15px; font-size:13px;">
+                <div style="display:flex; align-items:center; gap:8px; color:var(--text-1); font-weight:500;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Créer votre compte
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; color:var(--text-1); font-weight:500;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Créer votre première tontine
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; color:var(--text-3); font-weight:500; cursor:pointer;" onclick="switchTab('members');">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>
+                    Inviter au moins 3 membres
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations Personnelles -->
+        <div class="card settings-card">
+            <h3 class="card-title">Informations personnelles</h3>
+            <p style="font-size:13px; color:var(--text-3); margin-top:-10px; margin-bottom:15px;">Mettez à jour vos informations de profil.</p>
+            <div class="settings-form">
+                <div class="form-group"><label>Nom complet</label><input type="text" id="settings-name-input" class="form-input" value="Utilisateur"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="settings-email-input" class="form-input" value="utilisateur@email.com"></div>
+                <div class="form-group"><label>Téléphone</label><input type="tel" class="form-input" placeholder="+228 90 00 00 00"></div>
+                <button class="btn-primary" style="margin-top:auto" onclick="alert('Profil mis à jour avec succès !');">Mettre à jour le profil</button>
+            </div>
+        </div>
+
+        <!-- Préférences -->
+        <div class="card settings-card">
+            <h3 class="card-title">Préférences de l'application</h3>
+            <p style="font-size:13px; color:var(--text-3); margin-top:-10px; margin-bottom:15px;">Personnalisez votre expérience sur Tontine Pro.</p>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label>Langue</label>
+                    <select class="form-input">
+                        <option value="fr">Français (France)</option>
+                        <option value="en">English (UK)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Devise par défaut</label>
+                    <select class="form-input">
+                        <option value="XOF">Franc CFA (XOF)</option>
+                        <option value="EUR">Euro (€)</option>
+                        <option value="USD">Dollar Américain ($)</option>
+                    </select>
+                </div>
+                <div class="settings-toggle" style="margin-top:10px;">
+                    <span>Mode sombre (Dark mode)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="settings-dark-mode-toggle" onchange="document.body.classList.toggle('dark-mode', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card settings-card">
+            <h3 class="card-title">Notifications & Alertes</h3>
+            <p style="font-size:13px; color:var(--text-3); margin-top:-10px; margin-bottom:15px;">Choisissez comment vous souhaitez être informé.</p>
+            <div style="display:flex; flex-direction:column;">
+                <div class="settings-toggle">
+                    <span>Notifications par Email</span>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="alert('Préférence Email mise à jour !')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-toggle">
+                    <span>Alertes SMS (Nouveau tour)</span>
+                    <label class="switch">
+                        <input type="checkbox" onchange="alert('Préférence SMS mise à jour !')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-toggle">
+                    <span>Rappels de cotisation WhatsApp</span>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="alert('Préférence WhatsApp mise à jour !')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-toggle">
+                    <span>Résumé financier hebdomadaire</span>
+                    <label class="switch">
+                        <input type="checkbox" onchange="alert('Préférence Résumé hebdomadaire mise à jour !')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relances & Communications -->
+        <div class="card settings-card">
+            <h3 class="card-title">Relances & Communications</h3>
+            <p style="font-size:13px; color:var(--text-3); margin-top:-10px; margin-bottom:15px;">Gérez les communications avec les membres de vos tontines.</p>
+            
+            <div style="background: rgba(37, 211, 102, 0.05); border: 1px solid rgba(37, 211, 102, 0.2); border-left: 4px solid #25D366; padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:700; color:var(--text-1); font-size:14px; display:flex; align-items:center; gap:8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                        Relances WhatsApp
+                        <span style="background: rgba(37, 211, 102, 0.15); color: #25D366; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600;">3 relances auto aujourd'hui</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-3); margin-top:4px;">Envoyez un message de rappel aux membres en retard.</div>
+                </div>
+                <button style="margin-left: 15px; background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,211,102,0.2);" onclick="window.open('https://wa.me/?text=' + encodeURIComponent('👋 Bonjour, c\'est un rappel automatique de Tontine Pro. Vous avez une cotisation en retard. Merci de régulariser la situation dès que possible !'), '_blank');" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(37,211,102,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(37,211,102,0.2)';">
+                    Relancer maintenant
+                </button>
+            </div>
+        </div>
+
+        <!-- Facturation & Danger -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+            <div class="card settings-card" style="height:auto;">
+                <h3 class="card-title">Abonnement & Facturation</h3>
+                <div style="background: rgba(92, 96, 245, 0.05); border: 1px solid var(--primary); padding:15px; border-radius:12px; margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:700; color:var(--primary); font-size:15px;">Plan Gratuit</div>
+                            <div style="font-size:12px; color:var(--text-3); margin-top:2px;">1 Tontine active max</div>
+                        </div>
+                        <button class="btn-primary" style="padding:6px 12px; font-size:12px;" onclick="alert('Fonctionnalités Premium à venir très bientôt !')">Passer à Premium</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card settings-card" style="height:auto; border:1px solid rgba(239, 68, 68, 0.2);">
+                <h3 class="card-title" style="color:var(--danger);">Zone de danger</h3>
+                <p style="font-size:12.5px; color:var(--text-3); margin-top:-10px; margin-bottom:15px; line-height:1.5;">Ces actions sont irréversibles. Assurez-vous d'avoir exporté vos données avant de supprimer votre compte.</p>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-primary" style="flex:1; background:var(--content-bg); color:var(--text-1); border:1px solid var(--border);" onclick="window.print()">Exporter PDF / Excel</button>
+                    <button class="btn-primary danger-zone-btn" style="flex:1;" onclick="if(confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.')) { alert('Votre compte a bien été supprimé (Simulation).'); if(typeof logoutUser === 'function') logoutUser(); }">Supprimer le compte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="tab-audit" class="tab-pane">
+    <div class="card">
+        <h3 class="card-title">Audit Trail (Historique complet)</h3>
+        <p style="font-size: 13px; color: var(--text-3); margin-bottom: 20px;">Toutes les actions majeures sont tracées ici pour des raisons de sécurité et de transparence financière.</p>
+        <div class="tbl-wrap">
+            <table class="data-tbl">
+                <thead>
+                    <tr>
+                        <th>Date & Heure</th>
+                        <th>Action</th>
+                        <th>Auteur</th>
+                        <th>Adresse IP</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:var(--text-3);">Aujourd'hui, 08:32</td>
+                        <td>Clôture du Tour #1 (Entraide tontine)</td>
+                        <td><span style="display:flex; align-items:center; gap:8px;"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=30" style="border-radius:50%"> Vous (Admin)</span></td>
+                        <td style="color:var(--text-3); font-family:monospace;">192.168.1.105</td>
+                        <td><span class="badge-status badge-green">Succès</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-3);">Hier, 14:15</td>
+                        <td>Validation paiement 50 000 FCFA</td>
+                        <td><span style="display:flex; align-items:center; gap:8px;"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=30" style="border-radius:50%"> Vous (Admin)</span></td>
+                        <td style="color:var(--text-3); font-family:monospace;">192.168.1.105</td>
+                        <td><span class="badge-status badge-green">Succès</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-3);">Hier, 09:00</td>
+                        <td>Relance WhatsApp Auto (3 membres)</td>
+                        <td><span style="display:flex; align-items:center; gap:8px;"><div style="width:30px;height:30px;border-radius:50%;background:rgba(37,211,102,0.1);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div> Système</span></td>
+                        <td style="color:var(--text-3); font-family:monospace;">-</td>
+                        <td><span class="badge-status badge-green">Succès</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-3);">Il y a 2 jours</td>
+                        <td>Nouvelle connexion détectée</td>
+                        <td><span style="display:flex; align-items:center; gap:8px;"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=30" style="border-radius:50%"> Vous (Admin)</span></td>
+                        <td style="color:var(--text-3); font-family:monospace;">41.138.10.45</td>
+                        <td><span class="badge-status badge-yellow">Avertissement</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<section id="tab-security" class="tab-pane">
+    <div class="settings-wrap"><div class="card settings-card"><h3 class="card-title">Changer le mot de passe</h3><div class="form-group"><label>Mot de passe actuel</label><input type="password" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div><div class="form-group" style="margin-top:12px"><label>Nouveau mot de passe</label><input type="password" id="new-password-input" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div><div class="strength-bars" style="margin-top:8px"><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div></div><span id="strength-label" class="strength-label">Entrez un mot de passe</span><button class="btn-primary" style="margin-top:16px">Mettre a jour</button></div></div>
+</section>
+<section id="tab-support" class="tab-pane">
+    <h2 class="page-title">Centre d&apos;aide</h2>
+    <div class="faq-list">
+        <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Comment creer une tontine ?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Allez dans "Mes Tontines" puis cliquez sur "Creer une tontine". Suivez les etapes.</div></div>
+        <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Comment valider un paiement ?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Dans "Paiements", selectionnez le paiement en attente et cliquez sur "Valider".</div></div>
+        <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Comment inviter un membre ?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Dans "Membres", cliquez sur "Inviter un membre" et entrez son numero ou email.</div></div>
+    </div>
+</section>
+
+</div></main></div>
+
+<div class="modal-overlay hidden" id="payout-modal"><div class="modal-box"><div class="modal-hd"><h3>Demander un paiement</h3><button id="btn-close-payout-modal" class="modal-close">&times;</button></div><div class="modal-body"><div class="form-group"><label>Montant (FCFA)</label><input type="number" class="form-input" placeholder="Montant"></div><button class="btn-primary btn-block" id="btn-submit-payout">Confirmer</button></div></div></div>
+<button class="hidden" id="btn-request-payout"></button>
+<div class="modal-overlay hidden" id="momo-modal"><div class="modal-box"><div class="modal-hd"><h3>Paiement Mobile Money</h3><button id="btn-close-momo-modal" class="modal-close">&times;</button></div><div class="modal-body"><div id="momo-progress-container" class="hidden"><div class="prog-track"><div class="prog-fill" id="momo-progress-bar" style="width:0%"></div></div></div><button class="btn-primary btn-block" id="btn-momo-submit-payment">Payer</button></div></div></div>
+
+<audio id="sound-success" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-84.wav" preload="auto"></audio>
+
+<!-- Quick Action Modals -->
+<!-- 1. Créer une tontine -->
+<div class="modal-overlay hidden" id="create-tontine-modal">
+    <div class="modal-box">
+        <div class="modal-hd">
+            <h3>Créer une tontine</h3>
+            <button id="btn-close-create-tontine-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Nom de la tontine</label>
+                <input type="text" id="tontine-name-input" class="form-input" placeholder="Ex: Développement 2024">
+            </div>
+            <div class="form-group">
+                <label>Montant par cycle (FCFA)</label>
+                <input type="number" id="tontine-amount-input" class="form-input" placeholder="Ex: 50000">
+            </div>
+            <div class="form-group">
+                <label>Fréquence</label>
+                <select id="tontine-frequency-input" class="form-input">
+                    <option value="Quotidien">Quotidien</option>
+                    <option value="Hebdomadaire">Hebdomadaire</option>
+                    <option value="Mensuel" selected>Mensuel</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nombre max de membres</label>
+                <input type="number" id="tontine-max-members-input" class="form-input" value="10">
+            </div>
+            <button class="btn-primary btn-block" id="btn-submit-create-tontine" style="margin-top: 15px;">Créer la tontine</button>
+        </div>
+    </div>
+</div>
+
+<!-- 1.b Modifier une tontine -->
+<div class="modal-overlay hidden" id="edit-tontine-modal">
+    <div class="modal-box">
+        <div class="modal-hd">
+            <h3>Modifier la tontine</h3>
+            <button id="btn-close-edit-tontine-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-tontine-id-input">
+            <div class="form-group">
+                <label>Nom de la tontine</label>
+                <input type="text" id="edit-tontine-name-input" class="form-input" placeholder="Ex: Développement 2024">
+            </div>
+            <div class="form-group">
+                <label>Montant par cycle (FCFA)</label>
+                <input type="number" id="edit-tontine-amount-input" class="form-input" placeholder="Ex: 50000">
+            </div>
+            <div class="form-group">
+                <label>Fréquence</label>
+                <select id="edit-tontine-frequency-input" class="form-input">
+                    <option value="Quotidien">Quotidien</option>
+                    <option value="Hebdomadaire">Hebdomadaire</option>
+                    <option value="Mensuel">Mensuel</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nombre max de membres</label>
+                <input type="number" id="edit-tontine-max-members-input" class="form-input">
+            </div>
+            <button class="btn-primary btn-block" id="btn-submit-edit-tontine" style="margin-top: 15px;">Enregistrer les modifications</button>
+        </div>
+    </div>
+</div>
+
+<!-- 1.c Détails de la tontine -->
+<div class="modal-overlay hidden" id="tontine-details-modal">
+    <div class="modal-box" style="max-width: 600px;">
+        <div class="modal-hd" style="border-bottom: 1px solid var(--border, #E2E8F0); padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 id="details-tontine-name">Détails de la tontine</h3>
+            <button id="btn-close-tontine-details-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 0;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <!-- Montant & Statut -->
+                <div style="background: var(--content-bg, #F8FAFC); padding: 15px; border-radius: 12px; border: 1px solid var(--border, #E2E8F0);">
+                    <div style="font-size: 13px; color: var(--text-2, #64748B); margin-bottom: 5px;">Montant par cycle</div>
+                    <div style="font-size: 22px; font-weight: 700; color: var(--text-1, #1E293B);" id="details-tontine-amount">0 FCFA</div>
+                </div>
+                <div style="background: var(--content-bg, #F8FAFC); padding: 15px; border-radius: 12px; border: 1px solid var(--border, #E2E8F0);">
+                    <div style="font-size: 13px; color: var(--text-2, #64748B); margin-bottom: 5px;">Statut actuel</div>
+                    <div id="details-tontine-status" style="margin-top: 5px;"></div>
+                </div>
+                
+                <!-- Fréquence & Membres -->
+                <div style="background: var(--content-bg, #F8FAFC); padding: 15px; border-radius: 12px; border: 1px solid var(--border, #E2E8F0);">
+                    <div style="font-size: 13px; color: var(--text-2, #64748B); margin-bottom: 5px;">Fréquence</div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--text-1, #1E293B);" id="details-tontine-frequency">Hebdomadaire</div>
+                </div>
+                <div style="background: var(--content-bg, #F8FAFC); padding: 15px; border-radius: 12px; border: 1px solid var(--border, #E2E8F0);">
+                    <div style="font-size: 13px; color: var(--text-2, #64748B); margin-bottom: 5px;">Membres inscrits</div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--text-1, #1E293B);" id="details-tontine-members">0/0</div>
+                </div>
+            </div>
+
+            <!-- Progression -->
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                    <span style="font-weight: 600;">Progression du tour</span>
+                    <span id="details-tontine-progression-text" style="color: var(--primary, #5C60F5); font-weight: 600;">0%</span>
+                </div>
+                <div class="progress-bar-bg" style="height: 10px; border-radius: 5px; background: #E2E8F0; overflow: hidden;">
+                    <div id="details-tontine-progression-fill" class="progress-bar-fill" style="height: 100%; width: 0%; background: var(--primary, #5C60F5); border-radius: 5px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+
+            <!-- Section Membres (Placeholder) -->
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 16px; color: var(--text-1, #1E293B);">Membres participants</h4>
+                <div style="background: rgba(92, 96, 245, 0.05); border: 1px dashed var(--primary, #5C60F5); border-radius: 12px; padding: 25px; text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary, #5C60F5); margin: 0 auto 10px opacity: 0.8;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <p style="color: var(--text-2, #64748B); font-size: 14px; line-height: 1.5; margin: 0;">
+                        L'assignation détaillée des membres sera disponible dans le module <strong>Gestion des Membres</strong>.<br>
+                        Vous pourrez y définir les tours de rôle et envoyer des invitations.
+                    </p>
+                </div>
+            </div>
+            
+            <button class="btn-primary btn-block" id="btn-close-tontine-details-btn" style="margin-top: 25px; background: var(--content-bg, #F1F5F9); color: var(--text-1, #1E293B); border: 1px solid var(--border, #E2E8F0);">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- 1.d Ajouter un membre -->
+<div class="modal-overlay hidden" id="add-member-modal">
+    <div class="modal-box">
+        <div class="modal-hd">
+            <h3>Ajouter un membre</h3>
+            <button id="btn-close-add-member-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Nom complet</label>
+                <input type="text" id="member-name-input" class="form-input" placeholder="Ex: Jean Dupont">
+            </div>
+            <div class="form-group">
+                <label>Téléphone</label>
+                <input type="tel" id="member-phone-input" class="form-input" placeholder="Ex: +33 6 12 34 56 78">
+            </div>
+            <div class="form-group">
+                <label>Email (Optionnel)</label>
+                <input type="email" id="member-email-input" class="form-input" placeholder="Ex: jean.dupont@email.com">
+            </div>
+            <div class="form-group">
+                <label>Statut initial</label>
+                <select id="member-status-input" class="form-input">
+                    <option value="Actif" selected>Actif</option>
+                    <option value="Inactif">Inactif</option>
+                </select>
+            </div>
+            <button class="btn-primary btn-block" id="btn-submit-add-member" style="margin-top: 15px;">Ajouter le membre</button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Envoyer un message -->
+<div class="modal-overlay hidden" id="send-message-modal">
+    <div class="modal-box">
+        <div class="modal-hd">
+            <h3>Envoyer un message</h3>
+            <button id="btn-close-send-message-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Destinataire</label>
+                <select id="message-recipient-input" class="form-input">
+                    <!-- Options injected dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="message-content-input" class="form-input" rows="4" placeholder="Tapez votre message ici..."></textarea>
+            </div>
+            <button class="btn-primary btn-block" id="btn-submit-send-message" style="margin-top: 15px;">Envoyer</button>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Valider un paiement -->
+<div class="modal-overlay hidden" id="validate-payment-modal">
+    <div class="modal-box">
+        <div class="modal-hd">
+            <h3>Valider un paiement</h3>
+            <button id="btn-close-validate-payment-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Membre payeur</label>
+                <select id="payment-member-input" class="form-input">
+                    <!-- Options injected dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Montant reçu (FCFA)</label>
+                <input type="number" id="payment-amount-input" class="form-input" placeholder="Ex: 35000">
+            </div>
+            <button class="btn-primary btn-block" id="btn-submit-validate-payment" style="margin-top: 15px;">Valider le paiement</button>
+        </div>
+    </div>
+</div>
+
+<!-- 3.5. Clôturer un tour -->
+<div class="modal-overlay hidden" id="close-round-modal">
+    <div class="modal-box" style="text-align: center; max-width: 450px;">
+        <div class="modal-hd" style="border-bottom: none; justify-content: center; position: relative;">
+            <h3 style="font-size: 18px; color: #1e293b;">Clôturer ce tour</h3>
+            <button id="btn-close-round-modal-x" class="modal-close" style="position: absolute; right: 20px;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 0;">
+            <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">Vous êtes sur le point de clôturer le tour actuel de la tontine <strong id="close-round-tontine-name" style="color:#1e293b;">-</strong>.</p>
+                <h4 style="font-size: 13px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 5px;">Montant à distribuer</h4>
+                <div id="close-round-amount" style="font-size: 28px; font-weight: 700; color: #3b82f6; margin-bottom: 15px;">0 FCFA</div>
+                <h4 style="font-size: 13px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 5px;">Bénéficiaire</h4>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <img id="close-round-avatar" src="" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <strong id="close-round-beneficiary" style="font-size: 15px; color: #1e293b;">-</strong>
+                </div>
+            </div>
+            <p style="font-size: 12px; color: #ef4444; margin-bottom: 20px; padding: 0 10px;">Cette action va générer un retrait (distribution) dans l'historique et réinitialiser la progression du tour à 0%. C'est irréversible.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-sec-sm" id="btn-cancel-close-round" style="flex: 1; padding: 12px;">Annuler</button>
+                <button class="btn-primary" id="btn-confirm-close-round" style="flex: 1; padding: 12px; background: #3b82f6;">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Rapports et Statistiques -->
+<div class="modal-overlay hidden" id="reports-modal">
+    <div class="modal-box" style="max-width: 700px; width: 90%;">
+        <div class="modal-hd">
+            <h3>Rapports et Statistiques</h3>
+            <button id="btn-close-reports-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="padding-top: 10px;">
+            <div class="reports-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <div class="report-stat-card" style="background: rgba(92, 96, 245, 0.05); border: 1px solid rgba(92, 96, 245, 0.1); padding: 20px; border-radius: var(--radius-lg);">
+                    <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 5px;">Total des cotisations perçues</div>
+                    <div id="report-total-collected" style="font-size: 24px; font-weight: 700; color: var(--color-primary); font-family: 'Outfit', sans-serif;">0 FCFA</div>
+                </div>
+                <div class="report-stat-card" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1); padding: 20px; border-radius: var(--radius-lg);">
+                    <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 5px;">Taux de retard global</div>
+                    <div id="report-delay-rate" style="font-size: 24px; font-weight: 700; color: var(--color-danger); font-family: 'Outfit', sans-serif;">0%</div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                <h4 style="margin:0; font-size:14px; color:var(--text-1);">Évolution des transactions</h4>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <span style="font-size:12px; color:var(--text-3);">Période :</span>
+                    <select id="report-period-filter" class="form-input" style="padding: 4px 8px; font-size: 12px; height: 30px; width: auto;" onchange="if(typeof toggleCustomDates === 'function') toggleCustomDates(this.value)">
+                        <option value="1w">1 Semaine</option>
+                        <option value="1m">1 Mois</option>
+                        <option value="6m" selected>6 Mois</option>
+                        <option value="1y">1 An</option>
+                        <option value="custom">Personnalisé...</option>
+                    </select>
+                    
+                    <div id="custom-date-filters" style="display:none; align-items:center; gap:6px;">
+                        <input type="date" id="report-date-start" class="form-input" style="padding: 4px 8px; font-size: 12px; height: 30px; width: auto; color:var(--text-2);">
+                        <span style="font-size:12px; color:var(--text-3);">au</span>
+                        <input type="date" id="report-date-end" class="form-input" style="padding: 4px 8px; font-size: 12px; height: 30px; width: auto; color:var(--text-2);">
+                    </div>
+                    
+                    <button class="btn-primary" style="height: 30px; padding: 0 12px; font-size: 12px; font-weight:600; border-radius:6px;" onclick="if(typeof applyChartPeriod === 'function') applyChartPeriod()">Valider</button>
+                </div>
+            </div>
+            
+            <div class="report-chart-container" style="position: relative; height: 300px; width: 100%;">
+                <canvas id="payments-evolution-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Conteneur des Toasts -->
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Configuration de l'environnement (Supabase URL & Clé) -->
+<script src="config.js"></script>
+<script src="supabase.js"></script>
+<script src="data-service.js"></script>
+<script src="app_v5.js"></script>
+</body>
+</html>
