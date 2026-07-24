@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveautés Produit | Blog Tontine Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { navy: '#0B1F4D', 'navy-light': '#1A336D', yellow: '#F5B301', 'yellow-hover': '#E5A700' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-[#F5F6FA] text-slate-800 font-sans antialiased overflow-x-hidden flex flex-col min-h-screen">
+
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-navy/95 backdrop-blur-md shadow-lg py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <a href="../index.html" class="flex items-center gap-2 text-white">
+                <div class="bg-white/10 p-2 rounded-xl"><i data-feather="users" class="text-yellow w-6 h-6"></i></div>
+                <span class="text-xl font-heading font-bold tracking-tight">Tontine Pro</span>
+            </a>
+            <div class="hidden md:flex space-x-8 text-white/80 font-medium">
+                <a href="../index.html" class="hover:text-white transition-colors">Accueil</a>
+                <a href="../index.html#fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a>
+                <a href="../index.html#tarifs" class="hover:text-white transition-colors">Tarifs</a>
+                <a href="../index.html#a-propos" class="hover:text-white transition-colors">À propos</a>
+                <a href="index.html" class="text-yellow transition-colors font-bold">Blog</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="../connexion/" class="text-white font-medium hover:text-yellow transition-colors">Se connecter</a>
+                <a href="../../index.html" class="bg-yellow hover:bg-yellow-hover text-navy font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 shadow-lg shadow-yellow/20">S'inscrire gratuitement</a>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none"><i data-feather="menu"></i></button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-navy pt-24 px-6 md:hidden flex-col space-y-6 text-white text-lg font-medium hidden">
+        <a href="../index.html" class="mobile-link">Accueil</a>
+        <a href="../index.html#fonctionnalites" class="mobile-link">Fonctionnalités</a>
+        <a href="../index.html#tarifs" class="mobile-link">Tarifs</a>
+        <a href="../index.html#a-propos" class="mobile-link">À propos</a>
+        <a href="index.html" class="text-yellow mobile-link font-bold">Blog</a>
+        <hr class="border-white/10" />
+        <a href="../connexion/" class="mobile-link">Se connecter</a>
+        <a href="../../index.html" class="bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
+    </div>
+
+    <section class="bg-navy pt-32 pb-16 relative overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-10" style="background-image: url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;"></div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10 text-white">
+            <h1 class="text-4xl md:text-5xl font-heading font-extrabold mb-4">Le Blog <span class="text-yellow">Tontine Pro</span></h1>
+            <p class="text-white/80 text-lg max-w-2xl mx-auto">Découvrez tous nos articles et actualités.</p>
+        </div>
+    </section>
+
+    <div class="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
+            <div class="flex space-x-8 py-4 min-w-max text-sm font-medium text-slate-500">
+                <a href="index.html" class="hover:text-navy transition-colors">Tous les articles</a>
+                <a href="education.html" class="hover:text-navy transition-colors">Éducation Financière</a>
+                <a href="budget.html" class="hover:text-navy transition-colors">Gestion du budget</a>
+                <a href="histoire.html" class="hover:text-navy transition-colors">Histoire des tontines</a>
+                <a href="nouveautes.html" class="text-navy font-bold border-b-2 border-navy pb-1">Nouveautés Produit</a>
+            </div>
+        </div>
+    </div>
+
+    <section class="bg-purple-50 border-b border-purple-100 py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="w-16 h-16 bg-white text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-purple-100">
+                <i data-feather="star" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-3xl font-heading font-bold text-navy mb-4">Nouveautés Produit</h2>
+            <p class="text-slate-600 text-lg leading-relaxed">
+                Tontine Pro évolue en permanence pour répondre à vos attentes. Découvrez dans cette rubrique toutes les dernières mises à jour de l'application, les nouvelles intégrations Mobile Money, et les fonctionnalités inédites développées par notre équipe technique.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-16 flex-1 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="bg-white rounded-3xl p-12 border border-slate-200 inline-block shadow-sm">
+                <div class="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-feather="loader" class="w-8 h-8 animate-spin"></i>
+                </div>
+                <h3 class="text-xl font-bold text-navy mb-2">Des nouveautés arrivent très vite</h3>
+                <p class="text-slate-500">Notre équipe prépare de nouveaux articles pour cette rubrique.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-navy pt-16 pb-8 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
+                <div>© 2026 Tontine Pro. Tous droits réservés.</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        feather.replace();
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            const icon = menu.classList.contains('hidden') ? 'menu' : 'x';
+            btn.innerHTML = `<i data-feather="${icon}"></i>`;
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
