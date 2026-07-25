@@ -166,6 +166,9 @@ async function init() {
     if (!localStorage.getItem('tontine_onboarding_done')) {
         setTimeout(startOnboardingTour, 1000);
     }
+
+    // Axe 4 : appliquer les restrictions selon le rôle de l'utilisateur
+    applyRoleRestrictions();
 }
 
 async function logoutUser() {
@@ -517,7 +520,7 @@ function setupQuickActions() {
         });
     }
 
-    // 3. Valider paiement
+    // 3. Valider paiement — ouverture du modal multi-étapes
     if (btnQuickValidatePay) {
         btnQuickValidatePay.addEventListener('click', () => {
             const m = document.getElementById('validate-payment-modal');
@@ -530,6 +533,7 @@ function setupQuickActions() {
                         s.innerHTML += `<option value="${mem.id}">${mem.name || mem.full_name}</option>`;
                     });
                 }
+                payResetSteps();
                 m.classList.remove('hidden');
             }
         });
@@ -1455,6 +1459,17 @@ async function switchTab(tabId) {
             break;
         case 'reports':
             await renderReportsTab();
+            break;
+        case 'payments':
+            await renderPaymentsTab();
+            break;
+        case 'admin':
+            if (checkPermission('view_admin')) {
+                await renderAdminTab();
+            } else {
+                showToast('Accès réservé aux administrateurs.', 'error');
+                switchTab('home');
+            }
             break;
         case 'home':
             await loadDynamicData();
@@ -2431,3 +2446,352 @@ function startOnboardingTour() {
         if (typeof playSuccessSound === 'function') playSuccessSound();
     });
 }
+
+/* ======================================================
+   AXE 4 — MODAL PAIEMENT MULTI-ÉTAPES
+   ====================================================== */
+
+let _selectedPayMethod = 'wave';
+let _payAllTransactions = []; // cache local pour filtrage
+
+const PAY_METHOD_LABELS = {
+    wave: '🌊 Wave Money',
+    orange_money: '🟠 Orange Money',
+    card: '💳 Carte Bancaire',
+    cash: '💵 Espèces'
+};
+
+function selectPayMethod(card) {
+    document.querySelectorAll('.pay-method-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    _selectedPayMethod = card.getAttribute('data-method');
+}
+
+function payGoStep1() {
+    document.getElementById('pay-step-1').style.display = '';
+    document.getElementById('pay-step-2').style.display = 'none';
+    document.getElementById('pay-step-3').style.display = 'none';
+    document.getElementById('pay-step-dot-1').style.background = '#6366f1';
+    document.getElementById('pay-step-dot-2').style.background = 'var(--border)';
+    document.getElementById('pay-step-dot-3').style.background = 'var(--border)';
+    document.getElementById('pay-modal-subtitle').textContent = 'Étape 1 sur 3 — Détails';
+}
+
+function payGoStep2() {
+    const memSel = document.getElementById('payment-member-input');
+    const amt = document.getElementById('payment-amount-input').value;
+    const memId = memSel ? memSel.value : '';
+    const memName = memSel && memSel.selectedIndex > 0 ? memSel.options[memSel.selectedIndex].text : '';
+
+    if (!memId) { showToast('Veuillez sélectionner un membre.', 'error'); return; }
+    if (!amt || parseFloat(amt) <= 0) { showToast('Veuillez entrer un montant valide.', 'error'); return; }
+
+    const formatted = new Intl.NumberFormat('fr-FR').format(parseFloat(amt));
+    document.getElementById('pay-confirm-amount').textContent = formatted + ' FCFA';
+    document.getElementById('pay-confirm-member').textContent = memName;
+    document.getElementById('pay-confirm-method').textContent = PAY_METHOD_LABELS[_selectedPayMethod] || _selectedPayMethod;
+    document.getElementById('pay-confirm-date').textContent = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    document.getElementById('pay-step-1').style.display = 'none';
+    document.getElementById('pay-step-2').style.display = '';
+    document.getElementById('pay-step-dot-2').style.background = '#6366f1';
+    document.getElementById('pay-modal-subtitle').textContent = 'Étape 2 sur 3 — Confirmation';
+}
+
+async function payGoStep3() {
+    const memSel = document.getElementById('payment-member-input');
+    const amt = parseFloat(document.getElementById('payment-amount-input').value);
+    const memId = memSel ? memSel.value : '';
+    const memName = memSel && memSel.selectedIndex > 0 ? memSel.options[memSel.selectedIndex].text : 'Membre';
+
+    document.getElementById('pay-step-2').style.display = 'none';
+    document.getElementById('pay-step-3').style.display = '';
+    document.getElementById('pay-step-processing').style.display = '';
+    document.getElementById('pay-step-success').style.display = 'none';
+    document.getElementById('pay-step-dot-3').style.background = '#6366f1';
+    document.getElementById('pay-modal-subtitle').textContent = 'Étape 3 sur 3 — Traitement';
+
+    // Appel au service de paiement
+    const { data, error } = await DataService.createPayment({
+        member_id: memId,
+        amount: amt,
+        payment_method: _selectedPayMethod,
+        status: 'valide',
+        payment_type: 'cotisation'
+    });
+
+    // Délai visuel minimal (impression premium)
+    await new Promise(res => setTimeout(res, 1600));
+
+    document.getElementById('pay-step-processing').style.display = 'none';
+
+    if (error) {
+        const errMsg = typeof error === 'object' ? (error.message || JSON.stringify(error)) : error;
+        showToast('Erreur de paiement : ' + errMsg, 'error');
+        payGoStep2(); // revenir à la confirmation
+        return;
+    }
+
+    // Succès
+    const refNum = 'TP-' + Date.now().toString(36).toUpperCase();
+    document.getElementById('pay-success-ref').textContent = 'REF: ' + refNum;
+
+    const formatted = new Intl.NumberFormat('fr-FR').format(amt);
+    document.getElementById('pay-receipt-summary').innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-3);">Bénéficiaire</span><strong>${escapeHTML(memName)}</strong></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-3);">Montant</span><strong style="color:#10b981;">${formatted} FCFA</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-3);">Méthode</span><strong>${PAY_METHOD_LABELS[_selectedPayMethod]}</strong></div>
+    `;
+
+    document.getElementById('pay-step-success').style.display = '';
+    if (typeof playSuccessSound === 'function') playSuccessSound();
+
+    // Mise à jour du state local
+    state.stats.validatedPaymentsToday = (state.stats.validatedPaymentsToday || 0) + 1;
+    state.stats.totalAmountInPlay = (state.stats.totalAmountInPlay || 0) + amt;
+    if (!state.transactions) state.transactions = [];
+    state.transactions.unshift({
+        id: (data && data[0]) ? data[0].id : 'mock-' + Date.now(),
+        member: memName,
+        tontine: 'Tontine Principale',
+        amount: amt,
+        type: 'Cotisation',
+        status: 'Validé',
+        method: _selectedPayMethod,
+        date: new Date().toISOString()
+    });
+    _payAllTransactions = [...state.transactions];
+    renderDashboard();
+}
+
+function payResetSteps() {
+    payGoStep1();
+    document.getElementById('pay-step-dot-1').style.background = '#6366f1';
+    document.getElementById('pay-step-dot-2').style.background = 'var(--border)';
+    document.getElementById('pay-step-dot-3').style.background = 'var(--border)';
+    // reset méthode par défaut
+    document.querySelectorAll('.pay-method-card').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-method') === 'wave');
+    });
+    _selectedPayMethod = 'wave';
+}
+
+/* ======================================================
+   AXE 4 — ONGLET PAIEMENTS
+   ====================================================== */
+
+async function renderPaymentsTab() {
+    // Charger les données si besoin
+    if (!state.transactions || state.transactions.length === 0) {
+        await loadDynamicData();
+    }
+    _payAllTransactions = state.transactions ? [...state.transactions] : [];
+
+    // Stats
+    const validated = _payAllTransactions.filter(t => t.status === 'Validé' || t.status === 'valide');
+    const pending   = _payAllTransactions.filter(t => t.status === 'En attente' || t.status === 'en_attente');
+    const totalAmt  = validated.reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+
+    const elR = document.getElementById('pay-tab-total-received');
+    const elA = document.getElementById('pay-tab-total-amount');
+    const elP = document.getElementById('pay-tab-total-pending');
+    if (elR) elR.textContent = validated.length;
+    if (elA) elA.textContent = new Intl.NumberFormat('fr-FR').format(totalAmt);
+    if (elP) elP.textContent = pending.length;
+
+    renderPaymentsTable(_payAllTransactions);
+}
+
+function renderPaymentsTable(transactions) {
+    const tbody = document.getElementById('payments-table-body');
+    if (!tbody) return;
+
+    if (!transactions || transactions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:50px;text-align:center;color:var(--text-3);font-size:13px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;display:block;margin:0 auto 12px;"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            Aucune transaction pour le moment.<br><small>Commencez par valider un premier paiement.</small>
+        </td></tr>`;
+        return;
+    }
+
+    const statusBadge = (s) => {
+        if (s === 'Validé' || s === 'valide') return `<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">✓ Validé</span>`;
+        if (s === 'En attente' || s === 'en_attente') return `<span style="background:#fef9c3;color:#ca8a04;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">⏳ En attente</span>`;
+        return `<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">${escapeHTML(s)}</span>`;
+    };
+
+    const methodBadge = (m) => PAY_METHOD_LABELS[m] || m || '—';
+
+    tbody.innerHTML = transactions.map(t => {
+        const dateStr = t.date ? new Date(t.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+        const amtFormatted = new Intl.NumberFormat('fr-FR').format(parseFloat(t.amount) || 0);
+        const initials = (t.member || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        return `<tr style="border-bottom:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background='var(--content-bg)'" onmouseout="this.style.background='transparent'">
+            <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
+                    <span style="font-weight:600;font-size:13px;color:var(--text-1);">${escapeHTML(t.member || '—')}</span>
+                </div>
+            </td>
+            <td style="padding:12px 16px;font-weight:700;color:var(--primary);font-size:13px;">${amtFormatted} FCFA</td>
+            <td style="padding:12px 16px;font-size:12px;color:var(--text-2);">${methodBadge(t.method)}</td>
+            <td style="padding:12px 16px;">${statusBadge(t.status)}</td>
+            <td style="padding:12px 16px;font-size:12px;color:var(--text-3);">${dateStr}</td>
+        </tr>`;
+    }).join('');
+}
+
+function filterPayments(btn, filter) {
+    document.querySelectorAll('.pay-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    let filtered = _payAllTransactions;
+    if (filter === 'valide') filtered = _payAllTransactions.filter(t => t.status === 'Validé' || t.status === 'valide');
+    else if (filter === 'en_attente') filtered = _payAllTransactions.filter(t => t.status === 'En attente' || t.status === 'en_attente');
+    else if (filter === 'wave') filtered = _payAllTransactions.filter(t => t.method === 'wave');
+    else if (filter === 'orange_money') filtered = _payAllTransactions.filter(t => t.method === 'orange_money');
+
+    renderPaymentsTable(filtered);
+}
+
+/* ======================================================
+   AXE 4 — ONGLET ADMINISTRATION
+   ====================================================== */
+
+async function renderAdminTab() {
+    // Stats
+    const members = state.extendedMembers || extendedMembers || [];
+    const admins  = members.filter(m => m.role === 'admin' || m.role === 'Gestionnaire');
+    const tontines = state.activeTontines ? state.activeTontines.length : 0;
+
+    const elM = document.getElementById('admin-total-members');
+    const elA = document.getElementById('admin-total-admins');
+    const elT = document.getElementById('admin-total-tontines');
+    if (elM) elM.textContent = members.length;
+    if (elA) elA.textContent = admins.length || 1;
+    if (elT) elT.textContent = tontines;
+
+    // Lien d'invitation
+    const inviteEl = document.getElementById('invite-link-display');
+    if (inviteEl) {
+        const base = window.location.origin;
+        inviteEl.textContent = `${base}/inscription/?ref=tontine-pro-${Date.now().toString(36)}`;
+    }
+
+    renderAdminMembers('');
+}
+
+function renderAdminMembers(query) {
+    const tbody = document.getElementById('admin-members-table-body');
+    if (!tbody) return;
+
+    const members = state.extendedMembers || extendedMembers || [];
+    const filtered = query
+        ? members.filter(m => (m.name || m.full_name || '').toLowerCase().includes(query.toLowerCase()))
+        : members;
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Aucun membre trouvé.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(m => {
+        const name = escapeHTML(m.name || m.full_name || 'Inconnu');
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        const status = m.status === 'À jour' || m.status === 'actif'
+            ? `<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">✓ À jour</span>`
+            : `<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">⚠ En retard</span>`;
+        const role = m.role || 'membre';
+        const roleLabel = role === 'admin' || role === 'Gestionnaire'
+            ? `<span style="background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">🛡 Admin</span>`
+            : `<span style="background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">👤 Membre</span>`;
+
+        return `<tr style="border-bottom:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background='var(--content-bg)'" onmouseout="this.style.background='transparent'">
+            <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
+                    <div><div style="font-weight:600;font-size:13px;color:var(--text-1);">${name}</div><div style="font-size:11px;color:var(--text-3);">${escapeHTML(m.phone || m.email || '—')}</div></div>
+                </div>
+            </td>
+            <td style="padding:12px 16px;">${status}</td>
+            <td style="padding:12px 16px;">${roleLabel}</td>
+            <td style="padding:12px 16px;text-align:center;">
+                <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
+                    ${role === 'admin' || role === 'Gestionnaire' ? 'Rétrograder' : 'Promouvoir Admin'}
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function toggleMemberRole(memberId, memberName, currentRole) {
+    const newRole = (currentRole === 'admin' || currentRole === 'Gestionnaire') ? 'membre' : 'admin';
+    const action = newRole === 'admin' ? `promouvoir "${memberName}" comme Administrateur` : `rétrograder "${memberName}" en Membre`;
+    if (!confirm(`Êtes-vous sûr de vouloir ${action} ?`)) return;
+
+    // Mettre à jour localement
+    const members = state.extendedMembers || extendedMembers || [];
+    const found = members.find(m => m.id === memberId);
+    if (found) {
+        found.role = newRole;
+        showToast(`Rôle de ${memberName} mis à jour : ${newRole === 'admin' ? '🛡 Administrateur' : '👤 Membre'}`, 'success');
+        renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
+    }
+}
+
+function copyInviteLink() {
+    const el = document.getElementById('invite-link-display');
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(() => {
+        showToast('🔗 Lien d\'invitation copié !', 'success');
+    }).catch(() => {
+        showToast('Impossible de copier — copiez manuellement.', 'error');
+    });
+}
+
+/* ======================================================
+   AXE 4 — SYSTÈME DE PERMISSIONS PAR RÔLE
+   ====================================================== */
+
+const PERMISSIONS = {
+    admin: ['create_tontine', 'close_round', 'validate_payment', 'view_admin', 'manage_members', 'view_reports'],
+    gestionnaire: ['create_tontine', 'close_round', 'validate_payment', 'view_admin', 'view_reports'],
+    membre: ['view_reports']
+};
+
+function checkPermission(action) {
+    const role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    const allowed = PERMISSIONS[role] || PERMISSIONS['membre'];
+    return allowed.includes(action);
+}
+
+function applyRoleRestrictions() {
+    const role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    const isAdmin = role === 'admin' || role === 'gestionnaire';
+
+    // Afficher/masquer l'onglet Administration
+    const adminBtn = document.getElementById('btn-nav-admin');
+    if (adminBtn) adminBtn.style.display = isAdmin ? '' : 'none';
+
+    // Masquer les boutons sensibles pour les membres simples
+    if (!isAdmin) {
+        ['btn-quick-create-tontine', 'btn-quick-validate-pay'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = true;
+                el.title = 'Accès réservé aux gestionnaires';
+                el.style.opacity = '0.4';
+                el.style.cursor = 'not-allowed';
+            }
+        });
+    }
+
+    // Badge rôle dans la sidebar
+    const roleEl = document.querySelector('.sb-urole');
+    if (roleEl) {
+        if (isAdmin) {
+            roleEl.innerHTML = `<span style="color:#6366f1;font-weight:700;">🛡 ${isAdmin && role === 'admin' ? 'Admin' : 'Gestionnaire'}</span>`;
+        }
+    }
+}
+

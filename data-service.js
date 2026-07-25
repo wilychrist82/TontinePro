@@ -347,9 +347,9 @@ const DataService = (() => {
                     tontine_id: data.tontine_id || 'mock-tontine-id',
                     payer_id: data.member_id,
                     amount: data.amount,
-                    payment_method: 'mobile_money',
-                    status: 'valide',
-                    payment_type: 'cotisation',
+                    payment_method: data.payment_method || 'mobile_money',
+                    status: data.status || 'valide',
+                    payment_type: data.payment_type || 'cotisation',
                     created_at: new Date().toISOString()
                 }],
                 error: null

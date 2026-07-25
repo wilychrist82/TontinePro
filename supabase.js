@@ -371,12 +371,12 @@ async function insertPayment(paymentData) {
     } catch (e) { return { error: "Erreur lecture tontine" }; }
 
     const payload = {
-        tontine_id: tontineId,
+        tontine_id: paymentData.tontine_id || tontineId,
         payer_id: paymentData.member_id,
         amount: paymentData.amount,
-        payment_method: 'mobile_money',
-        status: 'valide',
-        payment_type: 'cotisation'
+        payment_method: paymentData.payment_method || 'mobile_money',
+        status: paymentData.status || 'valide',
+        payment_type: paymentData.payment_type || 'cotisation'
     };
 
     try {
