@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tontine Pro | Gérez vos tontines en toute confiance</title>
+    <title>Blog | Tontine Pro</title>
     <!-- Tailwind CSS via CDN pour l'intégration sans build -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- AOS CSS for Scroll Animations -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -23,15 +21,9 @@
                         heading: ['Outfit', 'sans-serif'],
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'float-delayed': 'float 7s ease-in-out infinite reverse',
                         'marquee': 'marquee 25s linear infinite',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
                         marquee: {
                             '0%': { transform: 'translateX(0)' },
                             '100%': { transform: 'translateX(-50%)' },
@@ -56,26 +48,26 @@
 <body class="bg-[#F5F6FA] text-slate-800 font-sans antialiased overflow-x-hidden">
 
     <!-- NAVBAR -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-navy py-5">
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-navy/95 backdrop-blur-md shadow-lg py-3">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div class="flex items-center gap-2 text-white">
+            <a href="../index.html" class="flex items-center gap-2 text-white">
                 <div class="bg-white/10 p-2 rounded-xl">
                     <i data-feather="users" class="text-yellow w-6 h-6"></i>
                 </div>
                 <span class="text-xl font-heading font-bold tracking-tight">Tontine Pro</span>
-            </div>
+            </a>
             
             <div class="hidden md:flex space-x-8 text-white/80 font-medium">
-                <a href="#" class="hover:text-white transition-colors scroll-to-top">Accueil</a>
-                <a href="#fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a>
-                <a href="#tarifs" class="hover:text-white transition-colors">Tarifs</a>
-                <a href="#a-propos" class="hover:text-white transition-colors">À propos</a>
-                <a href="blog/" class="hover:text-white transition-colors">Blog</a>
+                <a href="../index.html" class="hover:text-white transition-colors">Accueil</a>
+                <a href="../index.html#fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a>
+                <a href="../index.html#tarifs" class="hover:text-white transition-colors">Tarifs</a>
+                <a href="../index.html#a-propos" class="hover:text-white transition-colors">À propos</a>
+                <a href="#" class="text-yellow transition-colors font-bold">Blog</a>
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
-                <a href="connexion/" class="text-white font-medium hover:text-yellow transition-colors">Se connecter</a>
-                <a href="inscription/" class=" bg-yellow hover:bg-yellow-hover text-navy font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 shadow-lg shadow-yellow/20">
+                <a href="../connexion/" class="text-white font-medium hover:text-yellow transition-colors">Se connecter</a>
+                <a href="../inscription/index.html" class="bg-yellow hover:bg-yellow-hover text-navy font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 shadow-lg shadow-yellow/20">
                     S'inscrire gratuitement
                 </a>
             </div>
@@ -88,406 +80,112 @@
 
     <!-- MOBILE MENU -->
     <div id="mobile-menu" class="fixed inset-0 z-40 bg-navy pt-24 px-6 md:hidden flex-col space-y-6 text-white text-lg font-medium hidden">
-        <a href="#" class="mobile-link scroll-to-top">Accueil</a>
-        <a href="#fonctionnalites" class="mobile-link">Fonctionnalités</a>
-        <a href="#tarifs" class="mobile-link">Tarifs</a>
-        <a href="#a-propos" class="mobile-link">À propos</a>
-        <a href="blog/" class="mobile-link">Blog</a>
+        <a href="../index.html" class="mobile-link">Accueil</a>
+        <a href="../index.html#fonctionnalites" class="mobile-link">Fonctionnalités</a>
+        <a href="../index.html#tarifs" class="mobile-link">Tarifs</a>
+        <a href="../index.html#a-propos" class="mobile-link">À propos</a>
+        <a href="#" class="text-yellow mobile-link font-bold">Blog</a>
         <hr class="border-white/10" />
-        <a href="connexion/" class="mobile-link">Se connecter</a>
-        <a href="inscription/" class=" bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
+        <a href="../connexion/" class="mobile-link">Se connecter</a>
+        <a href="../inscription/index.html" class="bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
     </div>
 
-    <!-- HERO SECTION -->
-    <section class="bg-navy pt-32 pb-20 lg:pt-40 lg:pb-32 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-            
-            <div class="text-white space-y-8 z-10">
-                <div class="inline-flex items-center gap-2 glass rounded-full py-1.5 px-4 text-xs font-bold tracking-wider text-yellow uppercase">
-                    <i data-feather="award" class="w-4 h-4"></i> La solution moderne pour vos tontines
-                </div>
-                
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold leading-tight">
-                    Gérez vos tontines en toute <span class="text-yellow">confiance</span>,<br/>en toute <span class="text-yellow">simplicité</span>.
-                </h1>
-                
-                <p class="text-lg text-white/80 max-w-xl leading-relaxed">
-                    Fini les cahiers, les oublis et les doutes. Tontine Pro digitalise et sécurise la gestion de vos tontines. Tout est transparent, automatisé et accessible à tous.
-                </p>
-                
-                <div class="flex flex-wrap gap-4 text-sm font-medium">
-                    <div class="flex items-center gap-2"><i data-feather="check-circle" class="w-5 h-5 text-yellow"></i> Transparence totale</div>
-                    <div class="flex items-center gap-2"><i data-feather="check-circle" class="w-5 h-5 text-yellow"></i> Sécurité garantie</div>
-                    <div class="flex items-center gap-2"><i data-feather="check-circle" class="w-5 h-5 text-yellow"></i> Accessible partout</div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="inscription/" class=" bg-yellow hover:bg-yellow-hover text-navy font-bold py-3.5 px-8 rounded-full flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl shadow-yellow/20">
-                        Commencer gratuitement <i data-feather="arrow-right" class="w-5 h-5"></i>
-                    </a>
-                    <a href="#" class="open-demo-modal border border-white/30 hover:bg-white/5 text-white font-bold py-3.5 px-8 rounded-full flex items-center justify-center gap-2 transition-colors">
-                        Voir la démo <i data-feather="play-circle" class="w-5 h-5"></i>
-                    </a>
-                </div>
-
-                <div class="flex items-center gap-4 pt-6">
-                    <div class="flex -space-x-3">
-                        <img src="assets/avatar1.png" class="w-10 h-10 rounded-full border-2 border-navy object-cover" alt="Utilisateur Tontine Pro">
-                        <img src="assets/avatar2.png" class="w-10 h-10 rounded-full border-2 border-navy object-cover" alt="Utilisateur Tontine Pro">
-                        <img src="assets/avatar3.png" class="w-10 h-10 rounded-full border-2 border-navy object-cover" alt="Utilisateur Tontine Pro">
-                        <img src="assets/avatar4.png" class="w-10 h-10 rounded-full border-2 border-navy object-cover" alt="Utilisateur Tontine Pro">
-                    </div>
-                    <div class="text-sm">
-                        <div class="text-yellow text-lg tracking-widest leading-none mb-1">★★★★★</div>
-                        <div class="text-white/70">Plus de 10 000 utilisateurs<br/>nous font déjà confiance</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="relative z-10 flex justify-center lg:justify-end mt-10 lg:mt-0">
-                <!-- Phone Mockup Wrapper -->
-                <div class="relative w-full max-w-[320px] rounded-[40px] bg-white p-2 shadow-2xl border-4 border-slate-800 -rotate-2 hover:rotate-0 transition-transform duration-500">
-                    <div class="bg-[#F5F6FA] w-full h-[600px] rounded-[32px] overflow-hidden relative">
-                        <!-- Phone Header -->
-                        <div class="bg-white p-5 pb-4 shadow-sm rounded-b-3xl">
-                            <div class="flex justify-between items-center mb-4">
-                                <div>
-                                    <div class="text-xs text-slate-500 font-medium">Bonjour Alain 👋</div>
-                                    <div class="text-[10px] text-slate-400">Bienvenue sur Tontine Pro</div>
-                                </div>
-                                <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bf3c4?auto=format&fit=crop&w=60&h=60&q=80" class="w-8 h-8 rounded-full" alt="Alain">
-                            </div>
-                            <!-- Balance Card -->
-                            <div class="bg-gradient-to-br from-navy to-navy-light p-4 rounded-2xl text-white relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-4 -mt-4"></div>
-                                <div class="text-xs text-white/80 mb-1">Solde du jour</div>
-                                <div class="text-2xl font-bold font-heading">2 450 000 <span class="text-xs font-normal opacity-70">FCFA</span></div>
-                                <div class="text-[10px] text-yellow mt-2 flex items-center gap-1"><i data-feather="award" class="w-3 h-3"></i> 7 tontines actives</div>
-                            </div>
-                            <!-- 4 Icons -->
-                            <div class="flex justify-between mt-4 px-2 text-navy">
-                                <div class="flex flex-col items-center gap-1.5"><div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center"><i data-feather="grid" class="w-4 h-4"></i></div><span class="text-[8px] font-medium text-slate-600">Tontines</span></div>
-                                <div class="flex flex-col items-center gap-1.5"><div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center"><i data-feather="dollar-sign" class="w-4 h-4"></i></div><span class="text-[8px] font-medium text-slate-600">Paiements</span></div>
-                                <div class="flex flex-col items-center gap-1.5"><div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center"><i data-feather="message-circle" class="w-4 h-4"></i></div><span class="text-[8px] font-medium text-slate-600">Messages</span></div>
-                                <div class="flex flex-col items-center gap-1.5"><div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center"><i data-feather="file-text" class="w-4 h-4"></i></div><span class="text-[8px] font-medium text-slate-600">Rapports</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Tour en cours -->
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-xs font-bold text-slate-800">Tour en cours</h3>
-                                <i data-feather="chevron-right" class="w-4 h-4 text-slate-400"></i>
-                            </div>
-                            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=60&h=60&q=80" class="w-10 h-10 rounded-full object-cover" alt="Awa">
-                                    <div class="flex-1">
-                                        <div class="text-xs font-bold text-slate-800">Awa Diop</div>
-                                        <div class="text-[10px] text-slate-500">Doit recevoir</div>
-                                        <div class="text-xs font-bold text-[#10B981]">350 000 <span class="text-[8px]">FCFA</span></div>
-                                    </div>
-                                    <div class="bg-yellow/10 text-yellow text-[10px] font-bold px-2 py-1 rounded-md">Dans 2 jours</div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-[10px] text-slate-500 mb-1"><span>Progression du tour</span><span>70%</span></div>
-                                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                        <div class="bg-navy w-[70%] h-full rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Paiements list -->
-                            <div class="mt-4">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h3 class="text-xs font-bold text-slate-800">Paiements</h3>
-                                    <span class="text-[10px] text-navy font-bold">Voir tout</span>
-                                </div>
-                                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center"><i data-feather="check" class="w-3 h-3"></i></div>
-                                        <span class="text-[10px] font-bold text-slate-800">24 / 28 validés</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Floating Elements -->
-                <div class="absolute top-10 -right-4 md:-right-12 bg-white rounded-2xl p-4 shadow-2xl flex items-center gap-3 animate-float border border-slate-100 z-20">
-                    <div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center"><i data-feather="shield" class="w-5 h-5"></i></div>
-                    <div>
-                        <div class="text-xs font-bold text-slate-800">100% Sécurisé</div>
-                        <div class="text-[10px] text-slate-500">Vos données sont protégées</div>
-                    </div>
-                </div>
-
-                <div class="absolute bottom-12 -left-4 md:-left-16 animate-float-delayed z-20 hover:-translate-y-2 transition-transform duration-300">
-                    <div class="text-xs font-bold text-white mb-2 flex items-center gap-1.5 drop-shadow-md">
-                        <i data-feather="smartphone" class="w-4 h-4 text-emerald-400"></i> Mobile Money
-                    </div>
-                    <div class="flex items-center drop-shadow-2xl">
-                        <div class="flex -space-x-3 hover:space-x-0.5 transition-all duration-300">
-                            <!-- Flooz (Moov Money CSS Replica) -->
-                            <div class="w-10 h-10 rounded-full border-[3px] border-navy bg-[#F36F21] flex items-center justify-center overflow-hidden shrink-0 z-50 hover:z-[60] hover:scale-110 transition-transform cursor-help" title="Moov Money FLOOZ">
-                                <div class="flex flex-col items-center justify-center mt-0.5">
-                                    <div class="text-white leading-none flex items-baseline gap-[1px]">
-                                        <span class="font-black text-[6px] tracking-tight">MOOV</span>
-                                        <span class="font-bold text-[5px] tracking-tighter">Money</span>
-                                    </div>
-                                    <div class="text-[#00529C] font-black text-[9px] leading-none mt-[1px] tracking-tight">FLOOZ</div>
-                                </div>
-                            </div>
-                            <!-- Yas Mixx (CSS Replica) -->
-                            <div class="w-10 h-10 rounded-full border-[3px] border-navy bg-[#FFD100] flex items-center justify-center overflow-hidden shrink-0 z-40 hover:z-[60] hover:scale-110 transition-transform cursor-help" title="Yas Mixx">
-                                <div class="flex items-center justify-center gap-0.5 w-full h-full bg-[#FFD100]">
-                                    <div class="bg-[#003B7B] text-[#FFD100] font-black text-[6.5px] leading-none px-[3px] py-[2px] rounded-bl-[6px] rounded-tl-sm rounded-tr-md rounded-br-sm -rotate-3">yas</div>
-                                    <div class="w-[1.5px] h-3 bg-[#003B7B]"></div>
-                                    <div class="text-[#003B7B] font-black text-[7px] leading-none">mixx</div>
-                                </div>
-                            </div>
-                            <!-- Orange Money (CSS Replica) -->
-                            <div class="w-10 h-10 rounded-full border-[3px] border-navy bg-[#FF7900] flex items-center justify-center overflow-hidden shrink-0 z-30 hover:z-[60] hover:scale-110 transition-transform cursor-help" title="Orange Money">
-                                <div class="w-full h-full flex items-end justify-center pb-[5px]">
-                                    <span class="text-white font-bold text-[8px] tracking-tight">orange</span>
-                                </div>
-                            </div>
-                            <!-- Wave -->
-                            <div class="w-10 h-10 rounded-full border-[3px] border-navy bg-[#1CC1F3] flex items-center justify-center overflow-hidden shrink-0 z-20 hover:z-[60] hover:scale-110 transition-transform cursor-help" title="Wave">
-                                <span class="text-white font-black text-[11px] tracking-tighter">wave</span>
-                            </div>
-                            <!-- MTN -->
-                            <div class="w-10 h-10 rounded-full border-[3px] border-navy bg-[#FFCC00] flex items-center justify-center overflow-hidden shrink-0 z-10 hover:z-[60] hover:scale-110 transition-transform cursor-help" title="MTN Mobile Money">
-                                <span class="text-[10px] font-black text-[#00529B] leading-none mt-0.5">MTN</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+    <!-- BLOG HEADER -->
+    <section class="bg-navy pt-32 pb-16 relative overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-10" style="background-image: url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;"></div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10 text-white">
+            <h1 class="text-4xl md:text-5xl font-heading font-extrabold mb-4">Le Blog <span class="text-yellow">Tontine Pro</span></h1>
+            <p class="text-white/80 text-lg max-w-2xl mx-auto">Éducation financière, conseils de gestion, histoire des tontines en Afrique et actualités de la plateforme.</p>
         </div>
     </section>
 
-    <!-- BANDEAU FONCTIONNALITÉS -->
-    <div id="fonctionnalites" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-10 mb-20">
-        <div data-aos="fade-up" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-6 flex flex-wrap lg:flex-nowrap justify-between gap-6 border border-slate-100">
-            <div data-feature="gestion" class="open-feature-modal flex items-center gap-4 flex-1 min-w-[200px] p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-indigo-100 text-indigo-600 group-hover:scale-110 transition-transform"><i data-feather="grid" class="w-5 h-5"></i></div>
-                <div><h4 class="text-sm font-bold text-slate-800">Gestion simple</h4><p class="text-xs text-slate-500 leading-snug">Créez et gérez vos tontines en quelques clics</p></div>
-            </div>
-            <div data-feature="paiements" class="open-feature-modal flex items-center gap-4 flex-1 min-w-[200px] p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-emerald-100 text-emerald-600 group-hover:scale-110 transition-transform"><i data-feather="lock" class="w-5 h-5"></i></div>
-                <div><h4 class="text-sm font-bold text-slate-800">Paiements sécurisés</h4><p class="text-xs text-slate-500 leading-snug">Intégration Mobile Money 100% sécurisée</p></div>
-            </div>
-            <div data-feature="transparence" class="open-feature-modal flex items-center gap-4 flex-1 min-w-[200px] p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform"><i data-feather="eye" class="w-5 h-5"></i></div>
-                <div><h4 class="text-sm font-bold text-slate-800">Transparence totale</h4><p class="text-xs text-slate-500 leading-snug">Tous les paiements sont visibles par tous</p></div>
-            </div>
-            <div data-feature="notifications" class="open-feature-modal flex items-center gap-4 flex-1 min-w-[200px] p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-amber-100 text-amber-600 group-hover:scale-110 transition-transform"><i data-feather="bell" class="w-5 h-5"></i></div>
-                <div><h4 class="text-sm font-bold text-slate-800">Notifications</h4><p class="text-xs text-slate-500 leading-snug">Restez informé en temps réel</p></div>
-            </div>
-            <div data-feature="messagerie" class="open-feature-modal flex items-center gap-4 flex-1 min-w-[200px] p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-purple-100 text-purple-600 group-hover:scale-110 transition-transform"><i data-feather="message-circle" class="w-5 h-5"></i></div>
-                <div><h4 class="text-sm font-bold text-slate-800">Messagerie</h4><p class="text-xs text-slate-500 leading-snug">Échangez facilement avec les membres</p></div>
+    <!-- CATEGORIES -->
+    <div class="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
+            <div class="flex space-x-8 py-4 min-w-max text-sm font-medium text-slate-500">
+                <a href="index.html" class="text-navy font-bold border-b-2 border-navy pb-1">Tous les articles</a>
+                <a href="education.html" class="hover:text-navy transition-colors">Éducation Financière</a>
+                <a href="budget.html" class="hover:text-navy transition-colors">Gestion du budget</a>
+                <a href="histoire.html" class="hover:text-navy transition-colors">Histoire des tontines</a>
+                <a href="nouveautes.html" class="hover:text-navy transition-colors">Nouveautés Produit</a>
             </div>
         </div>
     </div>
 
-    <!-- TARIFS -->
-    <section id="tarifs" class="py-20 relative overflow-hidden">
-        <!-- Blobs animés pour le fond -->
-        <div class="absolute top-1/4 left-0 md:left-1/4 w-72 h-72 bg-yellow/10 rounded-full blur-3xl -z-10 animate-float"></div>
-        <div class="absolute bottom-1/4 right-0 md:right-1/4 w-96 h-96 bg-navy/5 rounded-full blur-3xl -z-10 animate-float-delayed"></div>
-        
-        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
-            <h2 class="text-3xl md:text-4xl font-heading font-extrabold text-navy mb-4">Des tarifs simples et transparents</h2>
-            <p class="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">Choisissez l'offre qui correspond à la taille de votre tontine.</p>
+    <!-- BLOG POSTS GRID -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div id="articles-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Article 1 Placeholder -->
+                <a href="education.html" class="block">
+                    <article class="bg-white rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 group cursor-pointer hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
+                        <div class="relative h-56 overflow-hidden">
+                            <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-navy text-xs font-bold px-3 py-1.5 rounded-full">Éducation Financière</div>
+                            <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=600&q=80" alt="Finance" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="text-xs text-slate-400 mb-3 flex items-center gap-2">
+                                <i data-feather="calendar" class="w-3 h-3"></i> 24 Octobre 2026
+                            </div>
+                            <h3 class="text-xl font-heading font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">Comment bien définir l'objectif de sa tontine ?</h3>
+                            <p class="text-slate-600 text-sm mb-6 flex-1 line-clamp-3">Découvrez les meilleures pratiques pour fixer un objectif commun réalisable et motivant pour tous les membres de votre groupe...</p>
+                            <div class="flex items-center gap-3 border-t border-slate-100 pt-4 mt-auto">
+                                <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=100&h=100&q=80" alt="Auteur" class="w-8 h-8 rounded-full object-cover">
+                                <div class="text-sm font-bold text-slate-800">Équipe Tontine Pro</div>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+
+                <!-- Article 2 Placeholder -->
+                <a href="histoire.html" class="block">
+                    <article class="bg-white rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 group cursor-pointer hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
+                        <div class="relative h-56 overflow-hidden">
+                            <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-navy text-xs font-bold px-3 py-1.5 rounded-full">Histoire</div>
+                            <img src="https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?auto=format&fit=crop&w=600&q=80" alt="Histoire" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="text-xs text-slate-400 mb-3 flex items-center gap-2">
+                                <i data-feather="calendar" class="w-3 h-3"></i> 15 Septembre 2026
+                            </div>
+                            <h3 class="text-xl font-heading font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">L'histoire fascinante des tontines en Afrique</h3>
+                            <p class="text-slate-600 text-sm mb-6 flex-1 line-clamp-3">Des origines traditionnelles jusqu'à la digitalisation moderne, plongez dans l'évolution de ce système d'entraide séculaire...</p>
+                            <div class="flex items-center gap-3 border-t border-slate-100 pt-4 mt-auto">
+                                <img src="https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?auto=format&fit=crop&w=100&h=100&q=80" alt="Auteur" class="w-8 h-8 rounded-full object-cover">
+                                <div class="text-sm font-bold text-slate-800">Fatou Sow</div>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+
+                <!-- Article 3 Placeholder -->
+                <a href="budget.html" class="block">
+                    <article class="bg-white rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 group cursor-pointer hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
+                        <div class="relative h-56 overflow-hidden">
+                            <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-navy text-xs font-bold px-3 py-1.5 rounded-full">Gestion du Budget</div>
+                            <img src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&w=600&q=80" alt="Budget" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="text-xs text-slate-400 mb-3 flex items-center gap-2">
+                                <i data-feather="calendar" class="w-3 h-3"></i> 02 Août 2026
+                            </div>
+                            <h3 class="text-xl font-heading font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">5 astuces pour ne jamais rater son tour de cotisation</h3>
+                            <p class="text-slate-600 text-sm mb-6 flex-1 line-clamp-3">Gérer son budget mensuel n'est pas toujours facile. Voici nos conseils concrets pour préparer sereinement vos versements...</p>
+                            <div class="flex items-center gap-3 border-t border-slate-100 pt-4 mt-auto">
+                                <img src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&w=100&h=100&q=80" alt="Auteur" class="w-8 h-8 rounded-full object-cover">
+                                <div class="text-sm font-bold text-slate-800">Équipe Tontine Pro</div>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+
+            </div>
             
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
-                <!-- Gratuite -->
-                <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-transform duration-300">
-                    <div class="text-navy font-heading font-bold text-xl mb-2">Basique</div>
-                    <div class="flex items-end gap-1 mb-6">
-                        <span class="text-4xl font-extrabold text-slate-800">0 FCFA</span>
-                        <span class="text-slate-500 mb-1">/mois</span>
-                    </div>
-                    <p class="text-slate-600 text-sm mb-8 h-10">Idéal pour les petites tontines familiales ou entre amis.</p>
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-green-500 w-5 h-5 shrink-0 mt-0.5"></i><span class="text-slate-700">Jusqu'à 10 membres</span></li>
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-green-500 w-5 h-5 shrink-0 mt-0.5"></i><span class="text-slate-700">1 Tontine active</span></li>
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-green-500 w-5 h-5 shrink-0 mt-0.5"></i><span class="text-slate-700">Historique des transactions</span></li>
-                        <li class="flex items-start gap-3"><i data-feather="x" class="text-slate-300 w-5 h-5 shrink-0 mt-0.5"></i><span class="text-slate-400">Paiements Mobile Money</span></li>
-                    </ul>
-                    <a href="inscription/" class=" block text-center border-2 border-navy text-navy hover:bg-navy hover:text-white font-bold py-3 rounded-full transition-colors">Commencer gratuitement</a>
-                </div>
-
-                <!-- Premium -->
-                <div data-aos="fade-up" data-aos-delay="200" class="bg-navy/95 backdrop-blur-xl rounded-3xl p-8 border border-yellow/30 shadow-[0_0_30px_rgba(245,179,1,0.15)] relative overflow-hidden hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_0_50px_rgba(245,179,1,0.3)] hover:border-yellow/60">
-                    <div class="absolute top-0 right-0 bg-yellow text-navy text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">Le plus populaire</div>
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
-                    
-                    <div class="text-yellow font-heading font-bold text-xl mb-2">Premium</div>
-                    <div class="flex items-end gap-1 mb-6 text-white">
-                        <span class="text-4xl font-extrabold">4 900 FCFA</span>
-                        <span class="text-white/60 mb-1">/mois</span>
-                    </div>
-                    <p class="text-white/80 text-sm mb-8 h-10">Pour les grandes tontines qui nécessitent sécurité et automatisation.</p>
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-yellow w-5 h-5 shrink-0 mt-0.5"></i><span class="text-white">Membres illimités</span></li>
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-yellow w-5 h-5 shrink-0 mt-0.5"></i><span class="text-white">Tontines illimitées</span></li>
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-yellow w-5 h-5 shrink-0 mt-0.5"></i><span class="text-white">Paiements Mobile Money</span></li>
-                        <li class="flex items-start gap-3"><i data-feather="check" class="text-yellow w-5 h-5 shrink-0 mt-0.5"></i><span class="text-white">Rappels automatiques</span></li>
-                    </ul>
-                    <a href="inscription/" class=" block text-center bg-yellow hover:bg-yellow-hover text-navy font-bold py-3 rounded-full transition-colors shadow-lg shadow-yellow/20">S'abonner maintenant</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- À PROPOS -->
-    <section id="a-propos" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row items-center gap-12">
-                <div class="w-full lg:w-1/2 relative group">
-                    <div class="absolute inset-0 bg-yellow/20 rounded-[40px] transform rotate-3 scale-105 z-0 transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110"></div>
-                    <img src="assets/tontine_traditionnelle.png" alt="Réunion Tontine Moderne" class="rounded-[40px] shadow-2xl object-cover h-[400px] w-full relative z-10 transition-transform duration-500 group-hover:-translate-y-2">
-                </div>
-                <div class="w-full lg:w-1/2 space-y-6">
-                    <div class="inline-flex items-center gap-2 bg-navy/5 rounded-full py-1.5 px-4 text-xs font-bold tracking-wider text-navy uppercase">
-                        <i data-feather="heart" class="w-4 h-4 text-yellow fill-yellow"></i> Notre Mission
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-heading font-extrabold text-navy leading-tight">
-                        Moderniser l'épargne collective en Afrique.
-                    </h2>
-                    <p class="text-slate-600 text-lg leading-relaxed">
-                        Depuis des générations, la tontine est le cœur de la solidarité financière. Avec Tontine Pro, notre mission est de préserver cette tradition tout en éliminant les risques de fraude et les erreurs de gestion grâce à la technologie.
-                    </p>
-                    <div class="grid grid-cols-2 gap-6 pt-4">
-                        <div>
-                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4"><i data-feather="shield" class="w-6 h-6"></i></div>
-                            <h4 class="font-bold text-slate-800 mb-2">Confiance</h4>
-                            <p class="text-sm text-slate-500 leading-snug">Chaque transaction est sécurisée pour une tranquillité d'esprit totale.</p>
-                        </div>
-                        <div>
-                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-4"><i data-feather="eye" class="w-6 h-6"></i></div>
-                            <h4 class="font-bold text-slate-800 mb-2">Transparence</h4>
-                            <p class="text-sm text-slate-500 leading-snug">Tous les membres ont accès en temps réel aux fonds du groupe.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- COMMENT ÇA MARCHE -->
-    <section class="py-20 bg-[#F5F6FA]">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-4xl font-heading font-extrabold text-navy mb-4">Comment ça marche ?</h2>
-            <p class="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">3 étapes simples pour digitaliser votre tontine</p>
-
-            <div class="grid md:grid-cols-3 gap-12 relative">
-                <!-- Ligne pointillée -->
-                <div class="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-slate-300 z-0"></div>
-
-                <div class="relative z-10 flex flex-col items-center text-center group">
-                    <div class="w-12 h-12 bg-navy text-white rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-lg shadow-navy/20 group-hover:scale-110 transition-transform">1</div>
-                    <div class="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-xl mb-6 relative">
-                        <div class="absolute inset-0 bg-navy/10 group-hover:bg-transparent transition-colors z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=400&h=400&q=80" alt="Créez tontine" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <h3 class="text-xl font-heading font-bold text-navy mb-3">Créez votre tontine</h3>
-                    <p class="text-slate-600 leading-relaxed max-w-xs">Définissez le montant, la fréquence, les membres et les règles.</p>
-                </div>
-
-                <div class="relative z-10 flex flex-col items-center text-center group">
-                    <div class="w-12 h-12 bg-navy text-white rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-lg shadow-navy/20 group-hover:scale-110 transition-transform">2</div>
-                    <div class="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-xl mb-6 relative">
-                        <div class="absolute inset-0 bg-navy/10 group-hover:bg-transparent transition-colors z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=400&h=400&q=80" alt="Collectez" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <h3 class="text-xl font-heading font-bold text-navy mb-3">Collectez les cotisations</h3>
-                    <p class="text-slate-600 leading-relaxed max-w-xs">Les membres paient via MTN, Orange, Wave, FLOOZ ou Yas Mixx. Vous validez en un clic.</p>
-                </div>
-
-                <div class="relative z-10 flex flex-col items-center text-center group">
-                    <div class="w-12 h-12 bg-navy text-white rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-lg shadow-navy/20 group-hover:scale-110 transition-transform">3</div>
-                    <div class="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-xl mb-6 relative">
-                        <div class="absolute inset-0 bg-navy/10 group-hover:bg-transparent transition-colors z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=400&h=400&q=80" alt="Affectez" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <h3 class="text-xl font-heading font-bold text-navy mb-3">Affectez et continuez</h3>
-                    <p class="text-slate-600 leading-relaxed max-w-xs">Le bénéficiaire reçoit sa part. Le tour passe automatiquement.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- BANDEAU STATS -->
-    <section class="py-10">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="bg-navy rounded-3xl p-10 md:p-14 text-white shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                
-                <h2 class="text-2xl md:text-3xl font-heading font-bold text-center mb-12">Tontine Pro en chiffres</h2>
-                
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/10">
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-4"><i data-feather="users" class="w-6 h-6 text-white"></i></div>
-                        <div class="text-3xl md:text-4xl font-heading font-extrabold mb-1">10 000+</div>
-                        <div class="text-sm text-white/70">Utilisateurs actifs</div>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-4"><i data-feather="award" class="w-6 h-6 text-white"></i></div>
-                        <div class="text-3xl md:text-4xl font-heading font-extrabold mb-1">500+</div>
-                        <div class="text-sm text-white/70">Tontines créées</div>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-4"><i data-feather="dollar-sign" class="w-6 h-6 text-white"></i></div>
-                        <div class="text-3xl md:text-4xl font-heading font-extrabold mb-1">12 M+</div>
-                        <div class="text-sm text-white/70">FCFA transigés</div>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-4"><i data-feather="shield" class="w-6 h-6 text-white"></i></div>
-                        <div class="text-3xl md:text-4xl font-heading font-extrabold mb-1">99.9%</div>
-                        <div class="text-sm text-white/70">Disponibilité</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA FINAL -->
-    <section class="py-20">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="bg-[#FFF8DF] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row items-stretch">
-                <div class="p-10 md:p-16 flex-1 flex flex-col justify-center">
-                    <h2 class="text-3xl md:text-4xl font-heading font-extrabold text-navy mb-4 leading-tight">
-                        Prêt à transformer la gestion<br/>de vos tontines ?
-                    </h2>
-                    <p class="text-slate-600 mb-8 max-w-md text-lg">
-                        Rejoignez des milliers d'utilisateurs qui ont déjà adopté Tontine Pro.
-                    </p>
-                    
-                    <div class="space-y-4 mb-10">
-                        <div class="flex items-center gap-3 font-semibold text-navy"><i data-feather="check-circle" class="w-5 h-5 text-yellow"></i> Sans engagement</div>
-                        <div class="flex items-center gap-3 font-semibold text-navy"><i data-feather="check-circle" class="w-5 h-5 text-yellow"></i> Installation gratuite</div>
-                        <div class="flex items-center gap-3 font-semibold text-navy"><i data-feather="check-circle" class="w-5 h-5 text-yellow"></i> Support 24/7</div>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="inscription/" class=" bg-navy hover:bg-navy-light text-white font-bold py-4 px-8 rounded-full flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl">
-                            S'inscrire gratuitement <i data-feather="arrow-right" class="w-5 h-5"></i>
-                        </a>
-                        <a href="#" class="bg-white border border-slate-200 hover:border-slate-300 text-navy font-bold py-4 px-8 rounded-full flex items-center justify-center gap-2 transition-colors shadow-sm">
-                            Voir la démo <i data-feather="play-circle" class="w-5 h-5"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="w-full md:w-5/12 relative min-h-[300px]">
-                    <img src="assets/tontine_moderne.png" alt="Membres Tontine Pro" class="absolute inset-0 w-full h-full object-cover">
-                </div>
+            <div class="mt-16 text-center">
+                <button id="load-more-btn" class="bg-white border border-slate-200 hover:border-slate-300 text-navy font-bold py-3 px-8 rounded-full transition-colors shadow-sm inline-flex items-center gap-2">
+                    Charger plus d'articles <i data-feather="refresh-cw" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
     </section>
@@ -553,10 +251,10 @@
                 <div>
                     <h4 class="font-bold text-lg mb-6 text-white">Liens utiles</h4>
                     <ul class="space-y-3 text-sm text-white/70">
-                        <li><a href="#" class="hover:text-yellow transition-colors">Fonctionnalités</a></li>
-                        <li><a href="#" class="hover:text-yellow transition-colors">Tarifs</a></li>
-                        <li><a href="#" class="hover:text-yellow transition-colors">À propos</a></li>
-                        <li><a href="#" class="hover:text-yellow transition-colors">Blog</a></li>
+                        <li><a href="../index.html#fonctionnalites" class="hover:text-yellow transition-colors">Fonctionnalités</a></li>
+                        <li><a href="../index.html#tarifs" class="hover:text-yellow transition-colors">Tarifs</a></li>
+                        <li><a href="../index.html#a-propos" class="hover:text-yellow transition-colors">À propos</a></li>
+                        <li><a href="index.html" class="hover:text-yellow transition-colors">Blog</a></li>
                     </ul>
                 </div>
                 <div class="flex flex-col items-center">
@@ -599,457 +297,57 @@
             <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
                 <div>© 2026 Tontine Pro. Tous droits réservés.</div>
                 <div class="flex gap-6">
-                    <a href="conditions.html" class="hover:text-white transition-colors">Conditions d'utilisation</a>
-                    <a href="confidentialite.html" class="hover:text-white transition-colors">Politique de confidentialité</a>
+                    <a href="../conditions.html" class="hover:text-white transition-colors">Conditions d'utilisation</a>
+                    <a href="../confidentialite.html" class="hover:text-white transition-colors">Politique de confidentialité</a>
                 </div>
             </div>
         </div>
     </footer>
 
     <script>
-        // Init Feather icons
         feather.replace();
-
-        // Navbar Scroll Effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 20) {
-                navbar.classList.add('bg-navy/95', 'backdrop-blur-md', 'shadow-lg');
-                navbar.classList.remove('py-5');
-                navbar.classList.add('py-3');
-            } else {
-                navbar.classList.remove('bg-navy/95', 'backdrop-blur-md', 'shadow-lg');
-                navbar.classList.remove('py-3');
-                navbar.classList.add('py-5');
-            }
-        });
 
         // Mobile Menu Toggle
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
-        const links = document.querySelectorAll('.mobile-link');
 
         btn.addEventListener('click', () => {
             menu.classList.toggle('hidden');
             menu.classList.toggle('flex');
-            // Toggle icon
             const icon = menu.classList.contains('hidden') ? 'menu' : 'x';
             btn.innerHTML = `<i data-feather="${icon}"></i>`;
             feather.replace();
         });
+        // Load More Articles
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const articlesContainer = document.getElementById('articles-container');
 
-        links.forEach(link => {
-            link.addEventListener('click', () => {
-                menu.classList.add('hidden');
-                menu.classList.remove('flex');
-                btn.innerHTML = `<i data-feather="menu"></i>`;
-                feather.replace();
-            });
-        });
-
-        // Smooth Scroll to Top
-        document.querySelectorAll('.scroll-to-top').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        });
-        // Smooth Scroll to Center for Features
-        document.querySelectorAll('a[href="#fonctionnalites"]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.getElementById('fonctionnalites');
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            });
-        });
-
-        // Smooth Scroll to Center for Tarifs
-        document.querySelectorAll('a[href="#tarifs"]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.getElementById('tarifs');
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            });
-        });
-
-        // Smooth Scroll to Center for A Propos
-        document.querySelectorAll('a[href="#a-propos"]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.getElementById('a-propos');
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            });
-        });
-
-        // Gestionnaire de redirection externe (ex: depuis les pages du blog)
-        window.addEventListener('DOMContentLoaded', () => {
-            const targetHash = sessionStorage.getItem('scrollToSection') || window.location.hash;
-            if (targetHash && ['#fonctionnalites', '#tarifs', '#a-propos'].includes(targetHash)) {
-                sessionStorage.removeItem('scrollToSection');
+        if(loadMoreBtn && articlesContainer) {
+            loadMoreBtn.addEventListener('click', () => {
+                const icon = loadMoreBtn.querySelector('svg');
+                if (icon) icon.classList.add('animate-spin');
+                
                 setTimeout(() => {
-                    const targetEl = document.querySelector(targetHash);
-                    if (targetEl) {
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        // Mettre en surbrillance orange le menu actif
-                        document.querySelectorAll('.md\\:flex.space-x-8 a, .mobile-link').forEach(link => {
-                            link.classList.remove('text-yellow', 'font-bold');
-                            const href = link.getAttribute('href');
-                            if (href && (href === targetHash || href.endsWith(targetHash))) {
-                                link.classList.add('text-yellow', 'font-bold');
-                            }
-                        });
-                    }
-                }, 400);
-            }
-        });
-    </script>
-
-    <!-- MODALE INSCRIPTION -->
-    <div id="register-modal" class="fixed inset-0 z-[100] hidden">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-navy/60 backdrop-blur-sm modal-close cursor-pointer transition-opacity duration-300 opacity-0" id="modal-backdrop"></div>
-        <!-- Modal Content -->
-        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-            <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg p-8 relative pointer-events-auto transform scale-95 opacity-0 transition-all duration-300" id="modal-content">
-                <button class="absolute top-6 right-6 text-slate-400 hover:text-navy transition-colors modal-close focus:outline-none">
-                    <i data-feather="x" class="w-6 h-6"></i>
-                </button>
-                <div class="text-center mb-6">
-                    <div class="w-12 h-12 bg-yellow/10 text-yellow rounded-xl flex items-center justify-center mx-auto mb-4"><i data-feather="user-plus"></i></div>
-                    <h2 class="text-2xl font-heading font-bold text-navy">Créer votre compte</h2>
-                    <p class="text-slate-500 text-sm mt-1">Rejoignez Tontine Pro et gérez vos tontines en sécurité.</p>
-                </div>
-                <form id="register-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nom complet</label>
-                        <input id="reg-fullname" type="text" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy focus:border-navy text-sm" placeholder="ex: Amadou Diallo">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Adresse e-mail</label>
-                        <input id="reg-email" type="email" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy focus:border-navy text-sm" placeholder="vous@exemple.com">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Numéro de téléphone</label>
-                        <div class="flex gap-2">
-                            <select id="reg-phone-code" class="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-navy focus:border-navy font-semibold text-slate-700 w-28 shrink-0">
-                                <option value="+225">🇨🇮 +225</option>
-                                <option value="+221">🇸🇳 +221</option>
-                                <option value="+228">🇹🇬 +228</option>
-                                <option value="+226">🇧🇫 +226</option>
-                                <option value="+237">🇨🇲 +237</option>
-                            </select>
-                            <input id="reg-phone" type="tel" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy focus:border-navy text-sm" placeholder="01 02 03 04 05">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Mot de passe</label>
-                        <input id="reg-password" type="password" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-navy focus:border-navy text-sm" placeholder="••••••••">
-                    </div>
-                    <div class="pt-2">
-                        <button type="submit" id="reg-submit-btn" class="w-full bg-navy hover:bg-navy-light text-white font-bold py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                            Créer mon compte
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODALE DÉMO VIDÉO -->
-    <div id="demo-modal" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-navy/90 backdrop-blur-md demo-modal-close cursor-pointer transition-opacity duration-300 opacity-0" id="demo-modal-backdrop"></div>
-        <div class="absolute inset-0 flex items-center justify-center p-4 lg:p-12 pointer-events-none">
-            <div class="w-full max-w-5xl relative pointer-events-auto transform scale-95 opacity-0 transition-all duration-300" id="demo-modal-content">
-                <button class="absolute -top-12 right-0 md:-right-12 text-white/50 hover:text-white transition-colors demo-modal-close focus:outline-none">
-                    <i data-feather="x" class="w-10 h-10"></i>
-                </button>
-                <div class="relative w-full pb-[56.25%] bg-black rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group cursor-pointer">
-                    <!-- Image de remplacement masquée
-                    <img id="demo-video-iframe-img" src="assets/demo_cover.png" alt="Aperçu de l'application Tontine Pro" class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-navy/30 group-hover:bg-transparent transition-colors duration-500"></div>
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div class="w-20 h-20 bg-yellow text-navy rounded-full flex items-center justify-center shadow-lg shadow-yellow/30 group-hover:scale-110 transition-transform duration-300">
-                            <i data-feather="play" class="w-10 h-10 ml-2"></i>
-                        </div>
-                    </div>
-                    -->
-                    
-                    <!-- iframe YouTube Vidéo en Français -->
-                    <iframe id="demo-video-iframe" class="absolute top-0 left-0 w-full h-full" src="" title="Démo Tontine Pro" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- MODALE FONCTIONNALITÉ -->
-    <div id="feature-modal" class="fixed inset-0 z-[110] hidden">
-        <div class="absolute inset-0 bg-navy/60 backdrop-blur-sm feature-modal-close cursor-pointer transition-opacity duration-300 opacity-0" id="feature-modal-backdrop"></div>
-        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative pointer-events-auto transform scale-95 opacity-0 transition-all duration-300 overflow-hidden" id="feature-modal-content">
-                <button class="absolute top-4 right-4 text-slate-400 hover:text-navy transition-colors feature-modal-close focus:outline-none z-10 bg-slate-100 rounded-full p-2">
-                    <i data-feather="x" class="w-5 h-5"></i>
-                </button>
-                <div class="p-8 text-center relative">
-                    <div id="feature-modal-icon-wrapper" class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-6 shadow-sm border">
-                        <i id="feature-modal-icon" data-feather="star" class="w-10 h-10"></i>
-                    </div>
-                    <h3 id="feature-modal-title" class="text-2xl font-heading font-bold text-navy mb-4">Titre</h3>
-                    <p id="feature-modal-text" class="text-slate-600 leading-relaxed mb-8">Texte</p>
-                    <a href="inscription/" class=" feature-modal-close bg-navy hover:bg-navy-light text-white font-bold py-3 px-6 rounded-full inline-flex items-center gap-2 transition-transform hover:scale-105 shadow-lg">
-                        Essayer gratuitement <i data-feather="arrow-right" class="w-4 h-4"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Modal Registration Logic
-        const registerModal = document.getElementById('register-modal');
-        const modalBackdrop = document.getElementById('modal-backdrop');
-        const modalContent = document.getElementById('modal-content');
-        const openBtns = document.querySelectorAll('.open-register-modal');
-        const closeBtns = document.querySelectorAll('.modal-close');
-
-        function openModal(e) {
-            if(e) e.preventDefault();
-            registerModal.classList.remove('hidden');
-            void registerModal.offsetWidth;
-            modalBackdrop.classList.remove('opacity-0');
-            modalContent.classList.remove('opacity-0', 'scale-95');
-            // Close mobile menu if open
-            const menu = document.getElementById('mobile-menu');
-            if(!menu.classList.contains('hidden')) {
-                menu.classList.add('hidden');
-                menu.classList.remove('flex');
-                document.getElementById('mobile-menu-btn').innerHTML = `<i data-feather="menu"></i>`;
-                feather.replace();
-            }
+                    if (icon) icon.classList.remove('animate-spin');
+                    loadMoreBtn.innerHTML = `Aucun autre article disponible`;
+                    loadMoreBtn.disabled = true;
+                    loadMoreBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                }, 800);
+            });
         }
 
-        function closeModal(e) {
-            if(e) e.preventDefault();
-            modalBackdrop.classList.add('opacity-0');
-            modalContent.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => {
-                registerModal.classList.add('hidden');
-            }, 300);
-        }
-
-        openBtns.forEach(btn => btn.addEventListener('click', openModal));
-        closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
-
-        // Modal Demo Logic
-        const demoModal = document.getElementById('demo-modal');
-        const demoModalBackdrop = document.getElementById('demo-modal-backdrop');
-        const demoModalContent = document.getElementById('demo-modal-content');
-        const openDemoBtns = document.querySelectorAll('.open-demo-modal');
-        const closeDemoBtns = document.querySelectorAll('.demo-modal-close');
-        const demoIframe = document.getElementById('demo-video-iframe');
-        const videoSrc = "https://www.youtube.com/embed/1nf0IuoQ1Vc?autoplay=1"; // Vidéo YouTube en Français
-
-        function openDemoModal(e) {
-            if(e) e.preventDefault();
-            demoIframe.src = videoSrc;
-            demoModal.classList.remove('hidden');
-            void demoModal.offsetWidth;
-            demoModalBackdrop.classList.remove('opacity-0');
-            demoModalContent.classList.remove('opacity-0', 'scale-95');
-        }
-
-        function closeDemoModal(e) {
-            if(e) e.preventDefault();
-            demoModalBackdrop.classList.add('opacity-0');
-            demoModalContent.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => {
-                demoModal.classList.add('hidden');
-                demoIframe.src = ""; // Stop the video
-            }, 300);
-        }
-
-        openDemoBtns.forEach(btn => btn.addEventListener('click', openDemoModal));
-        closeDemoBtns.forEach(btn => btn.addEventListener('click', closeDemoModal));
-
-        // Modal Feature Logic
-        const featureDetails = {
-            'gestion': {
-                title: 'Gestion simplifiée des Tontines',
-                icon: 'grid',
-                color: 'indigo',
-                text: "Fini les carnets perdus ou les calculs compliqués ! Créez vos groupes, définissez les règles (montant, fréquence), et invitez vos membres en quelques clics. Tontine Pro automatise le suivi et l'attribution des tours."
-            },
-            'paiements': {
-                title: 'Paiements 100% Sécurisés',
-                icon: 'lock',
-                color: 'emerald',
-                text: "Intégration complète avec les solutions Mobile Money locales (Flooz, Yas Mixx, Orange Money, Wave). Chaque transaction est tracée et sécurisée. L'argent est directement transféré au bénéficiaire du tour sans intermédiaire risqué."
-            },
-            'transparence': {
-                title: 'Transparence & Confiance',
-                icon: 'eye',
-                color: 'blue',
-                text: "La confiance est le pilier de la tontine. Sur Tontine Pro, tous les membres du groupe ont accès en temps réel à l'historique des cotisations, des retraits et au solde global. Il n'y a plus de place pour le doute."
-            },
-            'notifications': {
-                title: 'Rappels & Notifications',
-                icon: 'bell',
-                color: 'amber',
-                text: "Ne ratez plus aucun tour ! Le système envoie automatiquement des SMS et des notifications push (WhatsApp/In-app) pour rappeler les échéances de paiement et annoncer la distribution des cagnottes."
-            },
-            'messagerie': {
-                title: 'Messagerie Intégrée',
-                icon: 'message-circle',
-                color: 'purple',
-                text: "Gardez le contact avec votre groupe. Discutez directement avec les membres de votre tontine dans un espace dédié et sécurisé pour prendre des décisions ensemble sans quitter l'application."
-            }
-        };
-
-        const featureModal = document.getElementById('feature-modal');
-        const featureModalBackdrop = document.getElementById('feature-modal-backdrop');
-        const featureModalContent = document.getElementById('feature-modal-content');
-        const featureModalIconWrapper = document.getElementById('feature-modal-icon-wrapper');
-        const featureModalTitle = document.getElementById('feature-modal-title');
-        const featureModalText = document.getElementById('feature-modal-text');
-        
-        const openFeatureBtns = document.querySelectorAll('.open-feature-modal');
-        const closeFeatureBtns = document.querySelectorAll('.feature-modal-close');
-
-        function openFeatureModal(e) {
-            if(e) e.preventDefault();
-            const featureKey = e.currentTarget.getAttribute('data-feature');
-            const data = featureDetails[featureKey];
-            if(data) {
-                featureModalTitle.textContent = data.title;
-                featureModalText.textContent = data.text;
-                
-                // Dynamically update colors and icon
-                featureModalIconWrapper.className = `w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-6 shadow-sm border bg-${data.color}-100 text-${data.color}-600 border-${data.color}-200`;
-                
-                const newIcon = document.createElement('i');
-                newIcon.setAttribute('data-feather', data.icon);
-                newIcon.className = "w-10 h-10";
-                featureModalIconWrapper.innerHTML = '';
-                featureModalIconWrapper.appendChild(newIcon);
-                feather.replace();
-            }
-
-            featureModal.classList.remove('hidden');
-            void featureModal.offsetWidth;
-            featureModalBackdrop.classList.remove('opacity-0');
-            featureModalContent.classList.remove('opacity-0', 'scale-95');
-        }
-
-        function closeFeatureModal(e) {
-            if(e) e.preventDefault();
-            featureModalBackdrop.classList.add('opacity-0');
-            featureModalContent.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => {
-                featureModal.classList.add('hidden');
-            }, 300);
-        }
-
-        openFeatureBtns.forEach(btn => btn.addEventListener('click', openFeatureModal));
-        closeFeatureBtns.forEach(btn => btn.addEventListener('click', closeFeatureModal));
-
-        // Scrollspy for navigation links
-        const sections = document.querySelectorAll('div#fonctionnalites, section#tarifs, section#a-propos');
-        const navLinks = document.querySelectorAll('.md\\:flex.space-x-8 a, .mobile-link');
-        
-        window.addEventListener('scroll', () => {
-            let current = '#';
-            if (window.scrollY > 50) {
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (window.scrollY + 150 >= sectionTop) {
-                        current = '#' + section.getAttribute('id');
-                    }
-                });
-            }
-
-            navLinks.forEach(link => {
+        // Mémorisation de la section cible lors d'un clic vers la page d'accueil
+        document.querySelectorAll('a[href*="#"]').forEach(link => {
+            link.addEventListener('click', () => {
                 const href = link.getAttribute('href');
-                if (href && href !== 'blog/' && href !== 'connexion/' && !link.classList.contains('open-register-modal')) {
-                    link.classList.remove('text-yellow', 'font-bold');
-                    if (href === current) {
-                        link.classList.add('text-yellow', 'font-bold');
+                if (href && (href.includes('index.html#') || href.startsWith('#'))) {
+                    const hash = href.substring(href.indexOf('#'));
+                    if (['#fonctionnalites', '#tarifs', '#a-propos'].includes(hash)) {
+                        sessionStorage.setItem('scrollToSection', hash);
                     }
                 }
             });
         });
-        
-        window.dispatchEvent(new Event('scroll'));
-
-        feather.replace();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../config.js"></script>
-    <script>
-        // Supabase Registration Logic
-        const supabaseUrl = window.ENV.NEXT_PUBLIC_SUPABASE_URL;
-        const supabaseKey = window.ENV.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-        const registerForm = document.getElementById('register-form');
-        const regSubmitBtn = document.getElementById('reg-submit-btn');
-
-        if (registerForm) {
-            registerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const fullname = document.getElementById('reg-fullname').value;
-                const email = document.getElementById('reg-email').value;
-                const phoneCode = document.getElementById('reg-phone-code').value;
-                const phone = document.getElementById('reg-phone').value;
-                const password = document.getElementById('reg-password').value;
-
-                // Loading state
-                const originalBtnText = regSubmitBtn.innerHTML;
-                regSubmitBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 animate-spin mx-auto"></i>';
-                feather.replace();
-                regSubmitBtn.disabled = true;
-                regSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: fullname,
-                            phone: phoneCode + ' ' + phone
-                        }
-                    }
-                });
-
-                regSubmitBtn.disabled = false;
-                regSubmitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
-                regSubmitBtn.innerHTML = originalBtnText;
-
-                if (error) {
-                    alert("Erreur d'inscription : " + error.message);
-                } else {
-                    alert('Inscription réussie ! Redirection en cours...');
-                    window.location.href = '../index.html'; // Redirige vers le dashboard
-                }
-            });
-        }
-    </script>
-    <!-- AOS JS for Scroll Animations -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
-    </script>
-
 </body>
 </html>
