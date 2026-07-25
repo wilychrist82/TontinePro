@@ -542,71 +542,10 @@ function setupQuickActions() {
     const btnClosePay = document.getElementById('btn-close-validate-payment-modal');
     if (btnClosePay) btnClosePay.addEventListener('click', () => document.getElementById('validate-payment-modal').classList.add('hidden'));
 
-    const btnSubmitPay = document.getElementById('btn-submit-validate-payment');
-    if (btnSubmitPay) {
-        btnSubmitPay.addEventListener('click', async () => {
-            const memId = document.getElementById('payment-member-input').value;
-            const amt = document.getElementById('payment-amount-input').value;
+    // NOTE: Le bouton "btn-submit-validate-payment" est désormais géré par
+    // onclick="payGoStep3()" directement dans le HTML (modal multi-étapes Axe 4).
+    // L'ancien addEventListener a été retiré pour éviter les doubles déclenchements.
 
-            if (!memId) {
-                showToast("Veuillez sélectionner un membre.", "error");
-                return;
-            }
-            if (!amt || parseFloat(amt) <= 0) {
-                showToast("Veuillez entrer un montant valide.", "error");
-                return;
-            }
-
-            btnSubmitPay.disabled = true;
-
-            showGlobalLoader();
-            const { data, error } = await DataService.createPayment({ member_id: memId, amount: parseFloat(amt) });
-            hideGlobalLoader();
-
-            btnSubmitPay.disabled = false;
-
-            if (error) {
-                const errMsg = typeof error === 'object' ? (error.message || JSON.stringify(error)) : error;
-                showToast("Erreur lors de la validation : " + errMsg, "error");
-            } else {
-                document.getElementById('validate-payment-modal').classList.add('hidden');
-                document.getElementById('payment-amount-input').value = '';
-                
-                showToast("Paiement validé avec succès !", "success");
-                
-                if (typeof playSuccessSound === 'function') {
-                    playSuccessSound();
-                }
-                
-                if (data && data.length > 0) {
-                    const newPay = data[0];
-                    const memberList = state.extendedMembers || (typeof extendedMembers !== 'undefined' ? extendedMembers : []);
-                    const foundMem = memberList.find(m => m.id === memId);
-                    const memName = foundMem ? (foundMem.name || foundMem.full_name) : "Membre Inconnu";
-                    
-                    if (!state.transactions) state.transactions = [];
-                    state.transactions.unshift({
-                        id: newPay.id,
-                        member: memName,
-                        tontine: "Tontine Principale",
-                        amount: newPay.amount,
-                        type: 'Cotisation',
-                        status: newPay.status === 'valide' ? 'Validé' : 'En attente',
-                        date: newPay.created_at || new Date().toISOString()
-                    });
-                    
-                    state.stats.validatedPaymentsToday = (state.stats.validatedPaymentsToday || 0) + 1;
-                    state.stats.totalAmountInPlay = (state.stats.totalAmountInPlay || 0) + parseFloat(amt);
-                } else {
-                    await loadDynamicData();
-                }
-                
-                renderDashboard();
-                if (typeof renderRegistryTab === 'function') renderRegistryTab();
-                if (typeof animateDonutChart === 'function') animateDonutChart();
-            }
-        });
-    }
 
     // 4. Voir rapports
     if (btnQuickViewReports) {
