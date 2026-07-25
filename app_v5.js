@@ -2347,37 +2347,37 @@ function renderMembers() {
             `<button onclick="sendReminder('${m.name}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
             `<button style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Voir profil</button>`;
 
-        return \`
+        return `
             <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 15px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(92, 96, 245, 0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); font-size: 16px;">
-                            \${m.name.charAt(0)}
+                            ${m.name.charAt(0)}
                         </div>
                         <div>
-                            <div style="font-weight: 600; color: var(--text-1); font-size: 14px;">\${m.name}</div>
-                            <div style="font-size: 12px; color: var(--text-3);">\${m.role}</div>
+                            <div style="font-weight: 600; color: var(--text-1); font-size: 14px;">${m.name}</div>
+                            <div style="font-size: 12px; color: var(--text-3);">${m.role}</div>
                         </div>
                     </div>
-                    <span class="badge-status \${badgeClass}" style="font-size: 11px;">\${m.status}</span>
+                    <span class="badge-status ${badgeClass}" style="font-size: 11px;">${m.status}</span>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
                     <div style="background: var(--content-bg); padding: 10px; border-radius: 8px; text-align: center;">
                         <div style="color: var(--text-3); font-size: 11px; margin-bottom: 2px;">Tontines</div>
-                        <div style="font-weight: 600; color: var(--text-1);">\${m.tontines}</div>
+                        <div style="font-weight: 600; color: var(--text-1);">${m.tontines}</div>
                     </div>
                     <div style="background: var(--content-bg); padding: 10px; border-radius: 8px; text-align: center;">
                         <div style="color: var(--text-3); font-size: 11px; margin-bottom: 2px;">Total cotisé</div>
-                        <div style="font-weight: 600; color: var(--text-1);">\${m.amount}</div>
+                        <div style="font-weight: 600; color: var(--text-1);">${m.amount}</div>
                     </div>
                 </div>
                 
                 <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 15px; margin-top: auto;">
-                    \${actionBtn}
+                    ${actionBtn}
                 </div>
             </div>
-        \`;
+        `;
     }).join('');
 }
 
