@@ -67,7 +67,7 @@
 
             <div class="hidden md:flex items-center space-x-4">
                 <a href="../connexion/" class="text-white font-medium hover:text-yellow transition-colors">Se connecter</a>
-                <a href="../../index.html" class="bg-yellow hover:bg-yellow-hover text-navy font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 shadow-lg shadow-yellow/20">
+                <a href="../inscription/index.html" class="bg-yellow hover:bg-yellow-hover text-navy font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 shadow-lg shadow-yellow/20">
                     S'inscrire gratuitement
                 </a>
             </div>
@@ -87,7 +87,7 @@
         <a href="#" class="text-yellow mobile-link font-bold">Blog</a>
         <hr class="border-white/10" />
         <a href="../connexion/" class="mobile-link">Se connecter</a>
-        <a href="../../index.html" class="bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
+        <a href="../inscription/index.html" class="bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
     </div>
 
     <!-- BLOG HEADER -->
@@ -335,6 +335,19 @@
                 }, 800);
             });
         }
+
+        // Mémorisation de la section cible lors d'un clic vers la page d'accueil
+        document.querySelectorAll('a[href*="#"]').forEach(link => {
+            link.addEventListener('click', () => {
+                const href = link.getAttribute('href');
+                if (href && (href.includes('index.html#') || href.startsWith('#'))) {
+                    const hash = href.substring(href.indexOf('#'));
+                    if (['#fonctionnalites', '#tarifs', '#a-propos'].includes(hash)) {
+                        sessionStorage.setItem('scrollToSection', hash);
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>
