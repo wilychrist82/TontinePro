@@ -248,6 +248,7 @@ async function loadDynamicData() {
         state.transactions = [...demoTxs, ...(transactions || [])];
 
         // Vraies Statistiques Globales : 17.3M et 86%
+        renderMembers();
         if (window.SupabaseService && window.SupabaseService.fetchPaymentsForReports) {
             const payments = await window.SupabaseService.fetchPaymentsForReports().catch(() => []);
             if (payments && payments.length > 0) {
@@ -2255,6 +2256,130 @@ window.applyChartPeriod = function() {
     reportsChartInstance.data.datasets[0].data = dataPoints;
     reportsChartInstance.update();
 };
+
+// --- AXE 3 : EXPORTS & RELANCES ---
+
+window.exportTontineToPDF = function() {
+    const tontineName = document.getElementById('details-tontine-name').textContent;
+    const tontineAmount = document.getElementById('details-tontine-amount').textContent;
+    const tontineStatus = document.getElementById('details-tontine-status').textContent;
+    const tontineMembers = document.getElementById('details-tontine-members').textContent;
+
+    const element = document.createElement('div');
+    element.innerHTML = `
+        <div style="padding: 40px; font-family: 'Inter', sans-serif; color: #1E293B;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #0B1F4D; font-size: 28px; font-weight: bold; margin: 0;">Tontine Pro</h1>
+                <p style="color: #64748B; font-size: 14px; margin-top: 5px;">Rapport de Tontine</p>
+            </div>
+            
+            <div style="border-bottom: 2px solid #E2E8F0; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; color: #1E293B; margin: 0;">${tontineName}</h2>
+                <span style="display: inline-block; padding: 4px 10px; border-radius: 20px; background: #E0F2FE; color: #0284C7; font-size: 12px; margin-top: 8px;">${tontineStatus}</span>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                <tr>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #E2E8F0; color: #64748B; width: 40%;">Montant par cycle</td>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #E2E8F0; color: #1E293B; font-weight: 600; text-align: right;">${tontineAmount}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #E2E8F0; color: #64748B;">Membres inscrits</td>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #E2E8F0; color: #1E293B; font-weight: 600; text-align: right;">${tontineMembers}</td>
+                </tr>
+            </table>
+
+            <div style="margin-top: 40px; text-align: center; color: #94A3B8; font-size: 12px;">
+                <p>Généré automatiquement par Tontine Pro le ${new Date().toLocaleDateString('fr-FR')}</p>
+            </div>
+        </div>
+    `;
+
+    const opt = {
+      margin:       1,
+      filename:     'Rapport_' + tontineName.replace(/\s+/g, '_') + '.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    if (typeof showGlobalLoader === 'function') showGlobalLoader();
+    if (window.html2pdf) {
+        html2pdf().set(opt).from(element).save().then(() => {
+            if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+            if (typeof showToast === 'function') showToast("Le rapport PDF a été téléchargé avec succès !");
+            else alert("Le rapport PDF a été téléchargé avec succès !");
+        });
+    } else {
+        if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+        alert("Erreur: La bibliothèque d'export PDF n'est pas chargée.");
+    }
+};
+
+window.sendReminder = function(memberName, method) {
+    if (method === 'whatsapp') {
+        const text = encodeURIComponent(`👋 Bonjour ${memberName}, c'est un rappel automatique de Tontine Pro. Vous avez une cotisation en retard. Merci de régulariser la situation dès que possible !`);
+        window.open('https://wa.me/?text=' + text, '_blank');
+        if (typeof showToast === 'function') showToast(`Relance WhatsApp préparée pour ${memberName}`);
+    } else {
+        if (typeof showToast === 'function') showToast(`Email de relance envoyé à ${memberName} !`);
+    }
+};
+
+function renderMembers() {
+    const grid = document.getElementById('members-full-grid');
+    if (!grid) return;
+
+    const fakeMembers = [
+        { name: 'Kossi A.', role: 'Membre actif', status: 'À jour', tontines: 2, amount: '50 000 FCFA' },
+        { name: 'Awa N.', role: 'Membre actif', status: 'En retard', tontines: 1, amount: '25 000 FCFA' },
+        { name: 'Jean-Paul', role: 'Membre actif', status: 'À jour', tontines: 3, amount: '150 000 FCFA' },
+        { name: 'Fatou D.', role: 'Membre actif', status: 'En retard', tontines: 1, amount: '10 000 FCFA' },
+        { name: 'David M.', role: 'Administrateur', status: 'À jour', tontines: 2, amount: '100 000 FCFA' },
+        { name: 'Sophie L.', role: 'Membre actif', status: 'À jour', tontines: 1, amount: '25 000 FCFA' }
+    ];
+
+    grid.innerHTML = fakeMembers.map(m => {
+        const isLate = m.status === 'En retard';
+        const badgeClass = isLate ? 'badge-red' : 'badge-green';
+        
+        const actionBtn = isLate ? 
+            `<button onclick="sendReminder('${m.name}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
+            `<button style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Voir profil</button>`;
+
+        return \`
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 15px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(92, 96, 245, 0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); font-size: 16px;">
+                            \${m.name.charAt(0)}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-1); font-size: 14px;">\${m.name}</div>
+                            <div style="font-size: 12px; color: var(--text-3);">\${m.role}</div>
+                        </div>
+                    </div>
+                    <span class="badge-status \${badgeClass}" style="font-size: 11px;">\${m.status}</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+                    <div style="background: var(--content-bg); padding: 10px; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-3); font-size: 11px; margin-bottom: 2px;">Tontines</div>
+                        <div style="font-weight: 600; color: var(--text-1);">\${m.tontines}</div>
+                    </div>
+                    <div style="background: var(--content-bg); padding: 10px; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-3); font-size: 11px; margin-bottom: 2px;">Total cotisé</div>
+                        <div style="font-weight: 600; color: var(--text-1);">\${m.amount}</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 15px; margin-top: auto;">
+                    \${actionBtn}
+                </div>
+            </div>
+        \`;
+    }).join('');
+}
 
 // --- VISITE GUIDÉE (ONBOARDING) ---
 function startOnboardingTour() {

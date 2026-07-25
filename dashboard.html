@@ -637,7 +637,13 @@
                 </div>
             </div>
             
-            <button class="btn-primary btn-block" id="btn-close-tontine-details-btn" style="margin-top: 25px; background: var(--content-bg, #F1F5F9); color: var(--text-1, #1E293B); border: 1px solid var(--border, #E2E8F0);">Fermer</button>
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button class="btn-primary btn-block" id="btn-export-tontine-pdf" onclick="if(typeof exportTontineToPDF === 'function') exportTontineToPDF()" style="flex: 2; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 
+                    Télécharger le Rapport (PDF)
+                </button>
+                <button class="btn-primary btn-block" id="btn-close-tontine-details-btn" style="flex: 1; margin-top: 0; background: var(--content-bg, #F1F5F9); color: var(--text-1, #1E293B); border: 1px solid var(--border, #E2E8F0);">Fermer</button>
+            </div>
         </div>
     </div>
 </div>
@@ -799,6 +805,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <!-- Configuration de l'environnement (Supabase URL & Clé) -->
 <script src="config.js"></script>
 <script src="supabase.js"></script>
