@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | Tontine Pro</title>
-    <!-- Tailwind CSS via CDN pour l'intégration sans build -->
+    <title>Éducation Financière | Blog Tontine Pro</title>
+    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,19 +33,12 @@
             }
         }
     </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .glass {
-                @apply bg-white/10 backdrop-blur-md border border-white/20;
-            }
-        }
-    </style>
     <!-- Polices -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <!-- Icônes Lucide/Feather équivalent -->
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="bg-[#F5F6FA] text-slate-800 font-sans antialiased overflow-x-hidden">
+<body class="bg-[#F5F6FA] text-slate-800 font-sans antialiased overflow-x-hidden flex flex-col min-h-screen">
 
     <!-- NAVBAR -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-navy/95 backdrop-blur-md shadow-lg py-3">
@@ -62,7 +55,7 @@
                 <a href="../index.html#fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a>
                 <a href="../index.html#tarifs" class="hover:text-white transition-colors">Tarifs</a>
                 <a href="../index.html#a-propos" class="hover:text-white transition-colors">À propos</a>
-                <a href="#" class="text-yellow transition-colors font-bold">Blog</a>
+                <a href="index.html" class="text-yellow transition-colors font-bold">Blog</a>
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
@@ -84,7 +77,7 @@
         <a href="../index.html#fonctionnalites" class="mobile-link">Fonctionnalités</a>
         <a href="../index.html#tarifs" class="mobile-link">Tarifs</a>
         <a href="../index.html#a-propos" class="mobile-link">À propos</a>
-        <a href="#" class="text-yellow mobile-link font-bold">Blog</a>
+        <a href="index.html" class="text-yellow mobile-link font-bold">Blog</a>
         <hr class="border-white/10" />
         <a href="../connexion/" class="mobile-link">Se connecter</a>
         <a href="../../index.html" class="bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
@@ -95,7 +88,7 @@
         <div class="absolute inset-0 z-0 opacity-10" style="background-image: url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;"></div>
         <div class="max-w-7xl mx-auto px-4 text-center relative z-10 text-white">
             <h1 class="text-4xl md:text-5xl font-heading font-extrabold mb-4">Le Blog <span class="text-yellow">Tontine Pro</span></h1>
-            <p class="text-white/80 text-lg max-w-2xl mx-auto">Éducation financière, conseils de gestion, histoire des tontines en Afrique et actualités de la plateforme.</p>
+            <p class="text-white/80 text-lg max-w-2xl mx-auto">Découvrez tous nos articles et actualités.</p>
         </div>
     </section>
 
@@ -103,8 +96,8 @@
     <div class="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
             <div class="flex space-x-8 py-4 min-w-max text-sm font-medium text-slate-500">
-                <a href="index.html" class="text-navy font-bold border-b-2 border-navy pb-1">Tous les articles</a>
-                <a href="education.html" class="hover:text-navy transition-colors">Éducation Financière</a>
+                <a href="index.html" class="hover:text-navy transition-colors">Tous les articles</a>
+                <a href="education.html" class="text-navy font-bold border-b-2 border-navy pb-1">Éducation Financière</a>
                 <a href="budget.html" class="hover:text-navy transition-colors">Gestion du budget</a>
                 <a href="histoire.html" class="hover:text-navy transition-colors">Histoire des tontines</a>
                 <a href="nouveautes.html" class="hover:text-navy transition-colors">Nouveautés Produit</a>
@@ -112,12 +105,24 @@
         </div>
     </div>
 
+    <!-- CONTEXTE DE LA RUBRIQUE -->
+    <section class="bg-yellow/10 border-b border-yellow/20 py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="w-16 h-16 bg-white text-yellow rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-yellow/20">
+                <i data-feather="trending-up" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-3xl font-heading font-bold text-navy mb-4">Éducation Financière</h2>
+            <p class="text-slate-600 text-lg leading-relaxed">
+                Apprenez à maîtriser les rouages de la finance personnelle et collective. Dans cette rubrique, nous partageons des stratégies d'épargne adaptées au contexte africain, des conseils pour investir judicieusement vos fonds de tontine et des guides pour développer votre intelligence financière au quotidien.
+            </p>
+        </div>
+    </section>
+
     <!-- BLOG POSTS GRID -->
-    <section class="py-16">
+    <section class="py-16 flex-1">
         <div class="max-w-7xl mx-auto px-4">
-            <div id="articles-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Article 1 Placeholder -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Article -->
                 <a href="education.html" class="block">
                     <article class="bg-white rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 group cursor-pointer hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
                         <div class="relative h-56 overflow-hidden">
@@ -137,55 +142,6 @@
                         </div>
                     </article>
                 </a>
-
-                <!-- Article 2 Placeholder -->
-                <a href="histoire.html" class="block">
-                    <article class="bg-white rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 group cursor-pointer hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
-                        <div class="relative h-56 overflow-hidden">
-                            <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-navy text-xs font-bold px-3 py-1.5 rounded-full">Histoire</div>
-                            <img src="https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?auto=format&fit=crop&w=600&q=80" alt="Histoire" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-xs text-slate-400 mb-3 flex items-center gap-2">
-                                <i data-feather="calendar" class="w-3 h-3"></i> 15 Septembre 2026
-                            </div>
-                            <h3 class="text-xl font-heading font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">L'histoire fascinante des tontines en Afrique</h3>
-                            <p class="text-slate-600 text-sm mb-6 flex-1 line-clamp-3">Des origines traditionnelles jusqu'à la digitalisation moderne, plongez dans l'évolution de ce système d'entraide séculaire...</p>
-                            <div class="flex items-center gap-3 border-t border-slate-100 pt-4 mt-auto">
-                                <img src="https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?auto=format&fit=crop&w=100&h=100&q=80" alt="Auteur" class="w-8 h-8 rounded-full object-cover">
-                                <div class="text-sm font-bold text-slate-800">Fatou Sow</div>
-                            </div>
-                        </div>
-                    </article>
-                </a>
-
-                <!-- Article 3 Placeholder -->
-                <a href="budget.html" class="block">
-                    <article class="bg-white rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-slate-100 group cursor-pointer hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
-                        <div class="relative h-56 overflow-hidden">
-                            <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-navy text-xs font-bold px-3 py-1.5 rounded-full">Gestion du Budget</div>
-                            <img src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&w=600&q=80" alt="Budget" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-xs text-slate-400 mb-3 flex items-center gap-2">
-                                <i data-feather="calendar" class="w-3 h-3"></i> 02 Août 2026
-                            </div>
-                            <h3 class="text-xl font-heading font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">5 astuces pour ne jamais rater son tour de cotisation</h3>
-                            <p class="text-slate-600 text-sm mb-6 flex-1 line-clamp-3">Gérer son budget mensuel n'est pas toujours facile. Voici nos conseils concrets pour préparer sereinement vos versements...</p>
-                            <div class="flex items-center gap-3 border-t border-slate-100 pt-4 mt-auto">
-                                <img src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&w=100&h=100&q=80" alt="Auteur" class="w-8 h-8 rounded-full object-cover">
-                                <div class="text-sm font-bold text-slate-800">Équipe Tontine Pro</div>
-                            </div>
-                        </div>
-                    </article>
-                </a>
-
-            </div>
-            
-            <div class="mt-16 text-center">
-                <button id="load-more-btn" class="bg-white border border-slate-200 hover:border-slate-300 text-navy font-bold py-3 px-8 rounded-full transition-colors shadow-sm inline-flex items-center gap-2">
-                    Charger plus d'articles <i data-feather="refresh-cw" class="w-4 h-4"></i>
-                </button>
             </div>
         </div>
     </section>
@@ -306,11 +262,8 @@
 
     <script>
         feather.replace();
-
-        // Mobile Menu Toggle
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
-
         btn.addEventListener('click', () => {
             menu.classList.toggle('hidden');
             menu.classList.toggle('flex');
@@ -318,23 +271,6 @@
             btn.innerHTML = `<i data-feather="${icon}"></i>`;
             feather.replace();
         });
-        // Load More Articles
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        const articlesContainer = document.getElementById('articles-container');
-
-        if(loadMoreBtn && articlesContainer) {
-            loadMoreBtn.addEventListener('click', () => {
-                const icon = loadMoreBtn.querySelector('svg');
-                if (icon) icon.classList.add('animate-spin');
-                
-                setTimeout(() => {
-                    if (icon) icon.classList.remove('animate-spin');
-                    loadMoreBtn.innerHTML = `Aucun autre article disponible`;
-                    loadMoreBtn.disabled = true;
-                    loadMoreBtn.classList.add('opacity-70', 'cursor-not-allowed');
-                }, 800);
-            });
-        }
     </script>
 </body>
 </html>
