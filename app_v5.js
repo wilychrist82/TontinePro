@@ -1252,6 +1252,10 @@ function openEditTontineModal(id) {
     const maxMembers = parseInt(tontine.members.split('/')[1]) || 10;
     document.getElementById('edit-tontine-max-members-input').value = maxMembers;
 
+    if (!window.modalHistoryPushed) {
+        history.pushState({ modalOpen: true }, '');
+        window.modalHistoryPushed = true;
+    }
     document.getElementById('edit-tontine-modal').classList.remove('hidden');
 }
 
@@ -1276,6 +1280,10 @@ function openTontineDetailsModal(id) {
     
     // Petit effet d'animation pour la barre
     fill.style.width = '0%';
+    if (!window.modalHistoryPushed) {
+        history.pushState({ modalOpen: true }, '');
+        window.modalHistoryPushed = true;
+    }
     document.getElementById('tontine-details-modal').classList.remove('hidden');
     
     setTimeout(() => {
@@ -1452,25 +1460,33 @@ window.resetTontineDraw = resetTontineDraw;
 window.shareDrawCertWhatsApp = shareDrawCertWhatsApp;
 
 // ==========================================
-// OPTION B : GESTION AUTOMATIQUE DES PÉNALITÉS DE RETARD
+// OPTION B : GESTION AUTOMATIQUE DES PÉNALITÉS DE RETARD (TAUX 1% PAR 24H)
 // ==========================================
 function renderTontinePenalties(tontine) {
     const list = document.getElementById('penalty-members-list');
     const totalEl = document.getElementById('penalty-total-amount');
     if (!list) return;
 
+    const baseAmount = tontine.amount || 50000;
+    // Règle de calcul : 1% de la cotisation par 24h (1 jour) de retard
+    const dailyRate = Math.round(baseAmount * 0.01);
+
     // Initialiser le solde des pénalités si non existant
-    if (tontine.penaltyTotal === undefined) tontine.penaltyTotal = 4000;
+    if (tontine.penaltyTotal === undefined) tontine.penaltyTotal = dailyRate * 8;
     if (totalEl) totalEl.textContent = new Intl.NumberFormat('fr-FR').format(tontine.penaltyTotal) + ' FCFA';
 
     // Membres en retard simulés ou réels (ex: Awa N., Fatou D.)
     let lateMembers = [
-        { id: 'mem-2', name: 'Awa N.', days: 4, penalty: 2000, status: 'En retard', reason: 'Cotisation Tour #2' },
-        { id: 'mem-4', name: 'Fatou D.', days: 5, penalty: 2000, status: 'En retard', reason: 'Cotisation Tour #2' }
+        { id: 'mem-2', name: 'Awa N.', days: 4, penalty: 4 * dailyRate, status: 'En retard', reason: 'Cotisation Tour #2' },
+        { id: 'mem-4', name: 'Fatou D.', days: 5, penalty: 5 * dailyRate, status: 'En retard', reason: 'Cotisation Tour #2' }
     ];
 
     if (tontine.lateMembersList) {
         lateMembers = tontine.lateMembersList;
+        // Mettre à jour dynamiquement selon le taux 1% par 24h de retard
+        lateMembers.forEach(m => {
+            m.penalty = (m.days || 1) * dailyRate;
+        });
     } else {
         tontine.lateMembersList = lateMembers;
     }
@@ -1486,7 +1502,7 @@ function renderTontinePenalties(tontine) {
                 <div style="width:32px; height:32px; border-radius:50%; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">⚠</div>
                 <div>
                     <div style="font-weight:600; font-size:13px; color:var(--text-1);">${m.name} <span style="font-size:11px; color:#dc2626; font-weight:normal;">(${m.reason})</span></div>
-                    <div style="font-size:11px; color:#b91c1c;">Retard de <strong>${m.days} jours</strong> • Pénalité : <strong>+${new Intl.NumberFormat('fr-FR').format(m.penalty)} FCFA</strong></div>
+                    <div style="font-size:11px; color:#b91c1c;">Retard de <strong>${m.days} jours (${m.days * 24}h)</strong> • Taux 1% (${new Intl.NumberFormat('fr-FR').format(dailyRate)} F/24h) : <strong>+${new Intl.NumberFormat('fr-FR').format(m.penalty)} FCFA</strong></div>
                 </div>
             </div>
             <button onclick="resolveMemberPenalty('${m.id}', '${escapeHTML(m.name)}', ${m.penalty})" style="background:#16a34a; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
@@ -1504,9 +1520,9 @@ function applyTontinePenalties() {
     const tontine = window.currentOpenedTontine || state.activeTontines[0];
     if (!tontine) return;
 
-    showToast("⚡ Calcul des pénalités automatiques en cours...", "info");
+    showToast("⚡ Calcul automatique des pénalités (Taux 1% / 24h) en cours...", "info");
     setTimeout(() => {
-        showToast("✔ 2 pénalités actives vérifiées et synchronisées avec la caisse de réserve !", "success");
+        showToast("✔ Pénalités recalculées et synchronisées avec la caisse de réserve !", "success");
         renderTontinePenalties(tontine);
     }, 800);
 }
@@ -1525,7 +1541,7 @@ function resolveMemberPenalty(memberId, memberName, penaltyAmount) {
     // Ajouter la pénalité encaissée à la caisse totale
     tontine.penaltyTotal = (tontine.penaltyTotal || 0) + penaltyAmount;
     
-    showToast("💰 Pénalité de " + new Intl.NumberFormat('fr-FR').format(penaltyAmount) + " FCFA réglée par " + memberName + " et reversée dans la Caisse de Réserve !", "success");
+    showToast("💰 Pénalité de " + new Intl.NumberFormat('fr-FR').format(penaltyAmount) + " FCFA (1% / 24h) réglée par " + memberName + " et reversée dans la Caisse de Réserve !", "success");
     renderTontinePenalties(tontine);
     if (typeof renderMembers === 'function') renderMembers();
 }
@@ -1539,9 +1555,24 @@ function checkMemberPenalty(memberId) {
     const memberName = sel && sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : '';
     
     if (memberName.includes('Awa') || memberName.includes('Fatou') || memberName.includes('retard') || memberId === 'mem-2' || memberId === 'mem-4') {
+        const tontine = window.currentOpenedTontine || state.activeTontines[0];
+        const baseAmount = tontine ? tontine.amount : 50000;
+        const dailyRate = Math.round(baseAmount * 0.01);
+        const daysLate = memberName.includes('Fatou') ? 5 : 4;
+        const calcPenalty = daysLate * dailyRate;
+        
+        window.currentDynamicPenalty = calcPenalty;
+        
+        const badgeEl = document.getElementById('pay-penalty-badge-rate');
+        if (badgeEl) badgeEl.textContent = `+${new Intl.NumberFormat('fr-FR').format(calcPenalty)} FCFA (${daysLate}j x 1%)`;
+        
+        const descEl = document.getElementById('pay-penalty-desc-text');
+        if (descEl) descEl.innerHTML = `Une pénalité de <strong>1% par 24h (${daysLate} jours)</strong> a été calculée. <a href="#" onclick="applyPenaltyToAmount(); return false;" style="color:#ef4444; font-weight:700; text-decoration:underline;" id="link-apply-penalty-amount">Ajouter les ${new Intl.NumberFormat('fr-FR').format(calcPenalty)} FCFA au montant</a>`;
+        
         banner.style.display = 'block';
     } else {
         banner.style.display = 'none';
+        window.currentDynamicPenalty = 0;
     }
 }
 
@@ -1549,9 +1580,20 @@ function applyPenaltyToAmount() {
     const amtInp = document.getElementById('payment-amount-input');
     if (!amtInp) return;
     const currentVal = parseFloat(amtInp.value) || 0;
-    amtInp.value = currentVal + 2000;
-    showToast("✔ +2 000 FCFA de pénalité automatique ajoutés au montant à encaisser !", "success");
+    const penaltyToAdd = window.currentDynamicPenalty || 2000;
+    amtInp.value = currentVal + penaltyToAdd;
+    showToast(`✔ +${new Intl.NumberFormat('fr-FR').format(penaltyToAdd)} FCFA (Taux 1% par 24h de retard) ajoutés au montant à encaisser !`, "success");
 }
+
+// INTERCEPTION TOUCHE RETOUR (BACK BUTTON SUR MOBILE) POUR FERMER LES MODALES
+window.modalHistoryPushed = false;
+window.addEventListener('popstate', (e) => {
+    const openModals = document.querySelectorAll('.modal-overlay:not(.hidden)');
+    if (openModals.length > 0) {
+        openModals.forEach(m => m.classList.add('hidden'));
+        window.modalHistoryPushed = false;
+    }
+});
 
 window.renderTontinePenalties = renderTontinePenalties;
 window.applyTontinePenalties = applyTontinePenalties;

@@ -794,8 +794,8 @@
                                 <span>Caisse de Réserve & Pénalités</span>
                                 <span style="font-size: 11px; background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 12px; font-weight: 700; border: 1px solid #fde68a;">Auto-Actif ⚡</span>
                             </div>
-                            <div style="font-size: 12.5px; color: var(--text-2); margin-top: 3px; line-height: 1.4;">
-                                Règle : <strong>+2 000 FCFA</strong> de pénalité automatique après 3 jours de retard.
+                            <div style="font-size: 12.5px; color: var(--text-2); margin-top: 3px; line-height: 1.4;" id="tontine-penalty-rule-text">
+                                Règle : <strong>Taux de 1% de la cotisation</strong> appliqué automatiquement par tranche de 24h (1 jour) de retard.
                             </div>
                         </div>
                     </div>
@@ -864,12 +864,14 @@
                 </div>
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button class="btn-primary btn-block" id="btn-export-tontine-pdf" onclick="if(typeof exportTontineToPDF === 'function') exportTontineToPDF()" style="flex: 2; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); position: sticky; bottom: -20px; background: var(--card, #fff); padding-bottom: 20px; z-index: 20; margin-left: -20px; margin-right: -20px; padding-left: 20px; padding-right: 20px;">
+                <button class="btn-primary btn-block" id="btn-close-tontine-details-btn" onclick="document.getElementById('tontine-details-modal').classList.add('hidden'); if(window.modalHistoryPushed){history.back(); window.modalHistoryPushed=false;}" style="margin-top: 0; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; font-weight: 800; font-size: 14.5px; padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                    ⬅ Retour / Fermer la fenêtre
+                </button>
+                <button class="btn-primary btn-block" id="btn-export-tontine-pdf" onclick="if(typeof exportTontineToPDF === 'function') exportTontineToPDF()" style="margin-top: 0; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 13px; padding: 10px; background: var(--primary); color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 
                     Télécharger le Rapport (PDF)
                 </button>
-                <button class="btn-primary btn-block" id="btn-close-tontine-details-btn" style="flex: 1; margin-top: 0; background: var(--content-bg, #F1F5F9); color: var(--text-1, #1E293B); border: 1px solid var(--border, #E2E8F0);">Fermer</button>
             </div>
         </div>
     </div>
@@ -963,9 +965,9 @@
                     <div id="pay-member-penalty-banner" style="display:none; margin-top:8px; background:rgba(239,68,68,0.1); border:1px dashed #ef4444; border-radius:8px; padding:10px 12px; font-size:12px; color:#dc2626;">
                         <div style="font-weight:700; display:flex; align-items:center; justify-content:space-between;">
                             <span>⚠ Retard de cotisation détecté !</span>
-                            <span style="background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px; font-size:11px;">+2 000 FCFA</span>
+                            <span style="background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px; font-size:11px;" id="pay-penalty-badge-rate">Taux 1% / 24h</span>
                         </div>
-                        <div style="margin-top:4px; color:var(--text-2);">Une pénalité automatique a été appliquée pour ce membre. <a href="#" onclick="applyPenaltyToAmount(); return false;" style="color:#ef4444; font-weight:700; text-decoration:underline;">Ajouter les 2 000 FCFA au montant</a></div>
+                        <div style="margin-top:4px; color:var(--text-2);" id="pay-penalty-desc-text">Une pénalité automatique a été calculée. <a href="#" onclick="applyPenaltyToAmount(); return false;" style="color:#ef4444; font-weight:700; text-decoration:underline;" id="link-apply-penalty-amount">Ajouter la pénalité au montant</a></div>
                     </div>
                 </div>
                 <div class="form-group">
