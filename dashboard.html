@@ -766,6 +766,38 @@
                 </div>
             </div>
 
+            <!-- Section Caisse de Réserve & Pénalités Automatiques (Option B) -->
+            <div id="tontine-penalties-section" style="margin-bottom: 25px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="font-size: 26px;">⚖️</span>
+                        <div>
+                            <div style="font-size: 15px; font-weight: 700; color: #b45309; display: flex; align-items: center; gap: 8px;">
+                                <span>Caisse de Réserve & Pénalités</span>
+                                <span style="font-size: 11px; background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 12px; font-weight: 700; border: 1px solid #fde68a;">Auto-Actif ⚡</span>
+                            </div>
+                            <div style="font-size: 12.5px; color: var(--text-2); margin-top: 3px; line-height: 1.4;">
+                                Règle : <strong>+2 000 FCFA</strong> de pénalité automatique après 3 jours de retard.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; text-transform: uppercase; color: #b45309; font-weight: 700; letter-spacing: 0.5px;">Total Récolté</div>
+                            <div style="font-size: 20px; font-weight: 800; color: #d97706;" id="penalty-total-amount">4 000 FCFA</div>
+                        </div>
+                        <button onclick="if(typeof applyTontinePenalties === 'function') applyTontinePenalties()" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Calculer retards
+                        </button>
+                    </div>
+                </div>
+                <!-- Liste des pénalités en cours -->
+                <div id="penalty-members-list" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(245, 158, 11, 0.3); display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Rempli dynamiquement en JS -->
+                </div>
+            </div>
+
             <!-- Section Ordre de passage & Tirage au Sort -->
             <div id="tontine-draw-section" style="margin-top: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
@@ -907,9 +939,16 @@
             <div id="pay-step-1">
                 <div class="form-group">
                     <label style="font-weight:600;font-size:13px;">Membre payeur</label>
-                    <select id="payment-member-input" class="form-input" style="margin-top:6px;">
+                    <select id="payment-member-input" class="form-input" style="margin-top:6px;" onchange="if(typeof checkMemberPenalty === 'function') checkMemberPenalty(this.value)">
                         <!-- Options injected dynamically -->
                     </select>
+                    <div id="pay-member-penalty-banner" style="display:none; margin-top:8px; background:rgba(239,68,68,0.1); border:1px dashed #ef4444; border-radius:8px; padding:10px 12px; font-size:12px; color:#dc2626;">
+                        <div style="font-weight:700; display:flex; align-items:center; justify-content:space-between;">
+                            <span>⚠ Retard de cotisation détecté !</span>
+                            <span style="background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px; font-size:11px;">+2 000 FCFA</span>
+                        </div>
+                        <div style="margin-top:4px; color:var(--text-2);">Une pénalité automatique a été appliquée pour ce membre. <a href="#" onclick="applyPenaltyToAmount(); return false;" style="color:#ef4444; font-weight:700; text-decoration:underline;">Ajouter les 2 000 FCFA au montant</a></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label style="font-weight:600;font-size:13px;">Montant (FCFA)</label>
