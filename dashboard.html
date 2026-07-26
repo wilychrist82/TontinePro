@@ -105,7 +105,7 @@
                 <span class="sp-crown">&#x1F451;</span>
                 <div><div class="sp-title">Passez a Premium</div><div class="sp-sub">Plus de fonctionnalites, plus de securite</div></div>
             </div>
-            <button class="btn-premium" id="btn-discover-premium" onclick="alert('Fonctionnalités Premium à venir très bientôt !')">Decouvrir</button>
+            <button class="btn-premium" id="btn-discover-premium" onclick="openPremiumDiscoverModal(); return false;">Decouvrir</button>
         </div>
     </div>
 </aside>
@@ -262,6 +262,9 @@
         <h2 class="page-title" style="margin-bottom: 0;">Gestion des membres</h2>
         <div style="display:flex; gap:10px;">
             <input type="text" id="members-search" class="search-input" placeholder="Rechercher un membre..." style="width: 250px;">
+            <button class="btn-sec" style="display:flex; align-items:center; gap:5px; padding:8px 12px; font-size:13px; font-weight:600; border-radius:8px; background:var(--surface, #f1f5f9); border:1px solid var(--border); color:var(--text-1);" onclick="openMemberStatementModal(); return false;" title="Générer un relevé bancaire / relevé de cotisations en PDF pour un membre">
+                📄 Relevé PDF
+            </button>
             <button class="btn-primary" id="btn-quick-add-member" style="display:flex; align-items:center; gap:5px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Ajouter
@@ -330,8 +333,8 @@
             <div class="settings-form">
                 <div class="form-group"><label>Nom complet</label><input type="text" id="settings-name-input" class="form-input" value="Utilisateur"></div>
                 <div class="form-group"><label>Email</label><input type="email" id="settings-email-input" class="form-input" value="utilisateur@email.com"></div>
-                <div class="form-group"><label>Téléphone</label><input type="tel" class="form-input" placeholder="+228 90 00 00 00"></div>
-                <button class="btn-primary" style="margin-top:auto" onclick="alert('Profil mis à jour avec succès !');">Mettre à jour le profil</button>
+                <div class="form-group"><label>Téléphone</label><input type="tel" id="settings-phone-input" class="form-input" placeholder="+228 90 00 00 00"></div>
+                <button class="btn-primary" style="margin-top:auto" id="btn-update-profile" onclick="updateUserProfile(this); return false;">Mettre à jour le profil</button>
             </div>
         </div>
 
@@ -431,7 +434,7 @@
                             <div style="font-weight:700; color:var(--primary); font-size:15px;">Plan Gratuit</div>
                             <div style="font-size:12px; color:var(--text-3); margin-top:2px;">1 Tontine active max</div>
                         </div>
-                        <button class="btn-primary" style="padding:6px 12px; font-size:12px;" onclick="alert('Fonctionnalités Premium à venir très bientôt !')">Passer à Premium</button>
+                        <button class="btn-primary" style="padding:6px 12px; font-size:12px;" onclick="openPremiumDiscoverModal(); return false;">Passer à Premium</button>
                     </div>
                 </div>
             </div>
@@ -440,7 +443,7 @@
                 <h3 class="card-title" style="color:var(--danger);">Zone de danger</h3>
                 <p style="font-size:12.5px; color:var(--text-3); margin-top:-10px; margin-bottom:15px; line-height:1.5;">Ces actions sont irréversibles. Assurez-vous d'avoir exporté vos données avant de supprimer votre compte.</p>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-primary" style="flex:1; background:var(--content-bg); color:var(--text-1); border:1px solid var(--border);" onclick="window.print()">Exporter PDF / Excel</button>
+                    <button class="btn-primary" style="flex:1; background:linear-gradient(135deg, #0b1f4d, #5c60f5); color:white; border:none; display:flex; align-items:center; justify-content:center; gap:6px; font-weight:600; box-shadow:0 2px 6px rgba(92,96,245,0.2);" onclick="openMemberStatementModal(); return false;">📄 Exporter Relevé Membre (PDF)</button>
                     <button class="btn-primary danger-zone-btn" style="flex:1;" onclick="if(confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.')) { alert('Votre compte a bien été supprimé (Simulation).'); if(typeof logoutUser === 'function') logoutUser(); }">Supprimer le compte</button>
                 </div>
             </div>
@@ -497,7 +500,7 @@
     </div>
 </section>
 <section id="tab-security" class="tab-pane">
-    <div class="settings-wrap"><div class="card settings-card"><h3 class="card-title">Changer le mot de passe</h3><div class="form-group"><label>Mot de passe actuel</label><input type="password" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div><div class="form-group" style="margin-top:12px"><label>Nouveau mot de passe</label><input type="password" id="new-password-input" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div><div class="strength-bars" style="margin-top:8px"><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div></div><span id="strength-label" class="strength-label">Entrez un mot de passe</span><button class="btn-primary" style="margin-top:16px">Mettre a jour</button></div></div>
+    <div class="settings-wrap"><div class="card settings-card"><h3 class="card-title">Changer le mot de passe</h3><div class="form-group"><label>Mot de passe actuel</label><input type="password" id="current-password-input" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div><div class="form-group" style="margin-top:12px"><label>Nouveau mot de passe</label><input type="password" id="new-password-input" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div><div class="strength-bars" style="margin-top:8px"><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div></div><span id="strength-label" class="strength-label">Entrez un mot de passe</span><button class="btn-primary" style="margin-top:16px" id="btn-update-password" onclick="updateUserPassword(this); return false;">Mettre a jour</button></div></div>
 </section>
 <section id="tab-support" class="tab-pane">
     <h2 class="page-title">Centre d&apos;aide</h2>
@@ -1195,6 +1198,168 @@
             
             <div class="report-chart-container" style="position: relative; height: 300px; width: 100%;">
                 <canvas id="payments-evolution-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Relevé Bancaire Tontine Pro (Audit individuel de cotisation) -->
+<div class="modal-overlay hidden" id="member-statement-modal">
+    <div class="modal-box" style="max-width: 650px;">
+        <div class="modal-hd" style="background: linear-gradient(135deg, #0b1f4d, #1e293b); color: white; border-bottom: 2px solid #5c60f5;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">🏛️</span>
+                <div>
+                    <h3 style="color: #ffffff; font-size: 18px; margin: 0; font-weight: 800;">Relevé Bancaire & Cotisations</h3>
+                    <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">Génération d'audit de parcours et relevé officiel en PDF</div>
+                </div>
+            </div>
+            <button onclick="document.getElementById('member-statement-modal').classList.add('hidden'); window.modalHistoryPushed=false;" class="modal-close" style="color: white; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1);">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; max-height: 75vh; overflow-y: auto;">
+            <p style="font-size: 13px; color: var(--text-2); margin-top: 0; margin-bottom: 15px;">
+                Sélectionnez le membre et la période pour générer son relevé financier de cotisations complet, certifié avec sceau officiel (type relevé bancaire).
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+                <div class="form-group">
+                    <label style="font-weight: 700; font-size: 13px;">Titulaire / Membre</label>
+                    <select id="statement-member-select" class="form-input" onchange="previewMemberStatement()" style="font-weight: 600;">
+                        <option value="Jean-Paul">Jean-Paul</option>
+                        <option value="Kossi A.">Kossi A.</option>
+                        <option value="Awa N.">Awa N.</option>
+                        <option value="Fatou D.">Fatou D.</option>
+                        <option value="David M.">David M.</option>
+                        <option value="Sophie L.">Sophie L.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="font-weight: 700; font-size: 13px;">Tontine concernée</label>
+                    <select id="statement-tontine-select" class="form-input" onchange="previewMemberStatement()">
+                        <option value="all">Toutes ses tontines (Global)</option>
+                        <option value="Diamant">Tontine Diamant 2026</option>
+                        <option value="Or">Tontine Or (Hebdo)</option>
+                        <option value="Express">Tontine Express</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="background: var(--surface, #f8fafc); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 15px;">
+                <label style="font-weight: 700; font-size: 13px; color: var(--text-1); display: block; margin-bottom: 8px;">📅 Période du relevé (De tel moment à tel moment)</label>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 12px; color: var(--text-3);">Du :</span>
+                        <input type="date" id="statement-start-date" class="form-input" value="2026-01-01" onchange="previewMemberStatement()" style="padding: 6px 8px; font-size: 12px; height: 32px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 12px; color: var(--text-3);">Au :</span>
+                        <input type="date" id="statement-end-date" class="form-input" value="2026-12-31" onchange="previewMemberStatement()" style="padding: 6px 8px; font-size: 12px; height: 32px;">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;">
+                    <button type="button" class="btn-sec-sm" onclick="setStatementPeriod('3m')" style="font-size: 11px; padding: 4px 8px;">3 derniers mois</button>
+                    <button type="button" class="btn-sec-sm" onclick="setStatementPeriod('6m')" style="font-size: 11px; padding: 4px 8px;">6 derniers mois</button>
+                    <button type="button" class="btn-sec-sm" onclick="setStatementPeriod('year')" style="font-size: 11px; padding: 4px 8px;">Année 2026</button>
+                    <button type="button" class="btn-sec-sm" onclick="setStatementPeriod('all')" style="font-size: 11px; padding: 4px 8px; background: rgba(92, 96, 245, 0.1); color: var(--primary); font-weight: 700;">Tout le parcours ♾️</button>
+                </div>
+            </div>
+
+            <!-- Aperçu de la synthèse bancaire -->
+            <div style="background: linear-gradient(135deg, rgba(92, 96, 245, 0.05), rgba(16, 185, 129, 0.05)); border: 1px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px;">
+                    <span style="font-size: 13px; font-weight: 800; color: var(--text-1);">📋 APERÇU FINANCIER DU MEMBRE</span>
+                    <span style="font-size: 11px; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 12px; font-weight: 700;" id="statement-preview-badge">Certifié Tontine Pro</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                    <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="font-size: 11px; color: var(--text-3);">Total Cotisé</div>
+                        <div style="font-size: 15px; font-weight: 800; color: #10b981;" id="statement-preview-total">150 000 F</div>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="font-size: 11px; color: var(--text-3);">Versements</div>
+                        <div style="font-size: 15px; font-weight: 800; color: var(--text-1);" id="statement-preview-count">6 validés</div>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="font-size: 11px; color: var(--text-3);">Régularité</div>
+                        <div style="font-size: 15px; font-weight: 800; color: #6366f1;" id="statement-preview-trust">⭐ 100%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 12px; font-size: 12px; color: var(--text-2); background: rgba(255,255,255,0.7); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #5c60f5;">
+                    💡 Le document PDF contiendra l'historique chronologique complet, les numéros de référence de paiement, le solde cumulé et le sceau d'authenticité.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; border-top: 1px solid var(--border); padding-top: 15px;">
+                <button type="button" class="btn-primary" onclick="exportMemberStatementToPDF();" style="flex: 1; background: linear-gradient(135deg, #0b1f4d, #5c60f5); color: white; padding: 14px; font-weight: 800; font-size: 14px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(92, 96, 245, 0.3); cursor: pointer; transition: all 0.2s;">
+                    📥 Générer & Télécharger le Relevé (PDF)
+                </button>
+                <button type="button" class="btn-sec" onclick="document.getElementById('member-statement-modal').classList.add('hidden'); window.modalHistoryPushed=false;" style="padding: 12px; font-weight: 600; border-radius: 10px;">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal VIP Premium Tontine Pro -->
+<div class="modal-overlay hidden" id="premium-discover-modal">
+    <div class="modal-box" style="max-width: 580px;">
+        <div class="modal-hd" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; border-bottom: 2px solid #f59e0b;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">👑</span>
+                <div>
+                    <h3 style="color: #f59e0b; font-size: 18px; margin: 0; font-weight: 800;">Plan VIP Premium & Enterprise</h3>
+                    <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">Débloquez tout le potentiel de Tontine Pro</div>
+                </div>
+            </div>
+            <button onclick="document.getElementById('premium-discover-modal').classList.add('hidden'); window.modalHistoryPushed=false;" class="modal-close" style="color: white; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1);">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+            <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; padding: 12px 15px; border-radius: 12px; margin-bottom: 15px; text-align: center;">
+                <span style="font-size: 13.5px; color: #b45309; font-weight: 700;">🚀 Conçu spécialement pour les gestionnaires exigeants, trésoriers et cercles de confiance à forte volumétrie.</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface, #f8fafc); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">📲</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px; color: var(--text-1);">Relances SMS Avancées & Illimitées</div>
+                        <div style="font-size: 12px; color: var(--text-2); margin-top: 2px;">Envoi automatique de SMS de rappel aux membres en retard par API sans intervention manuelle.</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface, #f8fafc); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">🏢</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px; color: var(--text-1);">Multi-groupes & Tontines Illimitées</div>
+                        <div style="font-size: 12px; color: var(--text-2); margin-top: 2px;">Gérez jusqu'à 50 cercles de tontines en parallèle (contre 1 dans la version gratuite).</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface, #f8fafc); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">📊</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px; color: var(--text-1);">Audit & Exports Certifiés (Excel / PDF)</div>
+                        <div style="font-size: 12px; color: var(--text-2); margin-top: 2px;">Génération de bilans financiers complets, historique d'audit et reçus de versement officiels certifiés.</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface, #f8fafc); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(139, 92, 246, 0.15); color: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">🤖</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px; color: var(--text-1);">Assistant IA Anti-Retard & Pénalités</div>
+                        <div style="font-size: 12px; color: var(--text-2); margin-top: 2px;">Calcul dynamique automatique des pénalités (1%/24h) et scoring de fiabilité des participants.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-primary" onclick="activatePremiumPlan();" style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); cursor: pointer; transition: all 0.2s;">
+                    ✨ Activer mon Plan Premium (Essai Gratuit 30 Jours)
+                </button>
+                <button type="button" class="btn-sec" onclick="document.getElementById('premium-discover-modal').classList.add('hidden'); window.modalHistoryPushed=false;" style="padding: 10px; font-weight: 600; width: 100%; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    Rester sur le Plan Gratuit pour le moment
+                </button>
             </div>
         </div>
     </div>
