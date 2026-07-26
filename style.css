@@ -1002,7 +1002,7 @@ body.readonly-mode::before { content:"Mode Démo - Lecture seule"; position:fixe
    ============================================= */
 .pay-method-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
     gap: 12px;
     margin-bottom: 16px;
 }
@@ -1051,8 +1051,11 @@ body.readonly-mode::before { content:"Mode Démo - Lecture seule"; position:fixe
 }
 .pay-badge-wave { background: #e0f2fe; color: #0284c7; }
 .pay-badge-orange { background: #ffedd5; color: #ea580c; }
+.pay-badge-moov { background: #fef08a; color: #854d0e; }
+.pay-badge-yas { background: #dcfce7; color: #15803d; }
+.pay-badge-mtn { background: #fef9c3; color: #a16207; }
 .pay-badge-card { background: #f3e8ff; color: #9333ea; }
-.pay-badge-cash { background: #dcfce7; color: #16a34a; }
+.pay-badge-cash { background: #e2e8f0; color: #475569; }
 .pay-processing-box {
     background: var(--content-bg);
     border: 1px dashed var(--primary);
@@ -1071,3 +1074,64 @@ body.readonly-mode::before { content:"Mode Démo - Lecture seule"; position:fixe
     margin: 0 auto 12px auto;
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Simulateur USSD / Push Mobile Money */
+.ussd-simulator-card {
+    background: var(--content-bg);
+    border: 1.5px solid var(--primary);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: left;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15);
+    animation: fadeIn 0.25s ease-out;
+}
+.ussd-terminal-screen {
+    background: #0f172a;
+    color: #10b981;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    line-height: 1.6;
+    border: 1px solid #334155;
+    position: relative;
+    overflow: hidden;
+}
+.ussd-terminal-screen::before {
+    content: "• LIVE USSD PUSH";
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 9px;
+    color: #10b981;
+    font-weight: 800;
+    letter-spacing: 1px;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+.ussd-pin-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.ussd-pin-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 6px;
+    font-weight: 800;
+    color: var(--text-1);
+    outline: none;
+}
+.ussd-pin-input:focus {
+    border-color: var(--primary);
+}

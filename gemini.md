@@ -46,3 +46,26 @@ Tontine Pro est une application web (SaaS) de gestion de tontines (cercles d'ép
 4. **Supabase** : Pour toute nouvelle entité en base de données, assure-toi d'utiliser les méthodes asynchrones dans `data-service.js` (ex: `supabase.from('table').select()`).
 5. **Recherche Globale** : Le système de recherche filtre actuellement l'état local JavaScript (`state.activeTontines`, `extendedMembers`). Si le projet scale avec des milliers d'entrées, il faudra migrer cette recherche vers une requête Supabase.
 6. **Règle d'interaction** : Avant de donner une réponse à l'utilisateur, n'oublie jamais de l'appeler "wilfried".
+
+## 6. Historique des Axes d'Amélioration
+
+- **Axe 1 (Design & Animations)** : Terminés (Hover effects, boutons dynamiques).
+- **Axe 2 (Expérience Utilisateur)** : Terminés (Skeletons de chargement, Empty States illustrés).
+- **Axe 3 (Exports & Relances)** : Terminés (Export PDF des tontines, système de relance WhatsApp dans l'onglet Membres).
+- **Axe 4 (Terminé — Session Claude)** :
+  1. **Moyens de paiement** : Modal multi-étapes premium (3 étapes : Détails → Confirmation → Traitement/Reçu). Méthodes : Wave, Orange Money, Carte, Cash. Spinner d'attente + reçu avec numéro de référence.
+  2. **Onglet Paiements (`tab-payments`)** : Historique complet avec stats (total validé, montant, en attente), filtres par statut/méthode, tableau avec avatars et badges de couleur.
+  3. **Espace Administrateur (`tab-admin`)** : Visible uniquement aux admins/gestionnaires. Stats globales, lien d'invitation copiable, gestion des rôles des membres (Promouvoir/Rétrograder).
+  4. **Système de permissions** : `checkPermission(action)` vérifie le rôle de l'utilisateur. `applyRoleRestrictions()` masque les boutons sensibles pour les simples membres au chargement.
+
+- **Nouvelles fonctions clés (app_v5.js)** :
+  - `selectPayMethod(card)` — Sélection de méthode de paiement
+  - `payGoStep1/2/3()` — Navigation multi-étapes du modal
+  - `payResetSteps()` — Réinitialisation du modal
+  - `renderPaymentsTab()` / `renderPaymentsTable(transactions)` — Onglet Paiements
+  - `filterPayments(btn, filter)` — Filtres du tableau de paiements
+  - `renderAdminTab()` / `renderAdminMembers(query)` — Onglet Admin
+  - `toggleMemberRole(id, name, role)` — Changer le rôle d'un membre
+  - `copyInviteLink()` — Copier le lien d'invitation
+  - `checkPermission(action)` / `applyRoleRestrictions()` — Système de permissions
+

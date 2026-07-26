@@ -121,7 +121,7 @@ async function fetchDashboardStatsFromDB() {
     } catch (err) { return null; }
 }
 
-async function fetchTransactionsFromDB(limit = 10) {
+async function fetchTransactionsFromDB(limit = 100) {
     const client = getSupabaseClient();
     if (!client) return null;
     try {
@@ -222,7 +222,7 @@ async function fetchPaymentsForReports() {
     try {
         const { data, error } = await client
             .from('payments')
-            .select('amount, status, payment_date, tontines(name)');
+            .select('*, profiles(full_name), tontines(name)');
         if (error) { console.warn('[Supabase] Erreur fetchPaymentsForReports:', error.message); return null; }
         return data;
     } catch (err) { return null; }
@@ -370,13 +370,35 @@ async function insertPayment(paymentData) {
         else return { error: "Aucune tontine active trouvée" };
     } catch (e) { return { error: "Erreur lecture tontine" }; }
 
+    // Map UI payment methods to Postgres CHECK constraint allowed values
+    const methodMap = {
+        'wave': 'wave',
+        'orange_money': 'orange_money',
+        'moov_money': 'mobile_money',
+        'yas_mix': 'mobile_money',
+        'mtn_money': 'mobile_money',
+        'mtn': 'mobile_money',
+        'card': 'virement',
+        'cb': 'virement',
+        'cash': 'especes',
+        'especes': 'especes'
+    };
+    const dbMethod = methodMap[paymentData.payment_method] || 'mobile_money';
+
+    let notesVal = paymentData.account_detail || '';
+    if (paymentData.payment_method === 'moov_money' && !notesVal.includes('[Moov')) notesVal = '[Moov Flooz] ' + notesVal;
+    else if (paymentData.payment_method === 'yas_mix' && !notesVal.includes('[Yas Mix')) notesVal = '[Yas Mix] ' + notesVal;
+    else if ((paymentData.payment_method === 'mtn' || paymentData.payment_method === 'mtn_money') && !notesVal.includes('[MTN')) notesVal = '[MTN Mobile] ' + notesVal;
+
     const payload = {
         tontine_id: paymentData.tontine_id || tontineId,
         payer_id: paymentData.member_id,
         amount: paymentData.amount,
-        payment_method: paymentData.payment_method || 'mobile_money',
+        payment_method: dbMethod,
         status: paymentData.status || 'valide',
-        payment_type: paymentData.payment_type || 'cotisation'
+        payment_type: paymentData.payment_type || 'cotisation',
+        notes: notesVal,
+        reference: paymentData.reference || null
     };
 
     try {

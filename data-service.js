@@ -205,16 +205,38 @@ const DataService = (() => {
      */
     async function getTransactions() {
         if (isSupabaseConnected && window.SupabaseService) {
-            const dbData = await window.SupabaseService.fetchTransactions(10);
+            const dbData = await window.SupabaseService.fetchTransactions(100);
             if (dbData && dbData.length > 0) {
-                return dbData.map(p => ({
-                    id: p.id,
-                    title: `Cotisation ${p.profiles ? p.profiles.full_name : ''}`,
-                    date: new Date(p.payment_date).toLocaleDateString('fr-FR'),
-                    amount: p.amount,
-                    type: p.payment_type === 'payout' ? 'withdrawal' : 'deposit',
-                    icon: 'user'
-                }));
+                return dbData.map(p => {
+                    let method = p.payment_method || 'mobile_money';
+                    if (p.notes) {
+                        if (p.notes.includes('[Moov')) method = 'moov_money';
+                        else if (p.notes.includes('[Yas Mix')) method = 'yas_mix';
+                        else if (p.notes.includes('[MTN')) method = 'mtn';
+                    }
+                    if (p.reference) {
+                        if (p.reference.startsWith('MOOV-')) method = 'moov_money';
+                        else if (p.reference.startsWith('YAS-')) method = 'yas_mix';
+                        else if (p.reference.startsWith('WAVE-')) method = 'wave';
+                        else if (p.reference.startsWith('OM-')) method = 'orange_money';
+                        else if (p.reference.startsWith('CB-')) method = 'card';
+                        else if (p.reference.startsWith('CASH-')) method = 'cash';
+                    }
+
+                    return {
+                        id: p.id,
+                        member: p.profiles ? p.profiles.full_name : 'Membre',
+                        tontine: 'Tontine Principale',
+                        title: `Cotisation ${p.profiles ? p.profiles.full_name : ''}`,
+                        date: p.payment_date ? new Date(p.payment_date).toLocaleDateString('fr-FR') : new Date(p.created_at || Date.now()).toLocaleDateString('fr-FR'),
+                        amount: p.amount,
+                        type: p.payment_type === 'payout' ? 'withdrawal' : 'Cotisation',
+                        status: p.status === 'valide' ? 'Validé' : (p.status === 'en_attente' ? 'En attente' : p.status),
+                        method: method,
+                        account: p.notes || p.reference || '—',
+                        icon: 'user'
+                    };
+                });
             }
         }
         return [];

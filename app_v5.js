@@ -314,6 +314,10 @@ function setupQuickActions() {
     // 1. Créer tontine
     if (btnQuickCreateTontine) {
         btnQuickCreateTontine.addEventListener('click', () => {
+            if (!checkPermission('create_tontine')) {
+                showToast("🔒 Action refusée : Seul le gestionnaire peut créer une tontine !", "error");
+                return;
+            }
             const m = document.getElementById('create-tontine-modal');
             if (m) m.classList.remove('hidden');
         });
@@ -523,6 +527,10 @@ function setupQuickActions() {
     // 3. Valider paiement — ouverture du modal multi-étapes
     if (btnQuickValidatePay) {
         btnQuickValidatePay.addEventListener('click', () => {
+            if (!checkPermission('validate_payment')) {
+                showToast("🔒 Action refusée : Seul le gestionnaire peut valider les paiements !", "error");
+                return;
+            }
             const m = document.getElementById('validate-payment-modal');
             if (m) {
                 const s = document.getElementById('payment-member-input');
@@ -616,6 +624,10 @@ function setupQuickActions() {
     const btnQuickAddMember = document.getElementById('btn-quick-add-member');
     if (btnQuickAddMember) {
         btnQuickAddMember.addEventListener('click', () => {
+            if (!checkPermission('manage_members')) {
+                showToast("🔒 Action refusée : Seul le gestionnaire peut ajouter ou modifier des membres !", "error");
+                return;
+            }
             const m = document.getElementById('add-member-modal');
             if (m) m.classList.remove('hidden');
         });
@@ -631,6 +643,10 @@ function setupQuickActions() {
     const btnSubmitAddMember = document.getElementById('btn-submit-add-member');
     if (btnSubmitAddMember) {
         btnSubmitAddMember.addEventListener('click', async () => {
+            if (!checkPermission('manage_members')) {
+                showToast("🔒 Action refusée : Seul le gestionnaire peut ajouter ou modifier des membres !", "error");
+                return;
+            }
             if (btnSubmitAddMember.disabled) return;
             btnSubmitAddMember.disabled = true;
 
@@ -715,6 +731,10 @@ function setupQuickActions() {
     
     if (btnCloseCurrentRound) {
         btnCloseCurrentRound.addEventListener('click', () => {
+            if (!checkPermission('close_round')) {
+                showToast("🔒 Action refusée : Seul le gestionnaire peut clôturer un tour et distribuer les fonds !", "error");
+                return;
+            }
             if (!state.activeTontines || state.activeTontines.length === 0) {
                 showToast("Aucune tontine active à clôturer", "error");
                 return;
@@ -745,6 +765,11 @@ function setupQuickActions() {
     const btnConfirmCloseRound = document.getElementById('btn-confirm-close-round');
     if (btnConfirmCloseRound) {
         btnConfirmCloseRound.addEventListener('click', async () => {
+            if (!checkPermission('close_round')) {
+                showToast("🔒 Action refusée : Seul le gestionnaire peut distribuer les fonds !", "error");
+                if (modalCloseRound) modalCloseRound.classList.add('hidden');
+                return;
+            }
             if (btnConfirmCloseRound.disabled) return;
             btnConfirmCloseRound.disabled = true;
 
@@ -1146,9 +1171,14 @@ function renderTontinesTable() {
     });
     
     if (window.feather) feather.replace();
+    applyRoleRestrictions();
 }
 
 async function deleteTontineAction(id) {
+    if (!checkPermission('delete_tontine')) {
+        showToast("🔒 Action refusée : Seul l'administrateur peut supprimer une tontine !", "error");
+        return;
+    }
     if (!confirm("Êtes-vous sûr de vouloir supprimer cette tontine ? Cette action est irréversible.")) return;
     
     showGlobalLoader();
@@ -1168,6 +1198,10 @@ async function deleteTontineAction(id) {
 }
 
 function openEditTontineModal(id) {
+    if (!checkPermission('edit_tontine')) {
+        showToast("🔒 Action refusée : Seul le gestionnaire peut modifier une tontine !", "error");
+        return;
+    }
     const tontine = state.activeTontines.find(t => t.id === id);
     if (!tontine) return;
     
@@ -2297,7 +2331,9 @@ function renderMembers() {
         const isLate = m.status === 'En retard';
         const badgeClass = isLate ? 'badge-red' : 'badge-green';
         
-        const actionBtn = isLate ? 
+        const currentRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+        const isAdminUser = currentRole === 'admin' || currentRole === 'gestionnaire';
+        const actionBtn = (isLate && isAdminUser) ? 
             `<button onclick="sendReminder('${m.name}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
             `<button style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Voir profil</button>`;
 
@@ -2390,23 +2426,116 @@ function startOnboardingTour() {
    AXE 4 — MODAL PAIEMENT MULTI-ÉTAPES
    ====================================================== */
 
-let _selectedPayMethod = 'wave';
+let _selectedPayMethod = 'moov_money';
+let _payAccountDetail = '';
+let _ussdTimerInterval = null;
 let _payAllTransactions = []; // cache local pour filtrage
 
 const PAY_METHOD_LABELS = {
-    wave: '🌊 Wave Money',
+    moov_money: '🟡 Moov Money (Flooz)',
+    yas_mix: '🟢 Yas Mix (Togocom)',
     orange_money: '🟠 Orange Money',
+    wave: '🌊 Wave Money',
+    mtn_money: '⚡ MTN MoMo',
     card: '💳 Carte Bancaire',
     cash: '💵 Espèces'
+};
+
+const PAY_METHOD_CONFIG = {
+    moov_money: {
+        label: '📱 Numéro de téléphone Moov Money / Flooz',
+        placeholder: 'Ex: +228 99 00 00 00 / 01 00 00 00',
+        help: 'Un push USSD Flooz sera envoyé instantanément sur ce mobile pour confirmation.',
+        opName: 'Passerelle Moov Money Flooz',
+        badge: 'Flooz',
+        badgeClass: 'background:#fef08a;color:#854d0e;',
+        icon: '🟡',
+        defaultPrefix: '+228 '
+    },
+    yas_mix: {
+        label: '📱 Numéro Togocom / Yas Mix (TMoney)',
+        placeholder: 'Ex: +228 90 00 00 00 / 91 00 00 00',
+        help: 'Vous recevrez une notification Yas Mix / TMoney directement sur votre smartphone.',
+        opName: 'Passerelle Togocom / Yas Mix',
+        badge: 'Yas Mix',
+        badgeClass: 'background:#dcfce7;color:#15803d;',
+        icon: '🟢',
+        defaultPrefix: '+228 '
+    },
+    orange_money: {
+        label: '📱 Numéro de compte Orange Money',
+        placeholder: 'Ex: +225 07 00 00 00 / +221 77 000 00 00',
+        help: 'Validez ensuite la transaction avec votre code secret Orange Money (#144#).',
+        opName: 'Passerelle Orange Money',
+        badge: 'Orange',
+        badgeClass: 'background:#ffedd5;color:#ea580c;',
+        icon: '🟠',
+        defaultPrefix: '+225 '
+    },
+    wave: {
+        label: '📱 Numéro de compte Wave Money',
+        placeholder: 'Ex: +225 01 00 00 00 / +221 76 000 00 00',
+        help: 'Une requête de paiement sécurisée apparaîtra dans votre application Wave.',
+        opName: 'Passerelle Wave Money',
+        badge: 'Wave',
+        badgeClass: 'background:#e0f2fe;color:#0284c7;',
+        icon: '🌊',
+        defaultPrefix: '+225 '
+    },
+    mtn_money: {
+        label: '📱 Numéro MTN Mobile Money (MoMo)',
+        placeholder: 'Ex: +229 67 00 00 00 / +225 05 00 00 00',
+        help: 'Une requête USSD MTN Mobile Money s\'affichera sur votre écran (*133#).',
+        opName: 'Passerelle MTN Mobile Money',
+        badge: 'MTN MoMo',
+        badgeClass: 'background:#fef9c3;color:#a16207;',
+        icon: '⚡',
+        defaultPrefix: '+229 '
+    },
+    card: {
+        label: '💳 Numéro de carte bancaire & Expiration',
+        placeholder: 'Ex: 4532 •••• •••• 8890 (MM/AA)',
+        help: 'Paiement sécurisé par authentification bancaire 3D Secure / Verified by Visa.',
+        opName: 'Passerelle Bancaire Internationale',
+        badge: 'Carte',
+        badgeClass: 'background:#f3e8ff;color:#9333ea;',
+        icon: '💳',
+        defaultPrefix: '4532 '
+    },
+    cash: {
+        label: '💵 Reçu par (Nom du responsable / trésorier)',
+        placeholder: 'Ex: Wilfried (Trésorier Tontine Pro)',
+        help: 'Un reçu de caisse numéroté et horodaté sera émis après validation.',
+        opName: 'Caisse Tontine Pro',
+        badge: 'Espèces',
+        badgeClass: 'background:#e2e8f0;color:#475569;',
+        icon: '💵',
+        defaultPrefix: 'Wilfried '
+    }
 };
 
 function selectPayMethod(card) {
     document.querySelectorAll('.pay-method-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
     _selectedPayMethod = card.getAttribute('data-method');
+    
+    const config = PAY_METHOD_CONFIG[_selectedPayMethod] || PAY_METHOD_CONFIG['moov_money'];
+    const lbl = document.getElementById('pay-dynamic-label');
+    const inp = document.getElementById('pay-dynamic-input');
+    const hlp = document.getElementById('pay-dynamic-help');
+    
+    if (lbl) lbl.textContent = config.label;
+    if (hlp) hlp.textContent = config.help;
+    if (inp) {
+        inp.placeholder = config.placeholder;
+        if (!inp.value || inp.value.startsWith('+2') || inp.value === 'Wilfried ' || inp.value.startsWith('4532')) {
+            inp.value = config.defaultPrefix || '';
+        }
+    }
 }
 
 function payGoStep1() {
+    if (_ussdTimerInterval) clearInterval(_ussdTimerInterval);
     document.getElementById('pay-step-1').style.display = '';
     document.getElementById('pay-step-2').style.display = 'none';
     document.getElementById('pay-step-3').style.display = 'none';
@@ -2425,10 +2554,15 @@ function payGoStep2() {
     if (!memId) { showToast('Veuillez sélectionner un membre.', 'error'); return; }
     if (!amt || parseFloat(amt) <= 0) { showToast('Veuillez entrer un montant valide.', 'error'); return; }
 
+    const inp = document.getElementById('pay-dynamic-input');
+    _payAccountDetail = (inp && inp.value.trim() !== '') ? inp.value.trim() : (PAY_METHOD_CONFIG[_selectedPayMethod]?.defaultPrefix + 'XX');
+
     const formatted = new Intl.NumberFormat('fr-FR').format(parseFloat(amt));
     document.getElementById('pay-confirm-amount').textContent = formatted + ' FCFA';
     document.getElementById('pay-confirm-member').textContent = memName;
     document.getElementById('pay-confirm-method').textContent = PAY_METHOD_LABELS[_selectedPayMethod] || _selectedPayMethod;
+    const accEl = document.getElementById('pay-confirm-account');
+    if (accEl) accEl.textContent = _payAccountDetail;
     document.getElementById('pay-confirm-date').textContent = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     document.getElementById('pay-step-1').style.display = 'none';
@@ -2440,52 +2574,124 @@ function payGoStep2() {
 async function payGoStep3() {
     const memSel = document.getElementById('payment-member-input');
     const amt = parseFloat(document.getElementById('payment-amount-input').value);
-    const memId = memSel ? memSel.value : '';
     const memName = memSel && memSel.selectedIndex > 0 ? memSel.options[memSel.selectedIndex].text : 'Membre';
 
     document.getElementById('pay-step-2').style.display = 'none';
     document.getElementById('pay-step-3').style.display = '';
-    document.getElementById('pay-step-processing').style.display = '';
     document.getElementById('pay-step-success').style.display = 'none';
     document.getElementById('pay-step-dot-3').style.background = '#6366f1';
-    document.getElementById('pay-modal-subtitle').textContent = 'Étape 3 sur 3 — Traitement';
+    document.getElementById('pay-modal-subtitle').textContent = 'Étape 3 sur 3 — Validation Fintech';
 
-    // Appel au service de paiement
+    const sim = document.getElementById('pay-ussd-simulator');
+    const proc = document.getElementById('pay-step-processing');
+
+    // Si paiement Cash, validation directe en caisse sans USSD
+    if (_selectedPayMethod === 'cash') {
+        if (sim) sim.style.display = 'none';
+        if (proc) proc.style.display = '';
+        const titleEl = document.getElementById('pay-processing-title');
+        const subEl = document.getElementById('pay-processing-sub');
+        if (titleEl) titleEl.textContent = 'Enregistrement en caisse...';
+        if (subEl) subEl.textContent = 'Émission du reçu horodaté par le gestionnaire';
+        await executeFinalPayment();
+        return;
+    }
+
+    // Afficher le simulateur USSD / Push mobile interactif
+    const config = PAY_METHOD_CONFIG[_selectedPayMethod] || PAY_METHOD_CONFIG['moov_money'];
+    if (document.getElementById('ussd-op-icon')) document.getElementById('ussd-op-icon').textContent = config.icon;
+    if (document.getElementById('ussd-op-name')) document.getElementById('ussd-op-name').textContent = config.opName;
+    const badgeEl = document.getElementById('ussd-op-badge');
+    if (badgeEl) {
+        badgeEl.textContent = config.badge;
+        badgeEl.style.cssText = config.badgeClass;
+    }
+    if (document.getElementById('ussd-phone-display')) document.getElementById('ussd-phone-display').textContent = _payAccountDetail;
+    if (document.getElementById('ussd-amount-display')) document.getElementById('ussd-amount-display').textContent = new Intl.NumberFormat('fr-FR').format(amt) + ' FCFA';
+
+    const pinInp = document.getElementById('ussd-pin-input');
+    if (pinInp) pinInp.value = '';
+
+    if (proc) proc.style.display = 'none';
+    if (sim) sim.style.display = '';
+
+    // Démarrer le compte à rebours de 45s
+    let timeLeft = 45;
+    const timerEl = document.getElementById('ussd-timer');
+    if (_ussdTimerInterval) clearInterval(_ussdTimerInterval);
+    if (timerEl) timerEl.textContent = timeLeft + 's';
+
+    _ussdTimerInterval = setInterval(() => {
+        timeLeft--;
+        if (timerEl) timerEl.textContent = timeLeft + 's';
+        if (timeLeft <= 0) {
+            clearInterval(_ussdTimerInterval);
+            if (sim && sim.style.display !== 'none') {
+                showToast('Session USSD expirée. Validation automatique de la transaction...', 'warning');
+                confirmUSSDPayment();
+            }
+        }
+    }, 1000);
+}
+
+async function confirmUSSDPayment() {
+    if (_ussdTimerInterval) clearInterval(_ussdTimerInterval);
+    const sim = document.getElementById('pay-ussd-simulator');
+    const proc = document.getElementById('pay-step-processing');
+    if (sim) sim.style.display = 'none';
+    if (proc) proc.style.display = '';
+    
+    const titleEl = document.getElementById('pay-processing-title');
+    const subEl = document.getElementById('pay-processing-sub');
+    if (titleEl) titleEl.textContent = 'Authentification cryptographique en cours...';
+    if (subEl) subEl.textContent = 'Validation du code PIN USSD avec l\'opérateur ' + (PAY_METHOD_CONFIG[_selectedPayMethod]?.badge || 'Mobile');
+
+    await executeFinalPayment();
+}
+
+async function executeFinalPayment() {
+    const memSel = document.getElementById('payment-member-input');
+    const amt = parseFloat(document.getElementById('payment-amount-input').value);
+    const memId = memSel ? memSel.value : '';
+    const memName = memSel && memSel.selectedIndex > 0 ? memSel.options[memSel.selectedIndex].text : 'Membre';
+
+    const opPrefix = { moov_money: 'MOOV-', yas_mix: 'YAS-', orange_money: 'OM-', wave: 'WAVE-', mtn_money: 'MTN-', card: 'CB-', cash: 'CASH-' }[_selectedPayMethod] || 'TP-';
+    const refNum = opPrefix + Date.now().toString(36).toUpperCase();
+
     const { data, error } = await DataService.createPayment({
         member_id: memId,
         amount: amt,
         payment_method: _selectedPayMethod,
+        account_detail: _payAccountDetail,
+        reference: refNum,
         status: 'valide',
         payment_type: 'cotisation'
     });
 
-    // Délai visuel minimal (impression premium)
-    await new Promise(res => setTimeout(res, 1600));
+    await new Promise(res => setTimeout(res, 1500));
 
     document.getElementById('pay-step-processing').style.display = 'none';
 
     if (error) {
         const errMsg = typeof error === 'object' ? (error.message || JSON.stringify(error)) : error;
         showToast('Erreur de paiement : ' + errMsg, 'error');
-        payGoStep2(); // revenir à la confirmation
+        payGoStep2();
         return;
     }
 
-    // Succès
-    const refNum = 'TP-' + Date.now().toString(36).toUpperCase();
     document.getElementById('pay-success-ref').textContent = 'REF: ' + refNum;
 
     const formatted = new Intl.NumberFormat('fr-FR').format(amt);
     document.getElementById('pay-receipt-summary').innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-3);">Bénéficiaire</span><strong>${escapeHTML(memName)}</strong></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-3);">Montant</span><strong style="color:#10b981;">${formatted} FCFA</strong></div>
-        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-3);">Méthode</span><strong>${PAY_METHOD_LABELS[_selectedPayMethod]}</strong></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-3);">Méthode</span><strong>${PAY_METHOD_LABELS[_selectedPayMethod]}</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-3);">Compte / Tél</span><strong style="font-family:monospace;color:var(--primary);">${escapeHTML(_payAccountDetail)}</strong></div>
     `;
 
     document.getElementById('pay-step-success').style.display = '';
     if (typeof playSuccessSound === 'function') playSuccessSound();
 
-    // Mise à jour du state local
     state.stats.validatedPaymentsToday = (state.stats.validatedPaymentsToday || 0) + 1;
     state.stats.totalAmountInPlay = (state.stats.totalAmountInPlay || 0) + amt;
     if (!state.transactions) state.transactions = [];
@@ -2497,6 +2703,7 @@ async function payGoStep3() {
         type: 'Cotisation',
         status: 'Validé',
         method: _selectedPayMethod,
+        account: _payAccountDetail,
         date: new Date().toISOString()
     });
     _payAllTransactions = [...state.transactions];
@@ -2504,15 +2711,20 @@ async function payGoStep3() {
 }
 
 function payResetSteps() {
+    if (_ussdTimerInterval) clearInterval(_ussdTimerInterval);
     payGoStep1();
     document.getElementById('pay-step-dot-1').style.background = '#6366f1';
     document.getElementById('pay-step-dot-2').style.background = 'var(--border)';
     document.getElementById('pay-step-dot-3').style.background = 'var(--border)';
-    // reset méthode par défaut
+    
     document.querySelectorAll('.pay-method-card').forEach(c => {
-        c.classList.toggle('active', c.getAttribute('data-method') === 'wave');
+        c.classList.toggle('active', c.getAttribute('data-method') === 'moov_money');
     });
-    _selectedPayMethod = 'wave';
+    _selectedPayMethod = 'moov_money';
+    const inp = document.getElementById('pay-dynamic-input');
+    if (inp) inp.value = PAY_METHOD_CONFIG['moov_money'].defaultPrefix;
+    const cardEl = document.querySelector('.pay-method-card[data-method="moov_money"]') || document.querySelector('.pay-method-card');
+    if (cardEl) selectPayMethod(cardEl);
 }
 
 /* ======================================================
@@ -2520,13 +2732,11 @@ function payResetSteps() {
    ====================================================== */
 
 async function renderPaymentsTab() {
-    // Charger les données si besoin
     if (!state.transactions || state.transactions.length === 0) {
         await loadDynamicData();
     }
     _payAllTransactions = state.transactions ? [...state.transactions] : [];
 
-    // Stats
     const validated = _payAllTransactions.filter(t => t.status === 'Validé' || t.status === 'valide');
     const pending   = _payAllTransactions.filter(t => t.status === 'En attente' || t.status === 'en_attente');
     const totalAmt  = validated.reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
@@ -2559,7 +2769,11 @@ function renderPaymentsTable(transactions) {
         return `<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">${escapeHTML(s)}</span>`;
     };
 
-    const methodBadge = (m) => PAY_METHOD_LABELS[m] || m || '—';
+    const methodBadge = (m, acc) => {
+        const lbl = PAY_METHOD_LABELS[m] || m || '—';
+        const accStr = acc ? `<br><small style="color:var(--text-3);font-family:monospace;font-size:10px;">${escapeHTML(acc)}</small>` : '';
+        return lbl + accStr;
+    };
 
     tbody.innerHTML = transactions.map(t => {
         const dateStr = t.date ? new Date(t.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '—';
@@ -2573,7 +2787,7 @@ function renderPaymentsTable(transactions) {
                 </div>
             </td>
             <td style="padding:12px 16px;font-weight:700;color:var(--primary);font-size:13px;">${amtFormatted} FCFA</td>
-            <td style="padding:12px 16px;font-size:12px;color:var(--text-2);">${methodBadge(t.method)}</td>
+            <td style="padding:12px 16px;font-size:12px;color:var(--text-2);">${methodBadge(t.method, t.account || t.account_detail)}</td>
             <td style="padding:12px 16px;">${statusBadge(t.status)}</td>
             <td style="padding:12px 16px;font-size:12px;color:var(--text-3);">${dateStr}</td>
         </tr>`;
@@ -2587,8 +2801,7 @@ function filterPayments(btn, filter) {
     let filtered = _payAllTransactions;
     if (filter === 'valide') filtered = _payAllTransactions.filter(t => t.status === 'Validé' || t.status === 'valide');
     else if (filter === 'en_attente') filtered = _payAllTransactions.filter(t => t.status === 'En attente' || t.status === 'en_attente');
-    else if (filter === 'wave') filtered = _payAllTransactions.filter(t => t.method === 'wave');
-    else if (filter === 'orange_money') filtered = _payAllTransactions.filter(t => t.method === 'orange_money');
+    else if (filter !== 'all') filtered = _payAllTransactions.filter(t => t.method === filter);
 
     renderPaymentsTable(filtered);
 }
@@ -2708,29 +2921,87 @@ function applyRoleRestrictions() {
     const role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
     const isAdmin = role === 'admin' || role === 'gestionnaire';
 
-    // Afficher/masquer l'onglet Administration
-    const adminBtn = document.getElementById('btn-nav-admin');
-    if (adminBtn) adminBtn.style.display = isAdmin ? '' : 'none';
+    // Afficher/masquer les onglets Administration et Audit Trail dans la sidebar
+    ['btn-nav-admin', 'btn-nav-audit'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.style.display = isAdmin ? '' : 'none';
+    });
 
-    // Masquer les boutons sensibles pour les membres simples
-    if (!isAdmin) {
-        ['btn-quick-create-tontine', 'btn-quick-validate-pay'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
+    // Afficher/masquer les sections d'administration dans les paramètres (Relances WhatsApp, Facturation, Zone de danger)
+    ['settings-card-relances', 'settings-card-billing', 'settings-card-danger'].forEach(id => {
+        const card = document.getElementById(id);
+        if (card) card.style.display = isAdmin ? '' : 'none';
+    });
+
+    // Masquer / réactiver les boutons sensibles pour les membres simples
+    ['btn-quick-create-tontine', 'btn-quick-validate-pay', 'btn-quick-add-member', 'btn-close-current-round'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (!isAdmin) {
                 el.disabled = true;
                 el.title = 'Accès réservé aux gestionnaires';
                 el.style.opacity = '0.4';
                 el.style.cursor = 'not-allowed';
+            } else {
+                el.disabled = false;
+                el.title = '';
+                el.style.opacity = '1';
+                el.style.cursor = 'pointer';
             }
-        });
-    }
+        }
+    });
 
     // Badge rôle dans la sidebar
     const roleEl = document.querySelector('.sb-urole');
     if (roleEl) {
         if (isAdmin) {
-            roleEl.innerHTML = `<span style="color:#6366f1;font-weight:700;">🛡 ${isAdmin && role === 'admin' ? 'Admin' : 'Gestionnaire'}</span>`;
+            roleEl.innerHTML = `<span style="color:#6366f1;font-weight:700;">🛡 ${role === 'admin' ? 'Admin' : 'Gestionnaire'}</span>`;
+        } else {
+            roleEl.innerHTML = `<span style="color:#f59e0b;font-weight:700;">👤 Membre</span>`;
         }
     }
+
+    // Mettre à jour le bouton de bascule (Simulateur) dans la Topbar
+    const modeLbl = document.getElementById('lbl-current-role-mode');
+    if (modeLbl) modeLbl.textContent = isAdmin ? 'Admin 👑' : 'Membre 👤';
+
+    const modeBtn = document.getElementById('btn-toggle-role-mode');
+    if (modeBtn) {
+        if (isAdmin) {
+            modeBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            modeBtn.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
+        } else {
+            modeBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+            modeBtn.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+        }
+    }
+
+    // Masquer les boutons 3-points dans la vue Tontines pour les membres
+    document.querySelectorAll('.btn-action-dots').forEach(btn => {
+        btn.style.display = isAdmin ? '' : 'none';
+    });
 }
+
+function toggleRoleSimulator() {
+    const current = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'gestionnaire';
+    const newRole = (current === 'admin' || current === 'gestionnaire') ? 'membre' : 'gestionnaire';
+    state.user.role = newRole === 'gestionnaire' ? 'Gestionnaire' : 'Membre';
+
+    applyRoleRestrictions();
+    if (typeof renderTontinesTable === 'function') renderTontinesTable();
+    if (typeof renderMembersTab === 'function') renderMembersTab();
+    if (typeof renderMembers === 'function') renderMembers();
+    
+    // Si on était dans l'onglet Administration et qu'on bascule en Membre, on redirige vers Tableau de bord
+    if (newRole === 'membre') {
+        const activeTab = document.querySelector('.tab-pane.active');
+        if (activeTab && activeTab.id === 'tab-admin') {
+            switchTab('dashboard');
+        }
+        showToast('👤 Vue Simple Membre : Onglet Administration masqué, actions d\'administration bloquées !', 'warning');
+    } else {
+        showToast('🛡 Vue Gestionnaire restaurée : Tous les droits administrateur sont actifs !', 'success');
+    }
+}
+window.toggleRoleSimulator = toggleRoleSimulator;
 

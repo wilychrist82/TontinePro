@@ -68,7 +68,7 @@
             <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <span>Rapports</span>
         </button>
-        <button class="nav-item" data-tab="audit">
+        <button class="nav-item admin-only" data-tab="audit" id="btn-nav-audit">
             <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             <span>Audit Trail</span>
         </button>
@@ -126,6 +126,9 @@
         <div id="search-results-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 50; max-height: 300px; overflow-y: auto;"></div>
     </div>
     <div class="tb-right">
+        <button class="btn-primary" id="btn-toggle-role-mode" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); font-weight: 600; transition: all 0.2s;" onclick="toggleRoleSimulator()" title="Cliquer pour simuler la vue Simple Membre ou Administrateur">
+            <span>👁️ Vue :</span> <strong id="lbl-current-role-mode">Admin 👑</strong>
+        </button>
         <button class="tb-btn" id="btn-notifications-toggle" onclick="switchTab('notifications')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span class="tb-badge" style="display:none">0</span>
@@ -399,7 +402,7 @@
         </div>
 
         <!-- Relances & Communications -->
-        <div class="card settings-card">
+        <div class="card settings-card" id="settings-card-relances">
             <h3 class="card-title">Relances & Communications</h3>
             <p style="font-size:13px; color:var(--text-3); margin-top:-10px; margin-bottom:15px;">Gérez les communications avec les membres de vos tontines.</p>
             
@@ -420,7 +423,7 @@
 
         <!-- Facturation & Danger -->
         <div style="display:flex; flex-direction:column; gap:24px;">
-            <div class="card settings-card" style="height:auto;">
+            <div class="card settings-card" id="settings-card-billing" style="height:auto;">
                 <h3 class="card-title">Abonnement & Facturation</h3>
                 <div style="background: rgba(92, 96, 245, 0.05); border: 1px solid var(--primary); padding:15px; border-radius:12px; margin-bottom:15px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -433,7 +436,7 @@
                 </div>
             </div>
 
-            <div class="card settings-card" style="height:auto; border:1px solid rgba(239, 68, 68, 0.2);">
+            <div class="card settings-card" id="settings-card-danger" style="height:auto; border:1px solid rgba(239, 68, 68, 0.2);">
                 <h3 class="card-title" style="color:var(--danger);">Zone de danger</h3>
                 <p style="font-size:12.5px; color:var(--text-3); margin-top:-10px; margin-bottom:15px; line-height:1.5;">Ces actions sont irréversibles. Assurez-vous d'avoir exporté vos données avant de supprimer votre compte.</p>
                 <div style="display:flex; gap:10px;">
@@ -502,6 +505,132 @@
         <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Comment creer une tontine ?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Allez dans "Mes Tontines" puis cliquez sur "Creer une tontine". Suivez les etapes.</div></div>
         <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Comment valider un paiement ?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Dans "Paiements", selectionnez le paiement en attente et cliquez sur "Valider".</div></div>
         <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Comment inviter un membre ?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Dans "Membres", cliquez sur "Inviter un membre" et entrez son numero ou email.</div></div>
+    </div>
+</section>
+
+<!-- ===================== ONGLET PAIEMENTS ===================== -->
+<section id="tab-payments" class="tab-pane">
+    <div style="max-width:900px;">
+        <!-- En-tête -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h2 style="font-size:20px;font-weight:800;color:var(--text-1);margin:0;">Paiements & Transactions</h2>
+                <p style="font-size:13px;color:var(--text-3);margin:4px 0 0;">Historique complet de toutes les transactions</p>
+            </div>
+            <button class="btn-primary" onclick="document.getElementById('btn-quick-validate-pay').click()" style="display:flex;align-items:center;gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nouveau paiement
+            </button>
+        </div>
+        <!-- Stats rapides -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
+            <div class="stat-card" style="padding:16px;">
+                <div class="stat-icon s-green" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="stat-info"><div class="stat-val val-green" id="pay-tab-total-received" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Paiements validés</div></div>
+            </div>
+            <div class="stat-card" style="padding:16px;">
+                <div class="stat-icon s-yellow" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="stat-info"><div class="stat-val" id="pay-tab-total-amount" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Total collecté (FCFA)</div></div>
+            </div>
+            <div class="stat-card" style="padding:16px;">
+                <div class="stat-icon s-red" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div class="stat-info"><div class="stat-val" id="pay-tab-total-pending" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">En attente</div></div>
+            </div>
+        </div>
+        <!-- Filtres -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+            <button class="btn-sec-sm pay-filter-btn active" data-filter="all" onclick="filterPayments(this,'all')">Tous</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="valide" onclick="filterPayments(this,'valide')">✅ Validés</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="en_attente" onclick="filterPayments(this,'en_attente')">⏳ En attente</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="moov_money" onclick="filterPayments(this,'moov_money')">🟡 Moov</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="yas_mix" onclick="filterPayments(this,'yas_mix')">🟢 Yas Mix</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="orange_money" onclick="filterPayments(this,'orange_money')">🟠 Orange</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="wave" onclick="filterPayments(this,'wave')">🌊 Wave</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="mtn_money" onclick="filterPayments(this,'mtn_money')">⚡ MTN</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="card" onclick="filterPayments(this,'card')">💳 Carte</button>
+            <button class="btn-sec-sm pay-filter-btn" data-filter="cash" onclick="filterPayments(this,'cash')">💵 Espèces</button>
+        </div>
+        <!-- Tableau -->
+        <div class="card" style="padding:0;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;" id="payments-table">
+                <thead>
+                    <tr style="background:var(--content-bg);">
+                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Membre</th>
+                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Montant</th>
+                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Méthode</th>
+                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Statut</th>
+                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Date</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-table-body">
+                    <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== ONGLET ADMINISTRATION ===================== -->
+<section id="tab-admin" class="tab-pane">
+    <div style="max-width:900px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+            <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+                <h2 style="font-size:20px;font-weight:800;color:var(--text-1);margin:0;">Espace Administration</h2>
+                <p style="font-size:13px;color:var(--text-3);margin:4px 0 0;">Gestion des membres, rôles et invitations</p>
+            </div>
+        </div>
+        <!-- Cartes stats admin -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
+            <div class="stat-card" style="padding:16px;">
+                <div class="stat-icon s-purple" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <div class="stat-info"><div class="stat-val" id="admin-total-members" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Membres total</div></div>
+            </div>
+            <div class="stat-card" style="padding:16px;">
+                <div class="stat-icon s-blue" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="stat-info"><div class="stat-val" id="admin-total-admins" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Administrateurs</div></div>
+            </div>
+            <div class="stat-card" style="padding:16px;">
+                <div class="stat-icon s-green" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+                <div class="stat-info"><div class="stat-val" id="admin-total-tontines" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Tontines actives</div></div>
+            </div>
+        </div>
+        <!-- Lien d'invitation -->
+        <div class="card" style="margin-bottom:20px;padding:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:4px;">🔗 Lien d'invitation</div>
+                    <div style="font-size:12px;color:var(--text-3);">Partagez ce lien pour inviter des membres dans votre espace</div>
+                </div>
+                <button class="btn-primary" onclick="copyInviteLink()" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copier le lien
+                </button>
+            </div>
+            <div style="margin-top:12px;background:var(--content-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--text-2);word-break:break-all;" id="invite-link-display">Chargement...</div>
+        </div>
+        <!-- Gestion des membres -->
+        <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                <div style="font-size:14px;font-weight:700;color:var(--text-1);">Gestion des membres</div>
+                <input type="text" id="admin-search-members" placeholder="Rechercher..." style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text-1);outline:none;" oninput="renderAdminMembers(this.value)">
+            </div>
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="background:var(--content-bg);">
+                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Membre</th>
+                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Statut paiement</th>
+                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Rôle</th>
+                        <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-members-table-body">
+                    <tr><td colspan="4" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>
 
@@ -739,13 +868,21 @@
                 <div class="form-group">
                     <label style="font-weight:600;font-size:13px;">Moyen de paiement</label>
                     <div class="pay-method-grid" style="margin-top:8px;">
-                        <div class="pay-method-card active" data-method="wave" onclick="selectPayMethod(this)">
+                        <div class="pay-method-card active" data-method="moov_money" onclick="selectPayMethod(this)">
                             <div class="pay-method-header">
-                                <span style="font-size:20px;">🌊</span>
-                                <span class="pay-badge pay-badge-wave">Wave</span>
+                                <span style="font-size:20px;">🟡</span>
+                                <span class="pay-badge pay-badge-moov">Moov</span>
                             </div>
-                            <div class="pay-method-title">Wave Money</div>
-                            <div class="pay-method-sub">Transfert instantané</div>
+                            <div class="pay-method-title">Moov Money</div>
+                            <div class="pay-method-sub">Flooz Push USSD</div>
+                        </div>
+                        <div class="pay-method-card" data-method="yas_mix" onclick="selectPayMethod(this)">
+                            <div class="pay-method-header">
+                                <span style="font-size:20px;">🟢</span>
+                                <span class="pay-badge pay-badge-yas">Yas Mix</span>
+                            </div>
+                            <div class="pay-method-title">Yas Mix / TMoney</div>
+                            <div class="pay-method-sub">Togocom Mobile</div>
                         </div>
                         <div class="pay-method-card" data-method="orange_money" onclick="selectPayMethod(this)">
                             <div class="pay-method-header">
@@ -753,6 +890,22 @@
                                 <span class="pay-badge pay-badge-orange">Orange</span>
                             </div>
                             <div class="pay-method-title">Orange Money</div>
+                            <div class="pay-method-sub">Mobile Money</div>
+                        </div>
+                        <div class="pay-method-card" data-method="wave" onclick="selectPayMethod(this)">
+                            <div class="pay-method-header">
+                                <span style="font-size:20px;">🌊</span>
+                                <span class="pay-badge pay-badge-wave">Wave</span>
+                            </div>
+                            <div class="pay-method-title">Wave Money</div>
+                            <div class="pay-method-sub">Transfert instantané</div>
+                        </div>
+                        <div class="pay-method-card" data-method="mtn_money" onclick="selectPayMethod(this)">
+                            <div class="pay-method-header">
+                                <span style="font-size:20px;">⚡</span>
+                                <span class="pay-badge pay-badge-mtn">MTN</span>
+                            </div>
+                            <div class="pay-method-title">MTN MoMo</div>
                             <div class="pay-method-sub">Mobile Money</div>
                         </div>
                         <div class="pay-method-card" data-method="card" onclick="selectPayMethod(this)">
@@ -773,13 +926,20 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-primary btn-block" onclick="payGoStep2()" style="margin-top:8px;">Continuer →</button>
+                <div class="form-group" id="pay-dynamic-input-group" style="margin-top:14px;background:var(--content-bg);padding:12px;border-radius:10px;border:1px solid var(--border);">
+                    <label id="pay-dynamic-label" style="font-weight:700;font-size:12px;color:var(--text-1);display:flex;align-items:center;gap:6px;">📱 Numéro de téléphone Moov Money / Flooz</label>
+                    <div style="position:relative;margin-top:6px;">
+                        <input type="text" id="pay-dynamic-input" class="form-input" placeholder="Ex: +228 99 00 00 00 / 01 00 00 00" style="font-size:15px;font-weight:700;letter-spacing:1px;background:var(--surface);">
+                    </div>
+                    <span id="pay-dynamic-help" style="font-size:11px;color:var(--text-3);margin-top:5px;display:block;line-height:1.4;">Un push USSD Flooz sera envoyé instantanément sur ce mobile pour confirmation.</span>
+                </div>
+                <button class="btn-primary btn-block" onclick="payGoStep2()" style="margin-top:12px;">Continuer →</button>
             </div>
 
             <!-- ÉTAPE 2 : Confirmation -->
             <div id="pay-step-2" style="display:none;">
                 <div style="background:var(--content-bg);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;">
-                    <div style="font-size:12px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Montant</div>
+                    <div style="font-size:12px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Montant à payer</div>
                     <div id="pay-confirm-amount" style="font-size:28px;font-weight:800;color:var(--primary);">0 FCFA</div>
                     <div style="height:1px;background:var(--border);margin:14px 0;"></div>
                     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
@@ -787,36 +947,70 @@
                         <span id="pay-confirm-member" style="font-weight:600;color:var(--text-1);">—</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
-                        <span style="color:var(--text-3);">Méthode</span>
+                        <span style="color:var(--text-3);">Méthode de paiement</span>
                         <span id="pay-confirm-method" style="font-weight:600;color:var(--text-1);">—</span>
                     </div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                        <span style="color:var(--text-3);">Compte / Numéro</span>
+                        <span id="pay-confirm-account" style="font-weight:700;color:var(--primary);font-family:monospace;">—</span>
+                    </div>
                     <div style="display:flex;justify-content:space-between;font-size:13px;">
-                        <span style="color:var(--text-3);">Date</span>
+                        <span style="color:var(--text-3);">Date & Heure</span>
                         <span id="pay-confirm-date" style="font-weight:600;color:var(--text-1);">—</span>
                     </div>
                 </div>
-                <p style="font-size:12px;color:var(--text-3);margin-bottom:16px;text-align:center;">Vérifiez les informations avant de confirmer.</p>
+                <p style="font-size:12px;color:var(--text-3);margin-bottom:16px;text-align:center;">Vérifiez attentivement le numéro ou le compte avant la requête de paiement.</p>
                 <div style="display:flex;gap:10px;">
                     <button class="btn-sec-sm" onclick="payGoStep1()" style="flex:1;padding:11px;">← Modifier</button>
-                    <button class="btn-primary" id="btn-submit-validate-payment" onclick="payGoStep3()" style="flex:2;padding:11px;">Confirmer le paiement ✓</button>
+                    <button class="btn-primary" id="btn-submit-validate-payment" onclick="payGoStep3()" style="flex:2;padding:11px;">Initier le paiement ✓</button>
                 </div>
             </div>
 
             <!-- ÉTAPE 3 : Traitement + Succès -->
             <div id="pay-step-3" style="display:none;text-align:center;padding:10px 0 20px;">
+                <!-- Simulateur interactif USSD / Push Fintech -->
+                <div id="pay-ussd-simulator" class="ussd-simulator-card" style="display:none;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span id="ussd-op-icon" style="font-size:24px;">🟡</span>
+                            <div>
+                                <div id="ussd-op-name" style="font-weight:800;font-size:14px;color:var(--text-1);">Passerelle Moov Money Flooz</div>
+                                <div style="font-size:11px;color:#10b981;font-weight:600;">● Connexion réseau sécurisée (USSD Push)</div>
+                            </div>
+                        </div>
+                        <span class="pay-badge" id="ussd-op-badge" style="background:#fef08a;color:#854d0e;">Flooz</span>
+                    </div>
+
+                    <div class="ussd-terminal-screen">
+                        <div style="color:#94a3b8;font-size:10px;margin-bottom:6px;border-bottom:1px dashed #334155;padding-bottom:4px;">TERMINAL USSD MOBILE — <span id="ussd-phone-display" style="color:#38bdf8;font-weight:700;">+228 90 XX XX XX</span></div>
+                        <div style="color:#f8fafc;font-weight:600;">Confirmez le paiement de <span id="ussd-amount-display" style="color:#fbbf24;">35 000 FCFA</span> vers <span style="color:#10b981;">TONTINE PRO (SaaS)</span>.</div>
+                        <div style="margin-top:8px;color:#cbd5e1;font-size:11px;">Veuillez composer votre code secret ou cliquer sur valider :</div>
+                    </div>
+
+                    <div class="ussd-pin-box">
+                        <input type="password" id="ussd-pin-input" maxlength="4" placeholder="••••" class="ussd-pin-input">
+                        <button class="btn-primary" id="btn-ussd-confirm" onclick="confirmUSSDPayment()" style="flex:2;padding:10px 16px;font-size:13px;background:linear-gradient(135deg,#10b981,#059669);border:none;box-shadow:0 4px 12px rgba(16,185,129,0.3);">📲 Valider sur mon téléphone ✓</button>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-3);border-top:1px solid var(--border);padding-top:10px;">
+                        <span>⏳ Session active : <strong id="ussd-timer" style="color:var(--primary);">45s</strong></span>
+                        <a href="javascript:void(0)" onclick="confirmUSSDPayment()" style="color:var(--primary);text-decoration:underline;font-weight:700;">Simuler validation auto →</a>
+                    </div>
+                </div>
+
                 <div id="pay-step-processing" style="">
                     <div class="pay-spinner"></div>
-                    <div style="font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:6px;">Transaction en cours...</div>
-                    <div style="font-size:12px;color:var(--text-3);">Connexion au réseau de paiement</div>
+                    <div id="pay-processing-title" style="font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:6px;">Transaction en cours...</div>
+                    <div id="pay-processing-sub" style="font-size:12px;color:var(--text-3);">Connexion au réseau de paiement</div>
                 </div>
                 <div id="pay-step-success" style="display:none;">
-                    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 10px 20px -5px rgba(16,185,129,0.4);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
-                    <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-bottom:6px;">Paiement validé ! 🎉</div>
-                    <div id="pay-success-ref" style="font-size:11px;color:var(--text-3);background:var(--content-bg);border:1px solid var(--border);border-radius:6px;padding:8px 14px;display:inline-block;margin-bottom:18px;font-family:monospace;">REF: TP-XXXXXXXX</div>
-                    <div id="pay-receipt-summary" style="background:var(--content-bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:left;margin-bottom:16px;font-size:12px;"></div>
-                    <button class="btn-primary btn-block" onclick="document.getElementById('validate-payment-modal').classList.add('hidden');payResetSteps();">Fermer</button>
+                    <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-bottom:6px;">Paiement validé avec succès ! 🎉</div>
+                    <div id="pay-success-ref" style="font-size:11px;color:var(--text-3);background:var(--content-bg);border:1px solid var(--border);border-radius:6px;padding:8px 14px;display:inline-block;margin-bottom:18px;font-family:monospace;font-weight:700;">REF: TP-XXXXXXXX</div>
+                    <div id="pay-receipt-summary" style="background:var(--content-bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:left;margin-bottom:16px;font-size:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.02);"></div>
+                    <button class="btn-primary btn-block" onclick="document.getElementById('validate-payment-modal').classList.add('hidden');payResetSteps();">Fermer & Terminer</button>
                 </div>
             </div>
         </div>
@@ -896,127 +1090,6 @@
         </div>
     </div>
 </div>
-
-<!-- ===================== ONGLET PAIEMENTS ===================== -->
-<section id="tab-payments" class="tab-pane">
-    <div style="max-width:900px;">
-        <!-- En-tête -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div>
-                <h2 style="font-size:20px;font-weight:800;color:var(--text-1);margin:0;">Paiements & Transactions</h2>
-                <p style="font-size:13px;color:var(--text-3);margin:4px 0 0;">Historique complet de toutes les transactions</p>
-            </div>
-            <button class="btn-primary" onclick="document.getElementById('btn-quick-validate-pay').click()" style="display:flex;align-items:center;gap:8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nouveau paiement
-            </button>
-        </div>
-        <!-- Stats rapides -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
-            <div class="stat-card" style="padding:16px;">
-                <div class="stat-icon s-green" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-                <div class="stat-info"><div class="stat-val val-green" id="pay-tab-total-received" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Paiements validés</div></div>
-            </div>
-            <div class="stat-card" style="padding:16px;">
-                <div class="stat-icon s-yellow" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                <div class="stat-info"><div class="stat-val" id="pay-tab-total-amount" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Total collecté (FCFA)</div></div>
-            </div>
-            <div class="stat-card" style="padding:16px;">
-                <div class="stat-icon s-red" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-                <div class="stat-info"><div class="stat-val" id="pay-tab-total-pending" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">En attente</div></div>
-            </div>
-        </div>
-        <!-- Filtres -->
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-            <button class="btn-sec-sm pay-filter-btn active" data-filter="all" onclick="filterPayments(this,'all')">Tous</button>
-            <button class="btn-sec-sm pay-filter-btn" data-filter="valide" onclick="filterPayments(this,'valide')">✅ Validés</button>
-            <button class="btn-sec-sm pay-filter-btn" data-filter="en_attente" onclick="filterPayments(this,'en_attente')">⏳ En attente</button>
-            <button class="btn-sec-sm pay-filter-btn" data-filter="wave" onclick="filterPayments(this,'wave')">🌊 Wave</button>
-            <button class="btn-sec-sm pay-filter-btn" data-filter="orange_money" onclick="filterPayments(this,'orange_money')">🟠 Orange</button>
-        </div>
-        <!-- Tableau -->
-        <div class="card" style="padding:0;overflow:hidden;">
-            <table style="width:100%;border-collapse:collapse;" id="payments-table">
-                <thead>
-                    <tr style="background:var(--content-bg);">
-                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Membre</th>
-                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Montant</th>
-                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Méthode</th>
-                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Statut</th>
-                        <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Date</th>
-                    </tr>
-                </thead>
-                <tbody id="payments-table-body">
-                    <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-
-<!-- ===================== ONGLET ADMINISTRATION ===================== -->
-<section id="tab-admin" class="tab-pane">
-    <div style="max-width:900px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-            <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div>
-                <h2 style="font-size:20px;font-weight:800;color:var(--text-1);margin:0;">Espace Administration</h2>
-                <p style="font-size:13px;color:var(--text-3);margin:4px 0 0;">Gestion des membres, rôles et invitations</p>
-            </div>
-        </div>
-        <!-- Cartes stats admin -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
-            <div class="stat-card" style="padding:16px;">
-                <div class="stat-icon s-purple" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-                <div class="stat-info"><div class="stat-val" id="admin-total-members" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Membres total</div></div>
-            </div>
-            <div class="stat-card" style="padding:16px;">
-                <div class="stat-icon s-blue" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                <div class="stat-info"><div class="stat-val" id="admin-total-admins" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Administrateurs</div></div>
-            </div>
-            <div class="stat-card" style="padding:16px;">
-                <div class="stat-icon s-green" style="width:36px;height:36px;min-width:36px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
-                <div class="stat-info"><div class="stat-val" id="admin-total-tontines" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Tontines actives</div></div>
-            </div>
-        </div>
-        <!-- Lien d'invitation -->
-        <div class="card" style="margin-bottom:20px;padding:20px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                <div>
-                    <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:4px;">🔗 Lien d'invitation</div>
-                    <div style="font-size:12px;color:var(--text-3);">Partagez ce lien pour inviter des membres dans votre espace</div>
-                </div>
-                <button class="btn-primary" onclick="copyInviteLink()" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    Copier le lien
-                </button>
-            </div>
-            <div style="margin-top:12px;background:var(--content-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--text-2);word-break:break-all;" id="invite-link-display">Chargement...</div>
-        </div>
-        <!-- Gestion des membres -->
-        <div class="card" style="padding:0;overflow:hidden;">
-            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-                <div style="font-size:14px;font-weight:700;color:var(--text-1);">Gestion des membres</div>
-                <input type="text" id="admin-search-members" placeholder="Rechercher..." style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text-1);outline:none;" oninput="renderAdminMembers(this.value)">
-            </div>
-            <table style="width:100%;border-collapse:collapse;">
-                <thead>
-                    <tr style="background:var(--content-bg);">
-                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Membre</th>
-                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Statut paiement</th>
-                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Rôle</th>
-                        <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-members-table-body">
-                    <tr><td colspan="4" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
 
 <!-- Conteneur des Toasts -->
 <div id="toast-container"></div>
