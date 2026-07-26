@@ -851,12 +851,15 @@
                         </div>
                         <div id="draw-cert-time" style="font-size: 11.5px; color: #047857; margin-top: 3px;">Horodaté le —</div>
                     </div>
-                    <div style="display: flex; gap: 8px;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
                         <button onclick="if(typeof shareDrawCertWhatsApp === 'function') shareDrawCertWhatsApp()" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                             💬 Notifier WhatsApp
                         </button>
-                        <button id="btn-reset-draw" class="admin-only" onclick="if(typeof resetTontineDraw === 'function') resetTontineDraw()" style="background: transparent; color: #EF4444; border: 1px solid #EF4444; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#EF4444'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#EF4444';" title="Réinitialiser le tirage officiel">
-                            🔄 Relancer
+                        <span id="draw-lock-badge" style="font-size: 11px; background: rgba(0, 0, 0, 0.06); color: #475569; border: 1px solid rgba(0, 0, 0, 0.1); padding: 5px 10px; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px;" title="Le tirage ne peut plus être modifié tant que la tontine est en cours">
+                            🔒 Cycle En Cours (Verrouillé)
+                        </span>
+                        <button id="btn-reset-draw" class="admin-only hidden" onclick="if(typeof resetTontineDraw === 'function') resetTontineDraw()" style="background: transparent; color: #EF4444; border: 1px solid #EF4444; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#EF4444'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#EF4444';" title="Réinitialiser pour un nouveau cycle (uniquement si tontine clôturée)">
+                            🔄 Nouveau Cycle
                         </button>
                     </div>
                 </div>

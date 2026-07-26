@@ -235,7 +235,12 @@ async function loadDynamicData() {
         renderSkeletons();
 
         const tontines = await DataService.getTontines().catch(() => []);
-        if (tontines && tontines.length > 0) state.activeTontines = tontines;
+        if (tontines && tontines.length > 0) {
+            state.activeTontines = tontines;
+            state.activeTontines.forEach(t => {
+                if (typeof loadTontineDrawState === 'function') loadTontineDrawState(t);
+            });
+        }
 
         const messages = await DataService.getRecentMessages().catch(() => []);
         if (messages && messages.length > 0) state.recentMessages = messages;
@@ -1291,11 +1296,55 @@ function openTontineDetailsModal(id) {
     }, 100);
 
     window.currentOpenedTontine = tontine;
+    loadTontineDrawState(tontine);
     renderTontineDrawOrder(tontine, false);
     if (typeof renderTontinePenalties === 'function') renderTontinePenalties(tontine);
 }
 
+function saveTontineDrawState(tontine) {
+    if (!tontine) return;
+    try {
+        const saved = JSON.parse(localStorage.getItem('tontine_draw_states') || '{}');
+        const key = tontine.id || tontine.name;
+        saved[key] = {
+            isDrawOfficial: tontine.isDrawOfficial,
+            certCode: tontine.certCode,
+            certTime: tontine.certTime,
+            drawOrder: tontine.drawOrder
+        };
+        localStorage.setItem('tontine_draw_states', JSON.stringify(saved));
+        if (typeof DataService !== 'undefined' && DataService.updateTontine) {
+            DataService.updateTontine(tontine.id, {
+                is_draw_official: tontine.isDrawOfficial,
+                cert_code: tontine.certCode,
+                cert_time: tontine.certTime,
+                draw_order: tontine.drawOrder
+            }).catch(() => {});
+        }
+    } catch(e) { console.warn("Erreur sauvegarde draw state:", e); }
+}
+
+function loadTontineDrawState(tontine) {
+    if (!tontine) return;
+    try {
+        const saved = JSON.parse(localStorage.getItem('tontine_draw_states') || '{}');
+        const key = tontine.id || tontine.name;
+        const stateData = saved[key] || saved[tontine.name];
+        if (stateData && stateData.isDrawOfficial) {
+            tontine.isDrawOfficial = stateData.isDrawOfficial;
+            tontine.certCode = stateData.certCode;
+            tontine.certTime = stateData.certTime;
+            if (stateData.drawOrder && stateData.drawOrder.length > 0) {
+                tontine.drawOrder = stateData.drawOrder;
+            }
+        }
+    } catch(e) { console.warn("Erreur chargement draw state:", e); }
+}
+
 function renderTontineDrawOrder(tontine, isReshuffle) {
+    if (!isReshuffle) {
+        loadTontineDrawState(tontine);
+    }
     const resultsBox = document.getElementById('draw-results-list');
     const badge = document.getElementById('draw-status-badge');
     if (!resultsBox) return;
@@ -1364,15 +1413,31 @@ function renderTontineDrawOrder(tontine, isReshuffle) {
     const certCodeEl = document.getElementById('draw-cert-code');
     const certTimeEl = document.getElementById('draw-cert-time');
     const btnTrigger = document.getElementById('btn-trigger-draw');
+    const btnReset = document.getElementById('btn-reset-draw');
+    const lockBadge = document.getElementById('draw-lock-badge');
 
     if (tontine.isDrawOfficial) {
         if (certBox) certBox.classList.remove('hidden');
         if (certCodeEl) certCodeEl.textContent = tontine.certCode || 'CERT-8F39';
         if (certTimeEl) certTimeEl.textContent = 'Horodaté et verrouillé le ' + (tontine.certTime || '26/07/2026');
         if (btnTrigger) btnTrigger.style.display = 'none'; // Verrouillage Anti-Truquage !
+        
+        // RÈGLE ANTI-TRUQUAGE ABSOLUE (Demande expresse de Wilfried) :
+        // Tant que la tontine est 'En cours', le tirage est validé "une fois de bon" et est 100% verrouillé !
+        const isClosed = (tontine.status === 'Clôturée' || tontine.status === 'Terminée' || tontine.isClosed === true);
+        if (lockBadge) lockBadge.style.display = isClosed ? 'none' : 'flex';
+        if (btnReset) {
+            if (!isClosed) {
+                btnReset.classList.add('hidden'); // Interdiction totale d'afficher le bouton pendant le cycle en cours !
+            } else {
+                btnReset.classList.remove('hidden'); // Autoriser un nouveau cycle uniquement si la tontine a d'abord été clôturée !
+            }
+        }
     } else {
         if (certBox) certBox.classList.add('hidden');
         if (btnTrigger) btnTrigger.style.display = ''; // Réafficher le bouton si non officiel
+        if (btnReset) btnReset.classList.add('hidden');
+        if (lockBadge) lockBadge.style.display = 'none';
     }
 }
 
@@ -1383,6 +1448,11 @@ function triggerTontineDraw() {
     }
     const tontine = window.currentOpenedTontine;
     if (!tontine) return;
+
+    if (tontine.isDrawOfficial) {
+        showToast("🔒 Règle Anti-Truquage : Ce tirage est déjà officiel et verrouillé pour ce cycle !", "error");
+        return;
+    }
 
     const animBox = document.getElementById('draw-animation-box');
     const resultsBox = document.getElementById('draw-results-list');
@@ -1405,8 +1475,9 @@ function triggerTontineDraw() {
                 tontine.isDrawOfficial = true;
                 tontine.certCode = 'CERT-' + Math.random().toString(36).substring(2, 6).toUpperCase();
                 tontine.certTime = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                saveTontineDrawState(tontine); // Sauvegarde permanente !
                 renderTontineDrawOrder(tontine, true);
-                showToast(`🛡️ Tirage certifié (#${tontine.certCode}) ! Ordre officiel verrouillé contre le truquage.`, "success");
+                showToast(`🛡️ Tirage certifié (#${tontine.certCode}) ! Ordre officiel verrouillé pour ce cycle.`, "success");
             }
         }, 120);
     }
@@ -1414,21 +1485,28 @@ function triggerTontineDraw() {
 
 function resetTontineDraw() {
     if (!checkPermission('create_tontine')) {
-        showToast("🔒 Action refusée : Seul le gestionnaire peut relancer un tirage !", "error");
+        showToast("🔒 Action refusée : Seul le gestionnaire peut lancer un nouveau cycle !", "error");
         return;
     }
     const tontine = window.currentOpenedTontine;
     if (!tontine) return;
 
-    if (!confirm("⚠️ ATTENTION ANTI-TRUQUAGE : Ce tirage est officiellement certifié. Si vous le réinitialisez, le certificat actuel sera annulé et une alerte sera visible par tous les membres dans le journal d'audit ! Voulez-vous vraiment continuer ?")) {
+    const isClosed = (tontine.status === 'Clôturée' || tontine.status === 'Terminée' || tontine.isClosed === true);
+    if (!isClosed) {
+        showToast("🔒 IMPOSSIBLE DE RELANCER : Conformément aux règles anti-truquage, un tirage officiel ne peut absolument pas être relancé tant que la tontine est 'En cours'. Vous devez d'abord clôturer cette tontine avant de pouvoir recommencer un nouveau tirage !", "error");
+        return;
+    }
+
+    if (!confirm("⚠️ NOUVEAU CYCLE : Vous êtes sur le point de lancer un nouveau cycle pour cette tontine clôturée. L'ancien certificat de tirage sera archivé et un nouveau tirage pourra être effectué. Continuer ?")) {
         return;
     }
 
     tontine.isDrawOfficial = false;
     tontine.certCode = null;
     tontine.certTime = null;
+    saveTontineDrawState(tontine);
 
-    showToast("⚠️ Certificat annulé. Vous pouvez maintenant lancer un nouveau tirage.", "warning");
+    showToast("⚠️ Cycle réinitialisé. Vous pouvez maintenant lancer le tirage pour le nouveau tour.", "warning");
     renderTontineDrawOrder(tontine, false);
 }
 
@@ -3419,10 +3497,31 @@ function updateUserPassword(btnEl) {
         return;
     }
 
+    const userEmail = (state && state.user && state.user.email) ? state.user.email.trim().toLowerCase() : 'user@tontine.pro';
+    const storedPwd = localStorage.getItem('tontine_user_pwd_' + userEmail) || localStorage.getItem('tontine_user_pwd_general');
+    
+    if (storedPwd && currVal !== storedPwd) {
+        showToast("⚠ Erreur : Le mot de passe actuel saisi est incorrect !", "error");
+        if (currInp) currInp.focus();
+        return;
+    }
+
     if (!newVal || newVal.length < 4) {
         showToast("⚠ Le nouveau mot de passe doit comporter au moins 4 caractères !", "warning");
         if (newInp) newInp.focus();
         return;
+    }
+
+    // Enregistrer immédiatement le nouveau mot de passe (pour interdire l'ancien lors des prochaines connexions)
+    localStorage.setItem('tontine_user_pwd_' + userEmail, newVal);
+    localStorage.setItem('tontine_user_pwd_general', newVal);
+
+    // Mettre à jour sur le serveur Supabase
+    if (typeof getSupabaseClient === 'function') {
+        const client = getSupabaseClient();
+        if (client && client.auth) {
+            client.auth.updateUser({ password: newVal }).catch(e => {});
+        }
     }
 
     // Réinitialiser les champs
@@ -3442,7 +3541,7 @@ function updateUserPassword(btnEl) {
         }, 2500);
     }
 
-    showToast("🔒 Mot de passe mis à jour avec succès ! Votre compte est sécurisé.", "success");
+    showToast("🔒 Mot de passe mis à jour avec succès ! Votre ancien mot de passe ne fonctionnera plus pour vous connecter.", "success");
 }
 
 function openPremiumDiscoverModal() {

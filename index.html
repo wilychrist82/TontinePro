@@ -1063,6 +1063,9 @@
                 if (error) {
                     alert("Erreur d'inscription : " + error.message);
                 } else {
+                    const userEmailLower = (email || '').trim().toLowerCase();
+                    localStorage.setItem('tontine_user_pwd_' + userEmailLower, password);
+                    localStorage.setItem('tontine_user_pwd_general', password);
                     alert('Inscription réussie ! Redirection en cours...');
                     window.location.href = '../index.html'; // Redirige vers le dashboard
                 }

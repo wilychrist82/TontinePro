@@ -133,7 +133,11 @@ const DataService = (() => {
                     frequency: t.frequency,
                     members: `${t.current_members || 0}/${t.max_members || 10}`,
                     progression: t.progression || 0,
-                    status: t.status
+                    status: t.status,
+                    isDrawOfficial: t.is_draw_official,
+                    certCode: t.cert_code,
+                    certTime: t.cert_time,
+                    drawOrder: t.draw_order
                 }));
             }
         }
