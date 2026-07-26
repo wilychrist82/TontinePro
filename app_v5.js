@@ -7,6 +7,17 @@
 // Utiliser getSupabaseClient() pour obtenir l'instance.
 
 // --- 2. GLOBAL STATE ---
+function toggleCustomDays(selectEl, groupId) {
+    const group = document.getElementById(groupId);
+    if (!group) return;
+    if (selectEl.value === 'Personnalisé' || selectEl.value.startsWith('Chaque')) {
+        group.style.display = 'block';
+    } else {
+        group.style.display = 'none';
+    }
+}
+window.toggleCustomDays = toggleCustomDays;
+
 const state = {
     user: {
         name: "Utilisateur",
@@ -335,7 +346,11 @@ function setupQuickActions() {
 
             const name = document.getElementById('tontine-name-input').value.trim();
             const amount = parseInt(document.getElementById('tontine-amount-input').value);
-            const frequency = document.getElementById('tontine-frequency-input').value;
+            let frequency = document.getElementById('tontine-frequency-input').value;
+            if (frequency === 'Personnalisé') {
+                const customDays = parseInt(document.getElementById('tontine-custom-days-input').value) || 5;
+                frequency = `Chaque ${customDays} jours`;
+            }
             const maxMembers = parseInt(document.getElementById('tontine-max-members-input').value);
 
             if (!name) {
@@ -379,6 +394,9 @@ function setupQuickActions() {
                 document.getElementById('create-tontine-modal').classList.add('hidden');
                 document.getElementById('tontine-name-input').value = '';
                 document.getElementById('tontine-amount-input').value = '';
+                document.getElementById('tontine-frequency-input').value = 'Mensuel';
+                const customGrp = document.getElementById('tontine-custom-days-group');
+                if (customGrp) customGrp.style.display = 'none';
                 
                 showToast("Tontine créée avec succès !", "success");
                 
@@ -425,7 +443,11 @@ function setupQuickActions() {
             const id = document.getElementById('edit-tontine-id-input').value;
             const name = document.getElementById('edit-tontine-name-input').value;
             const amount = parseInt(document.getElementById('edit-tontine-amount-input').value);
-            const frequency = document.getElementById('edit-tontine-frequency-input').value;
+            let frequency = document.getElementById('edit-tontine-frequency-input').value;
+            if (frequency === 'Personnalisé') {
+                const customDays = parseInt(document.getElementById('edit-tontine-custom-days-input').value) || 5;
+                frequency = `Chaque ${customDays} jours`;
+            }
             const maxMembers = parseInt(document.getElementById('edit-tontine-max-members-input').value);
 
             if (!id || !name || isNaN(amount)) {
@@ -1211,7 +1233,20 @@ function openEditTontineModal(id) {
     document.getElementById('edit-tontine-id-input').value = tontine.id;
     document.getElementById('edit-tontine-name-input').value = tontine.name;
     document.getElementById('edit-tontine-amount-input').value = tontine.amount;
-    document.getElementById('edit-tontine-frequency-input').value = tontine.frequency;
+    
+    const freqInput = document.getElementById('edit-tontine-frequency-input');
+    const customGroup = document.getElementById('edit-tontine-custom-days-group');
+    const customInput = document.getElementById('edit-tontine-custom-days-input');
+    
+    if (tontine.frequency && (tontine.frequency.startsWith('Chaque') || tontine.frequency === 'Personnalisé')) {
+        freqInput.value = 'Personnalisé';
+        if (customGroup) customGroup.style.display = 'block';
+        const numMatch = tontine.frequency.match(/\d+/);
+        if (numMatch && customInput) customInput.value = numMatch[0];
+    } else {
+        freqInput.value = tontine.frequency || 'Mensuel';
+        if (customGroup) customGroup.style.display = 'none';
+    }
     
     // Extract max_members from string like '0/20' or '5/10'
     const maxMembers = parseInt(tontine.members.split('/')[1]) || 10;
