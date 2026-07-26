@@ -752,15 +752,32 @@
                 </div>
             </div>
 
-            <!-- Section Membres (Placeholder) -->
-            <div>
-                <h4 style="margin-bottom: 12px; font-size: 16px; color: var(--text-1, #1E293B);">Membres participants</h4>
-                <div style="background: rgba(92, 96, 245, 0.05); border: 1px dashed var(--primary, #5C60F5); border-radius: 12px; padding: 25px; text-align: center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary, #5C60F5); margin: 0 auto 10px opacity: 0.8;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    <p style="color: var(--text-2, #64748B); font-size: 14px; line-height: 1.5; margin: 0;">
-                        L'assignation détaillée des membres sera disponible dans le module <strong>Gestion des Membres</strong>.<br>
-                        Vous pourrez y définir les tours de rôle et envoyer des invitations.
-                    </p>
+            <!-- Section Ordre de passage & Tirage au Sort -->
+            <div id="tontine-draw-section" style="margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h4 style="margin: 0; font-size: 16px; color: var(--text-1, #1E293B); display: flex; align-items: center; gap: 8px;">
+                            <span>🎲 Ordre de Passage & Tirage au Sort</span>
+                            <span id="draw-status-badge" style="font-size: 11px; background: rgba(245, 158, 11, 0.15); color: #D97706; padding: 2px 8px; border-radius: 12px; font-weight: 600;">Standard</span>
+                        </h4>
+                        <div style="font-size: 12px; color: var(--text-3, #94A3B8); margin-top: 2px;">Ordre officiel d'attribution des cagnottes de cette tontine.</div>
+                    </div>
+                    <button id="btn-trigger-draw" onclick="if(typeof triggerTontineDraw === 'function') triggerTontineDraw()" style="background: linear-gradient(135deg, #5C60F5, #4F46E5); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(92, 96, 245, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        Lancer le Tirage !
+                    </button>
+                </div>
+
+                <!-- Zone d'animation du tirage (masquée par défaut) -->
+                <div id="draw-animation-box" class="hidden" style="background: rgba(92, 96, 245, 0.08); border: 2px dashed #5C60F5; border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 36px; margin-bottom: 10px; display: inline-block; animation: spin 1s infinite linear;">🎰</div>
+                    <h4 style="color: #5C60F5; font-size: 16px; margin: 0 0 5px 0;">Tirage aléatoire équitable en cours...</h4>
+                    <p id="draw-animation-name" style="font-size: 15px; font-weight: 700; color: #1E293B; margin: 0;">Mélange des membres...</p>
+                </div>
+
+                <!-- Liste officielle de l'ordre de passage -->
+                <div id="draw-results-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Sera injecté par JS -->
                 </div>
             </div>
             

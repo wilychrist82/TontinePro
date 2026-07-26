@@ -68,4 +68,11 @@ Tontine Pro est une application web (SaaS) de gestion de tontines (cercles d'ép
   - `toggleMemberRole(id, name, role)` — Changer le rôle d'un membre
   - `copyInviteLink()` — Copier le lien d'invitation
   - `checkPermission(action)` / `applyRoleRestrictions()` — Système de permissions
+  - `renderTontineDrawOrder(tontine, isReshuffle)` / `triggerTontineDraw()` — Générateur d'ordre de passage et tirage au sort aléatoire (Fisher-Yates) avec animation 🎰.
+
+- **Axe 5 (Terminé — Session Actuelle)** :
+  1. **Générateur d'Ordre de Passage & Tirage au Sort (`#tontine-draw-section`)** : Intégré dans le modal de détails d'une tontine (`#tontine-details-modal`) en remplacement du placeholder.
+  2. **Animation de Tirage Aléatoire** : Effet de machine à sous / roulette (`#draw-animation-box`) avec rotation de noms aléatoires pendant 1.5s, puis affichage de la liste numérotée officielle.
+  3. **Attribution des Tours** : Chaque membre reçoit son numéro de passage (#1, #2, #3...), la mention du gagnant du Tour 1 👑 et la date estimée d'encaissement.
+  4. **Sécurisation du Tirage** : Bouton `Lancer le Tirage !` restreint aux rôles Admin/Gestionnaire (désactivé en vue Membre). Lien rapide ajouté dans le menu déroulant d'action des tontines (`Détails & Tirage 🎲`).
 

@@ -1150,7 +1150,7 @@ function renderTontinesTable() {
                         </a>
                         <a class="action-dropdown-item" onclick="openTontineDetailsModal('${t.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            Voir détails
+                            Détails & Tirage 🎲
                         </a>
                         <a class="action-dropdown-item danger" onclick="deleteTontineAction('${t.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -1246,7 +1246,112 @@ function openTontineDetailsModal(id) {
     setTimeout(() => {
         fill.style.width = tontine.progression + '%';
     }, 100);
+
+    window.currentOpenedTontine = tontine;
+    renderTontineDrawOrder(tontine, false);
 }
+
+function renderTontineDrawOrder(tontine, isReshuffle) {
+    const resultsBox = document.getElementById('draw-results-list');
+    const badge = document.getElementById('draw-status-badge');
+    if (!resultsBox) return;
+
+    // Récupérer ou générer des membres pour ce cercle
+    let memberNames = ['Jean-Paul', 'Awa N.', 'Kossi A.', 'Fatou D.', 'David M.', 'Sophie L.', 'Raphaël B.', 'Aminata S.'];
+    if (state.extendedMembers && state.extendedMembers.length > 0) {
+        memberNames = state.extendedMembers.map(m => m.name || m.full_name || 'Membre');
+    }
+    const maxCount = parseInt(String(tontine.members).split('/')[1]) || 6;
+    let currentList = memberNames.slice(0, Math.min(memberNames.length, maxCount));
+
+    if (!tontine.drawOrder || isReshuffle) {
+        // Mélange de Fisher-Yates (Shuffle aléatoire)
+        let array = [...currentList];
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        tontine.drawOrder = array;
+    }
+
+    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const currentMonth = new Date().getMonth();
+
+    resultsBox.innerHTML = tontine.drawOrder.map((name, idx) => {
+        const drawMonth = monthNames[(currentMonth + idx) % 12];
+        const isFirst = idx === 0;
+        
+        return `
+            <div style="background: ${isFirst ? 'rgba(16, 185, 129, 0.08)' : 'var(--card, #fff)'}; border: 1px solid ${isFirst ? '#10B981' : 'var(--border, #E2E8F0)'}; border-radius: 10px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(4px)'" onmouseout="this.style.transform='translateX(0)'">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: ${isFirst ? '#10B981' : 'rgba(92, 96, 245, 0.1)'}; color: ${isFirst ? '#fff' : 'var(--primary, #5C60F5)'}; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; box-shadow: ${isFirst ? '0 2px 6px rgba(16,185,129,0.3)' : 'none'};">
+                        #${idx + 1}
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-1, #1E293B); font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                            ${name} ${isFirst ? '<span style="font-size: 11px; background: #10B981; color: white; padding: 1px 6px; border-radius: 4px; font-weight: 700;">👑 Gagnant Tour 1</span>' : ''}
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-3, #94A3B8);">
+                            📅 Date d'encaissement estimée : <strong>15 ${drawMonth} 2026</strong>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-weight: 700; color: var(--primary, #5C60F5); font-size: 13px;">${new Intl.NumberFormat('fr-FR').format(tontine.amount || 50000)} FCFA</span>
+                    <div style="font-size: 11px; color: #10B981; font-weight: 600;">✔ Assigné</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    if (badge) {
+        if (isReshuffle || tontine.isDrawOfficial) {
+            badge.textContent = '✔ Ordre Officiel Fixé';
+            badge.style.background = 'rgba(16, 185, 129, 0.15)';
+            badge.style.color = '#10B981';
+        } else {
+            badge.textContent = 'Provisoire';
+            badge.style.background = 'rgba(245, 158, 11, 0.15)';
+            badge.style.color = '#D97706';
+        }
+    }
+}
+
+function triggerTontineDraw() {
+    if (!checkPermission('create_tontine')) {
+        showToast("🔒 Action refusée : Seul le gestionnaire peut lancer le tirage au sort de l'ordre de passage !", "error");
+        return;
+    }
+    const tontine = window.currentOpenedTontine;
+    if (!tontine) return;
+
+    const animBox = document.getElementById('draw-animation-box');
+    const resultsBox = document.getElementById('draw-results-list');
+    const nameEl = document.getElementById('draw-animation-name');
+
+    if (animBox && resultsBox) {
+        resultsBox.style.display = 'none';
+        animBox.classList.remove('hidden');
+
+        const dummyNames = ['Kossi A.', 'Awa N.', 'Jean-Paul', 'Fatou D.', 'David M.', 'Sophie L.', 'Raphaël B.'];
+        let count = 0;
+        const interval = setInterval(() => {
+            const rnd = dummyNames[Math.floor(Math.random() * dummyNames.length)];
+            if (nameEl) nameEl.textContent = `Mélange en cours : ${rnd} ⚡`;
+            count++;
+            if (count > 10) {
+                clearInterval(interval);
+                animBox.classList.add('hidden');
+                resultsBox.style.display = 'flex';
+                tontine.isDrawOfficial = true;
+                renderTontineDrawOrder(tontine, true);
+                showToast("🎰 Tirage au sort terminé : l'ordre officiel de passage a été généré avec succès !", "success");
+            }
+        }, 120);
+    }
+}
+window.triggerTontineDraw = triggerTontineDraw;
+window.renderTontineDrawOrder = renderTontineDrawOrder;
 
 function renderTransactions() {
     const list = document.getElementById('transactions-list');
@@ -2934,7 +3039,7 @@ function applyRoleRestrictions() {
     });
 
     // Masquer / réactiver les boutons sensibles pour les membres simples
-    ['btn-quick-create-tontine', 'btn-quick-validate-pay', 'btn-quick-add-member', 'btn-close-current-round'].forEach(id => {
+    ['btn-quick-create-tontine', 'btn-quick-validate-pay', 'btn-quick-add-member', 'btn-close-current-round', 'btn-trigger-draw'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             if (!isAdmin) {
