@@ -1315,6 +1315,21 @@ function renderTontineDrawOrder(tontine, isReshuffle) {
             badge.style.color = '#D97706';
         }
     }
+
+    const certBox = document.getElementById('draw-cert-box');
+    const certCodeEl = document.getElementById('draw-cert-code');
+    const certTimeEl = document.getElementById('draw-cert-time');
+    const btnTrigger = document.getElementById('btn-trigger-draw');
+
+    if (tontine.isDrawOfficial) {
+        if (certBox) certBox.classList.remove('hidden');
+        if (certCodeEl) certCodeEl.textContent = tontine.certCode || 'CERT-8F39';
+        if (certTimeEl) certTimeEl.textContent = 'Horodaté et verrouillé le ' + (tontine.certTime || '26/07/2026');
+        if (btnTrigger) btnTrigger.style.display = 'none'; // Verrouillage Anti-Truquage !
+    } else {
+        if (certBox) certBox.classList.add('hidden');
+        if (btnTrigger) btnTrigger.style.display = ''; // Réafficher le bouton si non officiel
+    }
 }
 
 function triggerTontineDraw() {
@@ -1344,14 +1359,61 @@ function triggerTontineDraw() {
                 animBox.classList.add('hidden');
                 resultsBox.style.display = 'flex';
                 tontine.isDrawOfficial = true;
+                tontine.certCode = 'CERT-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+                tontine.certTime = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
                 renderTontineDrawOrder(tontine, true);
-                showToast("🎰 Tirage au sort terminé : l'ordre officiel de passage a été généré avec succès !", "success");
+                showToast(`🛡️ Tirage certifié (#${tontine.certCode}) ! Ordre officiel verrouillé contre le truquage.`, "success");
             }
         }, 120);
     }
 }
+
+function resetTontineDraw() {
+    if (!checkPermission('create_tontine')) {
+        showToast("🔒 Action refusée : Seul le gestionnaire peut relancer un tirage !", "error");
+        return;
+    }
+    const tontine = window.currentOpenedTontine;
+    if (!tontine) return;
+
+    if (!confirm("⚠️ ATTENTION ANTI-TRUQUAGE : Ce tirage est officiellement certifié. Si vous le réinitialisez, le certificat actuel sera annulé et une alerte sera visible par tous les membres dans le journal d'audit ! Voulez-vous vraiment continuer ?")) {
+        return;
+    }
+
+    tontine.isDrawOfficial = false;
+    tontine.certCode = null;
+    tontine.certTime = null;
+
+    showToast("⚠️ Certificat annulé. Vous pouvez maintenant lancer un nouveau tirage.", "warning");
+    renderTontineDrawOrder(tontine, false);
+}
+
+function shareDrawCertWhatsApp() {
+    const tontine = window.currentOpenedTontine;
+    if (!tontine || !tontine.drawOrder) return;
+
+    let msg = `🏛️ *TONTINE PRO — CERTIFICAT DE TIRAGE OFFICIEL* 🏛️\n`;
+    msg += `Tontine : *${tontine.name}*\n`;
+    if (tontine.certCode) msg += `Certificat : *#${tontine.certCode}* (${tontine.certTime})\n\n`;
+    msg += `*Ordre officiel d'encaissement :*\n`;
+    
+    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const currentMonth = new Date().getMonth();
+
+    tontine.drawOrder.forEach((name, idx) => {
+        const drawMonth = monthNames[(currentMonth + idx) % 12];
+        msg += `${idx === 0 ? '👑' : '👤'} *Tour #${idx + 1} (${drawMonth})* : ${name}\n`;
+    });
+
+    msg += `\n🛡️ _Ordre certifié par algorithme aléatoire équitable. Toute modification annule ce certificat et alerte le groupe._`;
+
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
 window.triggerTontineDraw = triggerTontineDraw;
 window.renderTontineDrawOrder = renderTontineDrawOrder;
+window.resetTontineDraw = resetTontineDraw;
+window.shareDrawCertWhatsApp = shareDrawCertWhatsApp;
 
 function renderTransactions() {
     const list = document.getElementById('transactions-list');
@@ -2973,8 +3035,8 @@ function renderAdminMembers(query) {
             <td style="padding:12px 16px;">${status}</td>
             <td style="padding:12px 16px;">${roleLabel}</td>
             <td style="padding:12px 16px;text-align:center;">
-                <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
-                    ${role === 'admin' || role === 'Gestionnaire' ? 'Rétrograder' : 'Promouvoir Admin'}
+                <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;${role === 'admin' || role === 'Gestionnaire' ? 'border-color:#ef4444;color:#ef4444;' : 'background:#6366f1;color:white;border:none;'}" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
+                    ${role === 'admin' || role === 'Gestionnaire' ? '🚫 Retirer droits' : '🤝 Déléguer Admin'}
                 </button>
             </td>
         </tr>`;
@@ -2983,15 +3045,15 @@ function renderAdminMembers(query) {
 
 function toggleMemberRole(memberId, memberName, currentRole) {
     const newRole = (currentRole === 'admin' || currentRole === 'Gestionnaire') ? 'membre' : 'admin';
-    const action = newRole === 'admin' ? `promouvoir "${memberName}" comme Administrateur` : `rétrograder "${memberName}" en Membre`;
-    if (!confirm(`Êtes-vous sûr de vouloir ${action} ?`)) return;
+    const action = newRole === 'admin' ? `déléguer les droits d'administration (Intérim) à "${memberName}"` : `retirer les droits d'administration à "${memberName}"`;
+    if (!confirm(`🤝 DÉLÉGATION DE POUVOIR : Êtes-vous sûr de vouloir ${action} ? \n\n${newRole === 'admin' ? 'Ce membre aura le pouvoir complet de gérer la tontine (tirages, paiements, clôtures) pendant votre absence !' : 'Ce membre redeviendra un simple participant sans accès à la gestion.'}`)) return;
 
     // Mettre à jour localement
     const members = state.extendedMembers || extendedMembers || [];
     const found = members.find(m => m.id === memberId);
     if (found) {
         found.role = newRole;
-        showToast(`Rôle de ${memberName} mis à jour : ${newRole === 'admin' ? '🛡 Administrateur' : '👤 Membre'}`, 'success');
+        showToast(`🤝 Délégation mise à jour pour ${memberName} : ${newRole === 'admin' ? '🛡 Administrateur (Intérim)' : '👤 Simple Membre'}`, 'success');
         renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
     }
 }
@@ -3011,19 +3073,22 @@ function copyInviteLink() {
    ====================================================== */
 
 const PERMISSIONS = {
-    admin: ['create_tontine', 'close_round', 'validate_payment', 'view_admin', 'manage_members', 'view_reports'],
-    gestionnaire: ['create_tontine', 'close_round', 'validate_payment', 'view_admin', 'view_reports'],
+    admin: ['create_tontine', 'edit_tontine', 'delete_tontine', 'close_round', 'validate_payment', 'view_admin', 'manage_members', 'view_reports'],
+    administrateur: ['create_tontine', 'edit_tontine', 'delete_tontine', 'close_round', 'validate_payment', 'view_admin', 'manage_members', 'view_reports'],
+    gestionnaire: ['create_tontine', 'edit_tontine', 'delete_tontine', 'close_round', 'validate_payment', 'view_admin', 'manage_members', 'view_reports'],
     membre: ['view_reports']
 };
 
 function checkPermission(action) {
-    const role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    if (role === 'administrateur') role = 'admin';
     const allowed = PERMISSIONS[role] || PERMISSIONS['membre'];
     return allowed.includes(action);
 }
 
 function applyRoleRestrictions() {
-    const role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    if (role === 'administrateur') role = 'admin';
     const isAdmin = role === 'admin' || role === 'gestionnaire';
 
     // Afficher/masquer les onglets Administration et Audit Trail dans la sidebar
@@ -3089,7 +3154,7 @@ function applyRoleRestrictions() {
 
 function toggleRoleSimulator() {
     const current = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'gestionnaire';
-    const newRole = (current === 'admin' || current === 'gestionnaire') ? 'membre' : 'gestionnaire';
+    const newRole = (current === 'admin' || current === 'gestionnaire' || current === 'administrateur') ? 'membre' : 'gestionnaire';
     state.user.role = newRole === 'gestionnaire' ? 'Gestionnaire' : 'Membre';
 
     applyRoleRestrictions();

@@ -611,10 +611,24 @@
             </div>
             <div style="margin-top:12px;background:var(--content-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--text-2);word-break:break-all;" id="invite-link-display">Chargement...</div>
         </div>
+        <!-- Encadré Délégation de Pouvoir / Intérim -->
+        <div class="card" style="margin-bottom:20px;padding:16px 20px;background:rgba(99,102,241,0.06);border:1px dashed #6366f1;">
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="font-size:24px;">🤝</div>
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:#4f46e5;margin-bottom:4px;">Délégation de pouvoir (Gestion par Intérim)</div>
+                    <div style="font-size:12.5px;color:var(--text-2);line-height:1.4;">
+                        En cas d'absence, de voyage ou d'indisponibilité, vous pouvez <strong>donner la main à n'importe quel membre de confiance</strong> pour gérer la tontine à votre place. 
+                        Cliquez simplement sur le bouton <span style="background:#6366f1;color:white;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">🤝 Déléguer Admin</span> à côté d'un membre. Il recevra instantanément tous les droits de gestion (tirage au sort, validation de paiements, clôture de tours, etc.). 
+                        Vous pourrez lui retirer ces droits à tout moment à votre retour en cliquant sur <span style="border:1px solid #ef4444;color:#ef4444;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">🚫 Retirer droits</span> !
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Gestion des membres -->
         <div class="card" style="padding:0;overflow:hidden;">
             <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-                <div style="font-size:14px;font-weight:700;color:var(--text-1);">Gestion des membres</div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-1);">Gestion des membres & Délégation de pouvoir</div>
                 <input type="text" id="admin-search-members" placeholder="Rechercher..." style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text-1);outline:none;" oninput="renderAdminMembers(this.value)">
             </div>
             <table style="width:100%;border-collapse:collapse;">
@@ -773,6 +787,25 @@
                     <div style="font-size: 36px; margin-bottom: 10px; display: inline-block; animation: spin 1s infinite linear;">🎰</div>
                     <h4 style="color: #5C60F5; font-size: 16px; margin: 0 0 5px 0;">Tirage aléatoire équitable en cours...</h4>
                     <p id="draw-animation-name" style="font-size: 15px; font-weight: 700; color: #1E293B; margin: 0;">Mélange des membres...</p>
+                </div>
+
+                <!-- Zone de Certification Anti-Truquage (Masquée par défaut) -->
+                <div id="draw-cert-box" class="hidden" style="background: rgba(16, 185, 129, 0.08); border: 1px solid #10B981; border-radius: 12px; padding: 12px 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; color: #065F46; display: flex; align-items: center; gap: 6px;">
+                            <span>🛡️ Tirage Clôturé & Certifié Anti-Truquage</span>
+                            <span id="draw-cert-code" style="font-family: monospace; background: #10B981; color: white; padding: 1px 6px; border-radius: 4px; font-size: 11px;">CERT-0000</span>
+                        </div>
+                        <div id="draw-cert-time" style="font-size: 11.5px; color: #047857; margin-top: 3px;">Horodaté le —</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="if(typeof shareDrawCertWhatsApp === 'function') shareDrawCertWhatsApp()" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                            💬 Notifier WhatsApp
+                        </button>
+                        <button id="btn-reset-draw" class="admin-only" onclick="if(typeof resetTontineDraw === 'function') resetTontineDraw()" style="background: transparent; color: #EF4444; border: 1px solid #EF4444; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#EF4444'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#EF4444';" title="Réinitialiser le tirage officiel">
+                            🔄 Relancer
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Liste officielle de l'ordre de passage -->
