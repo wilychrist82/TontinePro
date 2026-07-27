@@ -117,6 +117,18 @@ async function init() {
 
     showGlobalLoader();
 
+    // 0. Détection du mode Membre Invité (verrouillage de la vue membre pour un utilisateur rejoignant via un lien d'invitation)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'membre' || urlParams.get('invite') !== null || urlParams.get('ref') !== null) {
+        localStorage.setItem('tontine_invited_member_mode', 'true');
+    } else if (urlParams.get('role') === 'admin' || urlParams.get('admin') === 'true') {
+        localStorage.removeItem('tontine_invited_member_mode');
+    }
+    if (localStorage.getItem('tontine_invited_member_mode') === 'true') {
+        if (!state.user) state.user = {};
+        state.user.role = 'Membre';
+    }
+
     // 1. Initialisation DataService & Vérification Auth
     if (typeof DataService !== 'undefined') {
         await DataService.init();
@@ -3694,7 +3706,7 @@ async function renderAdminTab() {
     const inviteEl = document.getElementById('invite-link-display');
     if (inviteEl) {
         const base = window.location.origin;
-        inviteEl.textContent = `${base}/inscription/?ref=tontine-pro-${Date.now().toString(36)}`;
+        inviteEl.textContent = `${base}/dashboard.html?role=membre&invite=tontine-pro-${Date.now().toString(36)}`;
     }
 
     renderAdminMembers('');
@@ -3791,9 +3803,14 @@ function checkPermission(action) {
 }
 
 function applyRoleRestrictions() {
+    const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
     let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    if (isInvitedMember) {
+        role = 'membre';
+        if (state.user) state.user.role = 'Membre';
+    }
     if (role === 'administrateur') role = 'admin';
-    const isAdmin = role === 'admin' || role === 'gestionnaire';
+    const isAdmin = (role === 'admin' || role === 'gestionnaire') && !isInvitedMember;
 
     // Afficher/masquer les onglets Administration et Audit Trail dans la sidebar
     ['btn-nav-admin', 'btn-nav-audit'].forEach(id => {
@@ -3807,21 +3824,11 @@ function applyRoleRestrictions() {
         if (card) card.style.display = isAdmin ? '' : 'none';
     });
 
-    // Masquer / réactiver les boutons sensibles pour les membres simples
+    // Masquer complètement ou afficher les boutons sensibles d'administration
     ['btn-quick-create-tontine', 'btn-quick-validate-pay', 'btn-quick-add-member', 'btn-close-current-round', 'btn-trigger-draw'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            if (!isAdmin) {
-                el.disabled = true;
-                el.title = 'Accès réservé aux gestionnaires';
-                el.style.opacity = '0.4';
-                el.style.cursor = 'not-allowed';
-            } else {
-                el.disabled = false;
-                el.title = '';
-                el.style.opacity = '1';
-                el.style.cursor = 'pointer';
-            }
+            el.style.display = isAdmin ? '' : 'none';
         }
     });
 
@@ -3836,17 +3843,17 @@ function applyRoleRestrictions() {
     }
 
     // Mettre à jour le bouton de bascule (Simulateur) dans la Topbar
-    const modeLbl = document.getElementById('lbl-current-role-mode');
-    if (modeLbl) modeLbl.textContent = isAdmin ? 'Admin 👑' : 'Membre 👤';
-
     const modeBtn = document.getElementById('btn-toggle-role-mode');
     if (modeBtn) {
-        if (isAdmin) {
+        if (isInvitedMember || !isAdmin) {
+            // Pour un membre invité ou simple membre, on masque complètement le bouton de bascule simulateur !
+            modeBtn.style.display = 'none';
+        } else {
+            modeBtn.style.display = 'flex';
+            const modeLbl = document.getElementById('lbl-current-role-mode');
+            if (modeLbl) modeLbl.textContent = 'Admin 👑';
             modeBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
             modeBtn.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
-        } else {
-            modeBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-            modeBtn.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
         }
     }
 
