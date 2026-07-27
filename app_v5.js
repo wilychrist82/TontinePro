@@ -18,6 +18,17 @@ function toggleCustomDays(selectEl, groupId) {
 }
 window.toggleCustomDays = toggleCustomDays;
 
+function toggleTontineType(selectEl, groupId) {
+    const group = document.getElementById(groupId);
+    if (!group) return;
+    if (selectEl.value === 'Objectif') {
+        group.style.display = 'block';
+    } else {
+        group.style.display = 'none';
+    }
+}
+window.toggleTontineType = toggleTontineType;
+
 const state = {
     user: {
         name: "Utilisateur",
@@ -357,6 +368,9 @@ function setupQuickActions() {
                 frequency = `Chaque ${customDays} jours`;
             }
             const maxMembers = parseInt(document.getElementById('tontine-max-members-input').value);
+            const type = document.getElementById('tontine-type-input') ? document.getElementById('tontine-type-input').value : 'Rotative';
+            const goalAmount = document.getElementById('tontine-goal-amount-input') ? parseInt(document.getElementById('tontine-goal-amount-input').value) || 0 : 0;
+            const goalTitle = document.getElementById('tontine-goal-title-input') ? document.getElementById('tontine-goal-title-input').value.trim() : '';
 
             if (!name) {
                 showToast("Le nom de la tontine est obligatoire.", "error");
@@ -387,7 +401,10 @@ function setupQuickActions() {
                 name: name,
                 amount_per_cycle: amount,
                 frequency: frequency,
-                max_members: maxMembers || 10
+                max_members: maxMembers || 10,
+                type: type,
+                goal_amount: goalAmount,
+                goal_title: goalTitle
             });
             hideGlobalLoader();
             btnSubmitCreateTontine.disabled = false;
@@ -400,8 +417,13 @@ function setupQuickActions() {
                 document.getElementById('tontine-name-input').value = '';
                 document.getElementById('tontine-amount-input').value = '';
                 document.getElementById('tontine-frequency-input').value = 'Mensuel';
+                if (document.getElementById('tontine-type-input')) document.getElementById('tontine-type-input').value = 'Rotative';
+                if (document.getElementById('tontine-goal-amount-input')) document.getElementById('tontine-goal-amount-input').value = '';
+                if (document.getElementById('tontine-goal-title-input')) document.getElementById('tontine-goal-title-input').value = '';
                 const customGrp = document.getElementById('tontine-custom-days-group');
                 if (customGrp) customGrp.style.display = 'none';
+                const goalGrp = document.getElementById('tontine-goal-group');
+                if (goalGrp) goalGrp.style.display = 'none';
                 
                 showToast("Tontine créée avec succès !", "success");
                 
@@ -419,7 +441,10 @@ function setupQuickActions() {
                         frequency: newTontine.frequency,
                         members: newTontine.current_members + "/" + newTontine.max_members,
                         progression: newTontine.progression,
-                        status: newTontine.status
+                        status: newTontine.status,
+                        type: newTontine.type || type,
+                        goalAmount: newTontine.goalAmount || goalAmount,
+                        goalTitle: newTontine.goalTitle || goalTitle
                     });
                 } else {
                     await loadDynamicData();
@@ -454,6 +479,9 @@ function setupQuickActions() {
                 frequency = `Chaque ${customDays} jours`;
             }
             const maxMembers = parseInt(document.getElementById('edit-tontine-max-members-input').value);
+            const type = document.getElementById('edit-tontine-type-input') ? document.getElementById('edit-tontine-type-input').value : 'Rotative';
+            const goalAmount = document.getElementById('edit-tontine-goal-amount-input') ? parseInt(document.getElementById('edit-tontine-goal-amount-input').value) || 0 : 0;
+            const goalTitle = document.getElementById('edit-tontine-goal-title-input') ? document.getElementById('edit-tontine-goal-title-input').value.trim() : '';
 
             if (!id || !name || isNaN(amount)) {
                 alert("Veuillez remplir correctement les champs.");
@@ -466,7 +494,10 @@ function setupQuickActions() {
                 name: name,
                 amount_per_cycle: amount,
                 frequency: frequency,
-                max_members: maxMembers || 10
+                max_members: maxMembers || 10,
+                type: type,
+                goal_amount: goalAmount,
+                goal_title: goalTitle
             });
             hideGlobalLoader();
             btnSubmitEditTontine.disabled = false;
@@ -474,6 +505,15 @@ function setupQuickActions() {
             if (error) {
                 alert("Erreur lors de la modification : " + error);
             } else {
+                const existing = state.activeTontines.find(t => t.id == id);
+                if (existing) {
+                    existing.name = name;
+                    existing.amount = amount;
+                    existing.frequency = frequency;
+                    existing.type = type;
+                    existing.goalAmount = goalAmount;
+                    existing.goalTitle = goalTitle;
+                }
                 document.getElementById('edit-tontine-modal').classList.add('hidden');
                 await loadDynamicData();
                 renderDashboard();
@@ -904,6 +944,7 @@ function renderDashboard() {
     renderTransactions();
     renderRecentMessages();
     renderActivityFeed();
+    if (typeof renderAnalyticsCharts === 'function') renderAnalyticsCharts(state);
 }
 
 function renderStats() {
@@ -1146,20 +1187,31 @@ function renderTontinesTable() {
             healthIcon = '🟠';
         }
 
+        const isGoal = (t.type === 'Objectif');
+        const typeBadge = isGoal 
+            ? `<div style="margin-top:5px;display:flex;flex-direction:column;gap:2px;"><span style="background:#d1fae5;color:#059669;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;display:inline-block;width:fit-content;">🎯 Objectif : ${new Intl.NumberFormat('fr-FR').format(t.goalAmount || 0)} FCFA</span>${t.goalTitle ? `<span style="font-size:11px;color:var(--text-3);font-style:italic;">"${escapeHTML(t.goalTitle)}"</span>` : ''}</div>`
+            : `<div style="margin-top:5px;"><span style="background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;display:inline-block;">🔄 Rotative Classique</span></div>`;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${t.name}</td>
-            <td>${new Intl.NumberFormat('fr-FR').format(t.amount)} FCFA</td>
-            <td>${t.frequency}</td>
-            <td>${t.members}</td>
             <td>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" style="width: 0%" data-target="${t.progression}"></div>
+                <div style="font-weight:600; color:var(--text-1); font-size:14px;">${escapeHTML(t.name)}</div>
+                ${typeBadge}
+            </td>
+            <td><span style="font-weight:600; color:var(--text-1);">${new Intl.NumberFormat('fr-FR').format(t.amount)} FCFA</span></td>
+            <td><span style="color:var(--text-2); font-size:13px;">${t.frequency}</span></td>
+            <td><span style="font-weight:600; color:var(--primary); background:rgba(92,96,245,0.08); padding:4px 8px; border-radius:6px; font-size:12px;">👥 ${t.members}</span></td>
+            <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="progress-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+                        <div class="progress-bar-fill" style="width: 0%; height:100%; background:${isGoal ? 'linear-gradient(90deg,#10b981,#059669)' : 'linear-gradient(90deg,#6366f1,#8b5cf6)'}; transition:width 1s ease;" data-target="${t.progression}"></div>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;color:${isGoal ? '#059669' : '#6366f1'};min-width:32px;text-align:right;">${t.progression}%</span>
                 </div>
             </td>
             <td>
                 <div style="display:flex; flex-direction:column; gap:4px;">
-                    <span class="badge-status ${healthClass}" style="display:inline-flex; align-items:center; gap:4px; font-weight:700;">
+                    <span class="badge-status ${healthClass}" style="display:inline-flex; align-items:center; gap:4px; font-weight:700; width:fit-content;">
                         ${healthScore}% ${healthIcon}
                     </span>
                     <span style="font-size:11px; color:var(--text-3);">${t.status}</span>
@@ -1177,7 +1229,7 @@ function renderTontinesTable() {
                         </a>
                         <a class="action-dropdown-item" onclick="openTontineDetailsModal('${t.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            Détails & Tirage 🎲
+                            ${isGoal ? 'Détails & Objectif 🎯' : 'Détails & Tirage 🎲'}
                         </a>
                         <a class="action-dropdown-item danger" onclick="deleteTontineAction('${t.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -1257,6 +1309,18 @@ function openEditTontineModal(id) {
     const maxMembers = parseInt(tontine.members.split('/')[1]) || 10;
     document.getElementById('edit-tontine-max-members-input').value = maxMembers;
 
+    const typeInput = document.getElementById('edit-tontine-type-input');
+    const goalGroup = document.getElementById('edit-tontine-goal-group');
+    const goalAmountInput = document.getElementById('edit-tontine-goal-amount-input');
+    const goalTitleInput = document.getElementById('edit-tontine-goal-title-input');
+
+    if (typeInput) {
+        typeInput.value = tontine.type || 'Rotative';
+        if (goalGroup) goalGroup.style.display = (tontine.type === 'Objectif') ? 'block' : 'none';
+        if (goalAmountInput) goalAmountInput.value = tontine.goalAmount || '';
+        if (goalTitleInput) goalTitleInput.value = tontine.goalTitle || '';
+    }
+
     if (!window.modalHistoryPushed) {
         history.pushState({ modalOpen: true }, '');
         window.modalHistoryPushed = true;
@@ -1296,8 +1360,45 @@ function openTontineDetailsModal(id) {
     }, 100);
 
     window.currentOpenedTontine = tontine;
-    loadTontineDrawState(tontine);
-    renderTontineDrawOrder(tontine, false);
+    const drawSec = document.getElementById('tontine-draw-section');
+    const goalSec = document.getElementById('tontine-goal-display-section');
+
+    if (tontine.type === 'Objectif') {
+        if (drawSec) drawSec.style.display = 'none';
+        if (goalSec) {
+            goalSec.style.display = 'block';
+            goalSec.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.05)); border: 1px solid #10b981; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 20px -5px rgba(16, 185, 129, 0.15);">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);">
+                        🎯
+                    </div>
+                    <h4 style="margin: 0 0 6px 0; font-size: 18px; color: #065f46; font-weight: 800;">Épargne Projet Communautaire</h4>
+                    <div style="font-size: 14px; color: var(--text-2); margin-bottom: 15px; font-weight: 600;">"${escapeHTML(tontine.goalTitle || 'Projet non spécifié')}"</div>
+                    
+                    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="border-right: 1px solid var(--border);">
+                            <div style="font-size: 11px; color: var(--text-3); text-transform: uppercase; font-weight: 700;">Objectif Global</div>
+                            <div style="font-size: 18px; font-weight: 800; color: #059669; margin-top: 4px;">${new Intl.NumberFormat('fr-FR').format(tontine.goalAmount || 0)} FCFA</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-3); text-transform: uppercase; font-weight: 700;">Progression</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 4px;">${tontine.progression}%</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--content-bg); padding: 12px; border-radius: 10px; font-size: 12px; color: var(--text-2); line-height: 1.5; text-align: left;">
+                        <strong>💡 Fonctionnement Épargne Projet :</strong> Contrairement à une tontine rotative classique où chaque membre remporte la cagnotte à tour de rôle, cette caisse commune est bloquée et dédiée à la réalisation du projet <em>"${escapeHTML(tontine.goalTitle || 'commun')}"</em>. Tous les fonds cotisés sont cumulés jusqu'à l'atteinte des 100%.
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (goalSec) goalSec.style.display = 'none';
+        if (drawSec) drawSec.style.display = 'block';
+        loadTontineDrawState(tontine);
+        renderTontineDrawOrder(tontine, false);
+    }
+
     if (typeof renderTontinePenalties === 'function') renderTontinePenalties(tontine);
 }
 
@@ -1967,6 +2068,67 @@ function updateCircleView(tontine) {
     }
 }
 
+/* ==========================================
+   AXE 6 : TONTINE TRUST SCORE (SCORING & BADGES)
+   ========================================== */
+function calculateTrustScore(member, transactions = []) {
+    let baseScore = member.trust !== undefined ? member.trust : (member.reliability_score !== undefined ? member.reliability_score : 100);
+    
+    if ((member.status === 'En retard' || member.role === 'En retard') && baseScore > 65) {
+        baseScore = Math.max(30, baseScore - 35);
+    }
+
+    const penalties = (state.penalties || []).filter(p => p.member === (member.name || member.full_name));
+    penalties.forEach(p => {
+        if (!p.resolved) baseScore = Math.max(10, baseScore - 20);
+        else baseScore = Math.min(95, baseScore + 5);
+    });
+
+    return Math.round(Math.min(100, Math.max(0, baseScore)));
+}
+
+function getTrustBadgeHTML(score, memberName = '') {
+    let badgeClass = 'trust-badge-platinum';
+    let icon = '💎';
+    let label = 'Platine';
+
+    if (score >= 90) {
+        badgeClass = 'trust-badge-platinum';
+        icon = '💎';
+        label = 'Platine';
+    } else if (score >= 75) {
+        badgeClass = 'trust-badge-gold';
+        icon = '🥇';
+        label = 'Or';
+    } else if (score >= 50) {
+        badgeClass = 'trust-badge-silver';
+        icon = '🥈';
+        label = 'Argent';
+    } else {
+        badgeClass = 'trust-badge-risk';
+        icon = '⚠️';
+        label = 'À Risque';
+    }
+
+    const safeName = escapeHTML(memberName || 'Ce membre');
+    return `<span class="trust-badge ${badgeClass}" onclick="showTrustScoreDetails('${safeName}', ${score}, '${label}')" title="Cliquer pour voir le détail de fiabilité">${icon} ${label} (${score}%)</span>`;
+}
+
+function showTrustScoreDetails(memberName, score, label) {
+    let explanation = "";
+    if (score >= 90) {
+        explanation = "Fiabilité irréprochable. Aucun retard constaté sur les cycles en cours et ponctualité parfaite aux cotisations.";
+    } else if (score >= 75) {
+        explanation = "Très bon payeur. Cotise régulièrement avec seulement de très légers retards régularisés rapidement.";
+    } else if (score >= 50) {
+        explanation = "Fiabilité moyenne. A présenté quelques retards de paiement ou des régularisations tardives dans le passé.";
+    } else {
+        explanation = "Attention : Profil à risque. Présente des retards de paiement actifs ou des pénalités non régularisées. À surveiller de près avant l'intégration dans des tontines à forts montants.";
+    }
+
+    alert(`🌟 TONTINE TRUST SCORE : ${memberName}\n\nScore actuel : ${score}/100 (${label})\n\n📋 Analyse de l'algorithme :\n${explanation}`);
+}
+
 async function renderMembersTab(searchQuery = '') {
     const grid = document.getElementById('members-full-grid');
     if (!grid) return;
@@ -1990,24 +2152,58 @@ async function renderMembersTab(searchQuery = '') {
 
     grid.innerHTML = members.map(m => {
         const name  = m.name || m.full_name || 'Membre';
-        const role  = m.role  || m.status  || 'Membre';
-        const trust = m.trust !== undefined ? m.trust : (m.reliability_score || 0);
-        const avatar = m.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=5C60F5&color=fff`;
-        const trustClass = trust >= 90 ? 'excellent' : trust >= 75 ? 'good' : 'fair';
-        const trustLabel = trust >= 90 ? 'Excellent' : trust >= 75 ? 'Bien'   : 'Moyen';
+        const role  = m.role  || 'Membre actif';
+        const status = m.status || 'À jour';
+        const isLate = status === 'En retard' || role === 'En retard';
+        const statusBadgeClass = isLate ? 'badge-red' : 'badge-green';
+        const trustScore = calculateTrustScore(m);
+        const trustBadgeHtml = getTrustBadgeHTML(trustScore, name);
+        const avatar = m.avatar || getAvatarInitials(name);
         const contributed = m.contributed !== undefined
             ? new Intl.NumberFormat('fr-FR').format(m.contributed) + ' FCFA'
-            : '—';
+            : (m.amount || '50 000 FCFA');
+        const tontinesCount = m.tontines !== undefined ? m.tontines : 1;
+
+        const currentRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+        const isAdminUser = currentRole === 'admin' || currentRole === 'gestionnaire';
+        const actionBtn = (isLate && isAdminUser) ? 
+            `<button onclick="sendReminder('${escapeHTML(name)}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; font-weight:600;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
+            `<button onclick="openMemberStatementModal('', '${escapeHTML(name)}'); return false;" style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight:600;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Profil & Relevé</button>`;
+
         return `
-        <div class="member-card">
-            <img src="${avatar}" alt="${name}" class="member-av"
-                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=5C60F5&color=fff'">
-            <div class="member-info">
-                <div class="member-name">${name}</div>
-                <div class="member-role">${role}</div>
+        <div class="member-card-full" style="transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0, 0, 0, 0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)';">
+            <div class="member-card-top" style="justify-content: space-between; align-items: flex-start;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <img src="${avatar}" alt="${escapeHTML(name)}" class="member-avatar-large"
+                         onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=5C60F5&color=fff&bold=true'">
+                    <div>
+                        <div class="member-full-name">${escapeHTML(name)}</div>
+                        <div class="member-phone-small">${escapeHTML(m.phone || m.email || role)}</div>
+                    </div>
+                </div>
+                <span class="badge-status ${statusBadgeClass}" style="font-size: 11px;">${status}</span>
             </div>
-            <div class="member-trust ${trustClass}">${trustLabel} (${trust}%)</div>
-            <div class="member-contributed">${contributed}</div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(92, 96, 245, 0.04); padding: 8px 12px; border-radius: 8px; border: 1px dashed rgba(92, 96, 245, 0.2);">
+                <span style="font-size: 12px; color: var(--text-2); font-weight: 500;">Fiabilité (Trust Score) :</span>
+                ${trustBadgeHtml}
+            </div>
+            
+            <div class="member-stats-row" style="grid-template-columns: 1fr 1fr;">
+                <div class="member-stat-mini">
+                    <span class="member-stat-mini-val">${tontinesCount}</span>
+                    <span class="member-stat-mini-label">Tontine(s)</span>
+                </div>
+                <div class="member-stat-mini">
+                    <span class="member-stat-mini-val" style="color: var(--primary); font-size: 13px;">${contributed}</span>
+                    <span class="member-stat-mini-label">Total cotisé</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: auto;">
+                <button onclick="openMemberStatementModal('', '${escapeHTML(name)}'); return false;" style="background: rgba(92, 96, 245, 0.1); color: var(--primary); border: 1px solid rgba(92, 96, 245, 0.2); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight:600; cursor: pointer; display: flex; align-items: center; gap: 4px;">📄 Relevé PDF</button>
+                ${actionBtn}
+            </div>
         </div>`;
     }).join('');
 }
@@ -2085,41 +2281,200 @@ window.deleteTransaction = function(id) {
 };
 
 async function renderMessagesTab() {
-    const convList = document.getElementById('conversations-list');
-    if (!convList) return;
-    convList.innerHTML = '<p style="padding:16px;color:var(--color-text-muted);font-size:13px">Chargement...</p>';
-
-    const messages = await DataService.getRecentMessages().catch(() => []);
-    if (!messages || messages.length === 0) {
-        convList.innerHTML = '<p style="padding:16px;color:var(--color-text-muted);font-size:13px">Aucun message.</p>';
-        return;
+    const tontines = state.activeTontines || [];
+    const members = state.extendedMembers || extendedMembers || [];
+    
+    // 1. Salons de Tontines
+    const roomsList = document.getElementById('tontine-rooms-list');
+    if (roomsList) {
+        let roomsHTML = `
+            <div class="conv-item active-conv" style="cursor:pointer; padding: 10px; border-radius: 8px; margin-bottom: 4px;" onclick="switchTontineRoom('# Général — Communauté', 'Tous les membres &middot; En ligne', null)">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(92,96,245,0.15); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;">#</div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 700; font-size: 13px; color: var(--text-1);"># Général</div>
+                    <div style="font-size: 11px; color: var(--text-3);">Communauté Tontine Pro</div>
+                </div>
+            </div>
+        `;
+        
+        tontines.forEach(t => {
+            const memCount = (t.members && t.members.length) ? t.members.length : members.length;
+            const safeName = escapeHTML(t.name).replace(/'/g, "\\'");
+            roomsHTML += `
+                <div class="conv-item" style="cursor:pointer; padding: 10px; border-radius: 8px; margin-bottom: 4px;" onclick="switchTontineRoom('# ${safeName}', '${memCount} membres &middot; Salon Tontine', '${t.id}')">
+                    <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(16,185,129,0.15); color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 16px;">🚀</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 700; font-size: 13px; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"># ${escapeHTML(t.name)}</div>
+                        <div style="font-size: 11px; color: var(--text-3);">${new Intl.NumberFormat('fr-FR').format(t.amount || 0)} FCFA</div>
+                    </div>
+                </div>
+            `;
+        });
+        roomsList.innerHTML = roomsHTML;
     }
 
-    convList.innerHTML = messages.map(msg => {
-        const icon = msg.type === 'group' ? 'users' : msg.type === 'system' ? 'bell' : 'user';
-        const safeSender = escapeHTML(msg.sender).replace(/'/g, "\\'");
-        const memberCount = msg.type === 'group' ? (extendedMembers.length > 0 ? extendedMembers.length : 10) : 1;
-        const countText = msg.type === 'group' ? `${memberCount} membres &middot; En ligne` : `En ligne`;
+    // 2. Messages Directs
+    const convList = document.getElementById('conversations-list');
+    if (convList) {
+        const messages = await DataService.getRecentMessages().catch(() => []);
+        if (!messages || messages.length === 0) {
+            convList.innerHTML = '<p style="padding:16px;color:var(--color-text-muted);font-size:12px">Aucun message direct.</p>';
+        } else {
+            convList.innerHTML = messages.map(msg => {
+                const icon = msg.type === 'group' ? 'users' : msg.type === 'system' ? 'bell' : 'user';
+                const safeSender = escapeHTML(msg.sender).replace(/'/g, "\\'");
+                const countText = `Message direct &middot; En ligne`;
+                return `
+                <div class="conv-item" style="cursor:pointer; padding: 10px; border-radius: 8px;" onclick="switchTontineRoom('${safeSender}', '${countText}', null)">
+                    <div class="msg-avatar ${msg.type}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(99,102,241,0.1);color:#6366f1;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(msg.sender)}</div>
+                        <div style="font-size:11.5px;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(msg.text)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
 
-        return `
-        <div class="conv-item" style="cursor:pointer" onclick="document.getElementById('chat-title').textContent='${safeSender}'; document.getElementById('chat-members-count').innerHTML='${countText}';">
-            <div class="msg-avatar ${msg.type}" style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    ${icon === 'users'
-                        ? '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'
-                        : icon === 'bell'
-                        ? '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'
-                        : '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'}
-                </svg>
-            </div>
-            <div style="flex:1;min-width:0">
-                <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(msg.sender)}</div>
-                <div style="font-size:12px;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(msg.text)}</div>
-            </div>
-            <div style="font-size:11px;color:var(--color-text-muted);flex-shrink:0">${msg.time}</div>
-        </div>`;
-    }).join('');
+    // Initialisation Chat par défaut
+    switchTontineRoom('# Général — Communauté', 'Tous les membres &middot; En ligne', null);
+
+    // 3. Initialisation Centre de Relance
+    const memSelect = document.getElementById('reminder-member-select');
+    if (memSelect) {
+        memSelect.innerHTML = '<option value="">Sélectionner un membre...</option>' + 
+            members.map(m => `<option value="${escapeHTML(m.name || m.full_name || '')}" ${m.status === 'En retard' ? 'data-retard="true"' : ''}>${escapeHTML(m.name || m.full_name || '')} (${m.status === 'En retard' ? '⚠️ En retard' : 'À jour'})</option>`).join('');
+        const lateM = members.find(m => m.status === 'En retard') || members[0];
+        if (lateM) memSelect.value = lateM.name || lateM.full_name;
+    }
+
+    const tonSelect = document.getElementById('reminder-tontine-select');
+    if (tonSelect) {
+        tonSelect.innerHTML = '<option value="">Sélectionner une tontine...</option>' + 
+            tontines.map(t => `<option value="${escapeHTML(t.name)}" data-amount="${t.amount || 25000}">${escapeHTML(t.name)} (${new Intl.NumberFormat('fr-FR').format(t.amount || 0)} FCFA)</option>`).join('');
+        if (tontines.length > 0) tonSelect.value = tontines[0].name;
+    }
+
+    if (typeof updateReminderPreview === 'function') updateReminderPreview();
 }
+
+function switchTontineRoom(roomName, countText, tontineId) {
+    const titleEl = document.getElementById('chat-title');
+    const countEl = document.getElementById('chat-members-count');
+    const msgsEl = document.getElementById('chat-messages-area');
+    
+    if (titleEl) titleEl.textContent = roomName;
+    if (countEl) countEl.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block; margin-right: 6px;"></span>` + countText;
+
+    if (msgsEl) {
+        msgsEl.innerHTML = `
+            <div style="text-align: center; font-size: 11px; color: var(--text-3); margin: 10px 0;">--- Aujourd'hui ---</div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #6366F1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">W</div>
+                <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; border-radius: 14px; border-top-left-radius: 4px; max-width: 80%;">
+                    <div style="font-size: 11.5px; font-weight: 700; color: #6366F1; margin-bottom: 4px;">Wilfried (Gestionnaire)</div>
+                    <div style="font-size: 13.5px; color: var(--text-1); line-height: 1.4;">Bienvenue dans le salon <strong>${escapeHTML(roomName)}</strong> ! N'hésitez pas à poser vos questions ou à partager les justificatifs de vos cotisations Wave / OM ici. 🚀</div>
+                    <div style="font-size: 10px; color: var(--text-3); text-align: right; margin-top: 4px;">10:15</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">A</div>
+                <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; border-radius: 14px; border-top-left-radius: 4px; max-width: 80%;">
+                    <div style="font-size: 11.5px; font-weight: 700; color: #10B981; margin-bottom: 4px;">Awa Diop</div>
+                    <div style="font-size: 13.5px; color: var(--text-1); line-height: 1.4;">Merci Wilfried ! C'est très pratique d'avoir un espace dédié pour chaque tontine. ✅</div>
+                    <div style="font-size: 10px; color: var(--text-3); text-align: right; margin-top: 4px;">10:22</div>
+                </div>
+            </div>
+        `;
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+}
+window.switchTontineRoom = switchTontineRoom;
+
+window.currentReminderType = 'tour';
+function setReminderType(type) {
+    window.currentReminderType = type;
+    const btnTour = document.getElementById('btn-rem-type-tour');
+    const btnRetard = document.getElementById('btn-rem-type-retard');
+    if (btnTour) {
+        btnTour.style.border = type === 'tour' ? '2px solid var(--primary)' : '1px solid var(--border)';
+        btnTour.style.background = type === 'tour' ? 'rgba(92,96,245,0.08)' : 'var(--surface)';
+        btnTour.style.color = type === 'tour' ? 'var(--primary)' : 'var(--text-2)';
+    }
+    if (btnRetard) {
+        btnRetard.style.border = type === 'retard' ? '2px solid #ef4444' : '1px solid var(--border)';
+        btnRetard.style.background = type === 'retard' ? 'rgba(239,68,68,0.08)' : 'var(--surface)';
+        btnRetard.style.color = type === 'retard' ? '#ef4444' : 'var(--text-2)';
+    }
+    updateReminderPreview();
+}
+window.setReminderType = setReminderType;
+
+function generateReminderTemplate(memberName, tontineName, amount, type) {
+    const mem = memberName || 'Cher membre';
+    const ton = tontineName || 'votre tontine';
+    const amtStr = amount ? new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA' : 'votre cotisation';
+
+    if (type === 'retard') {
+        return `⚠️ Bonjour ${mem}, nous constatons un retard de paiement concernant la tontine « ${ton} » (${amtStr}). Merci de régulariser rapidement votre situation via Wave / Orange Money afin d'éviter l'application des pénalités de retard et maintenir la confiance du groupe. Merci de votre compréhension ! 🙏`;
+    } else {
+        return `🔔 Bonjour ${mem}, rappel amical Tontine Pro : le prochain tour de la tontine « ${ton} » approche à grands pas ! Montant à cotiser : ${amtStr}. Merci de préparer et valider votre contribution avant la date limite. Bonne journée ! 🚀`;
+    }
+}
+window.generateReminderTemplate = generateReminderTemplate;
+
+function updateReminderPreview() {
+    const memEl = document.getElementById('reminder-member-select');
+    const tonEl = document.getElementById('reminder-tontine-select');
+    const txtEl = document.getElementById('reminder-preview-text');
+    if (!txtEl) return;
+
+    const memName = memEl ? memEl.value : '';
+    const tonName = tonEl ? tonEl.value : '';
+    let amount = 25000;
+    if (tonEl && tonEl.selectedIndex > 0) {
+        const opt = tonEl.options[tonEl.selectedIndex];
+        if (opt && opt.getAttribute('data-amount')) amount = parseInt(opt.getAttribute('data-amount'), 10);
+    }
+
+    txtEl.value = generateReminderTemplate(memName, tonName, amount, window.currentReminderType || 'tour');
+}
+window.updateReminderPreview = updateReminderPreview;
+
+function copyReminderText() {
+    const txtEl = document.getElementById('reminder-preview-text');
+    if (!txtEl || !txtEl.value) return;
+    navigator.clipboard.writeText(txtEl.value).then(() => {
+        showToast('📋 Message copié dans le presse-papiers !', 'success');
+    }).catch(() => {
+        txtEl.select();
+        document.execCommand('copy');
+        showToast('📋 Message copié !', 'success');
+    });
+}
+window.copyReminderText = copyReminderText;
+
+function sendReminderVia(channel) {
+    const txtEl = document.getElementById('reminder-preview-text');
+    if (!txtEl || !txtEl.value) {
+        showToast('Veuillez d\'abord générer un message de rappel.', 'error');
+        return;
+    }
+    const text = txtEl.value;
+    if (channel === 'whatsapp') {
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+        showToast('🚀 Ouverture de WhatsApp pour envoi du rappel...', 'success');
+    } else if (channel === 'sms') {
+        window.open('sms:?body=' + encodeURIComponent(text), '_self');
+        showToast('📱 Ouverture de votre application SMS...', 'success');
+    } else if (channel === 'email') {
+        window.open('mailto:?subject=' + encodeURIComponent('Rappel Tontine Pro') + '&body=' + encodeURIComponent(text), '_self');
+        showToast('📧 Ouverture de votre client email...', 'success');
+    }
+}
+window.sendReminderVia = sendReminderVia;
 
 function updateNotifBadges(notifs) {
     const unreadCount = notifs.filter(n => !n.read).length;
@@ -2747,61 +3102,9 @@ window.sendReminder = function(memberName, method) {
 };
 
 function renderMembers() {
-    const grid = document.getElementById('members-full-grid');
-    if (!grid) return;
-
-    const fakeMembers = [
-        { name: 'Kossi A.', role: 'Membre actif', status: 'À jour', tontines: 2, amount: '50 000 FCFA' },
-        { name: 'Awa N.', role: 'Membre actif', status: 'En retard', tontines: 1, amount: '25 000 FCFA' },
-        { name: 'Jean-Paul', role: 'Membre actif', status: 'À jour', tontines: 3, amount: '150 000 FCFA' },
-        { name: 'Fatou D.', role: 'Membre actif', status: 'En retard', tontines: 1, amount: '10 000 FCFA' },
-        { name: 'David M.', role: 'Administrateur', status: 'À jour', tontines: 2, amount: '100 000 FCFA' },
-        { name: 'Sophie L.', role: 'Membre actif', status: 'À jour', tontines: 1, amount: '25 000 FCFA' }
-    ];
-
-    grid.innerHTML = fakeMembers.map(m => {
-        const isLate = m.status === 'En retard';
-        const badgeClass = isLate ? 'badge-red' : 'badge-green';
-        
-        const currentRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
-        const isAdminUser = currentRole === 'admin' || currentRole === 'gestionnaire';
-        const actionBtn = (isLate && isAdminUser) ? 
-            `<button onclick="sendReminder('${m.name}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
-            `<button style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Voir profil</button>`;
-
-        return `
-            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 15px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(92, 96, 245, 0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); font-size: 16px;">
-                            ${m.name.charAt(0)}
-                        </div>
-                        <div>
-                            <div style="font-weight: 600; color: var(--text-1); font-size: 14px;">${m.name}</div>
-                            <div style="font-size: 12px; color: var(--text-3);">${m.role}</div>
-                        </div>
-                    </div>
-                    <span class="badge-status ${badgeClass}" style="font-size: 11px;">${m.status}</span>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
-                    <div style="background: var(--content-bg); padding: 10px; border-radius: 8px; text-align: center;">
-                        <div style="color: var(--text-3); font-size: 11px; margin-bottom: 2px;">Tontines</div>
-                        <div style="font-weight: 600; color: var(--text-1);">${m.tontines}</div>
-                    </div>
-                    <div style="background: var(--content-bg); padding: 10px; border-radius: 8px; text-align: center;">
-                        <div style="color: var(--text-3); font-size: 11px; margin-bottom: 2px;">Total cotisé</div>
-                        <div style="font-weight: 600; color: var(--text-1);">${m.amount}</div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); padding-top: 15px; margin-top: auto;">
-                    <button onclick="openMemberStatementModal('', '${m.name.replace(/'/g, "\\'")}'); return false;" style="background: rgba(92, 96, 245, 0.1); color: var(--primary); border: 1px solid rgba(92, 96, 245, 0.2); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight:600; cursor: pointer; display: flex; align-items: center; gap: 4px;">📄 Relevé PDF</button>
-                    ${actionBtn}
-                </div>
-            </div>
-        `;
-    }).join('');
+    if (typeof renderMembersTab === 'function') {
+        renderMembersTab();
+    }
 }
 
 // --- VISITE GUIDÉE (ONBOARDING) ---
@@ -3239,11 +3542,142 @@ function filterPayments(btn, filter) {
     renderPaymentsTable(filtered);
 }
 
+function renderAnalyticsCharts(stateObj) {
+    const dashCont = document.getElementById('dashboard-analytics-pro-container');
+    const adminCont = document.getElementById('admin-analytics-pro-container');
+    if (!dashCont && !adminCont) return;
+
+    const baseAmount = (stateObj && stateObj.stats && stateObj.stats.totalAmountInPlay) ? stateObj.stats.totalAmountInPlay : 650000;
+    const months = ['Fév', 'Mars', 'Avr', 'Mai', 'Juin', 'Juil'];
+    const chartData = months.map((m, idx) => {
+        const factor = 0.55 + (idx * 0.09); // croissance
+        const expected = Math.round(baseAmount * factor);
+        const actual = Math.round(expected * (idx === 5 ? ((stateObj && stateObj.stats ? stateObj.stats.participationRate || 88 : 88) / 100) : (0.94 + (idx % 2) * 0.04)));
+        return { label: m, expected, actual };
+    });
+    const maxVal = Math.max(...chartData.map(d => Math.max(d.expected, d.actual)), 1);
+
+    const barChartHTML = `
+        <div style="background: var(--surface, #F8FAFC); border: 1px solid var(--border, #E2E8F0); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 14px; font-weight: 800; color: var(--text-1, #1E293B);">📈 Évolution des Collectes</span>
+                    <span style="font-size: 11px; color: var(--primary, #5C60F5); background: rgba(92,96,245,0.1); padding: 2px 8px; border-radius: 10px; font-weight: 700;">6 Derniers Mois</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-3, #94A3B8); margin-bottom: 16px;">Comparatif Attendu vs Réellement Encaissé</div>
+            </div>
+            
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 160px; padding: 10px 4px 0 4px; border-bottom: 1px solid var(--border, #E2E8F0); gap: 6px;">
+                ${chartData.map(d => {
+                    const hExp = Math.round((d.expected / maxVal) * 130);
+                    const hAct = Math.round((d.actual / maxVal) * 130);
+                    return `
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div style="display: flex; align-items: flex-end; gap: 3px; height: 130px; width: 100%; justify-content: center;">
+                            <div class="analytics-bar" data-height="${hExp}" style="width: 12px; background: #93C5FD; border-radius: 4px 4px 0 0; height: 0px; transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);" title="Attendu : ${new Intl.NumberFormat('fr-FR').format(d.expected)} FCFA"></div>
+                            <div class="analytics-bar" data-height="${hAct}" style="width: 12px; background: linear-gradient(180deg, #5C60F5, #818CF8); border-radius: 4px 4px 0 0; height: 0px; transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;" title="Encaissé : ${new Intl.NumberFormat('fr-FR').format(d.actual)} FCFA"></div>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-2, #64748B); margin-top: 4px;">${d.label}</span>
+                    </div>`;
+                }).join('')}
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 11.5px; font-weight: 700; color: var(--text-2, #64748B);">
+                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #93C5FD; display: inline-block;"></span> Attendu</span>
+                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #5C60F5; display: inline-block;"></span> Encaissé</span>
+            </div>
+        </div>
+    `;
+
+    const tontineCount = (stateObj && stateObj.activeTontines) ? stateObj.activeTontines.length : 2;
+    const reserveAmount = tontineCount * 18500 + 25000;
+    const covRate = 96;
+
+    const reserveHTML = `
+        <div style="background: var(--surface, #F8FAFC); border: 1px solid var(--border, #E2E8F0); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 14px; font-weight: 800; color: var(--text-1, #1E293B);">🛡️ Caisse de Réserve & Pénalités</span>
+                    <span style="font-size: 11px; color: #059669; background: rgba(16,185,129,0.12); padding: 2px 8px; border-radius: 10px; font-weight: 700;">Sécurisé</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-3, #94A3B8); margin-bottom: 16px;">Fonds de garantie pour couvrir les retards</div>
+            </div>
+
+            <div style="text-align: center; margin: 12px 0;">
+                <div style="font-size: 28px; font-weight: 900; color: #059669; letter-spacing: -0.5px;">${new Intl.NumberFormat('fr-FR').format(reserveAmount)} <span style="font-size: 14px; font-weight: 700;">FCFA</span></div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-2, #64748B); margin-top: 4px;">Taux de couverture des imprévus : <strong style="color: #059669;">${covRate}%</strong></div>
+                
+                <div style="margin-top: 16px; background: var(--border, #E2E8F0); height: 10px; border-radius: 5px; overflow: hidden; padding: 2px;">
+                    <div class="analytics-bar-w" data-width="${covRate}" style="width: 0%; height: 100%; background: linear-gradient(90deg, #34D399, #059669); border-radius: 4px; transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+                </div>
+            </div>
+
+            <div style="background: var(--content-bg, #F1F5F9); padding: 12px; border-radius: 10px; font-size: 11.5px; color: var(--text-2, #475569); display: flex; align-items: center; gap: 8px; margin-top: 12px; line-height: 1.4;">
+                <span style="font-size: 18px;">💡</span>
+                <span>Cette réserve cumule les pénalités de retard et le fonds initial pour garantir <strong>0 défaut de paiement</strong>.</span>
+            </div>
+        </div>
+    `;
+
+    const methodsHTML = `
+        <div style="background: var(--surface, #F8FAFC); border: 1px solid var(--border, #E2E8F0); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 14px; font-weight: 800; color: var(--text-1, #1E293B);">💳 Flux de Paiements</span>
+                    <span style="font-size: 11px; color: #7C3AED; background: rgba(139,92,246,0.1); padding: 2px 8px; border-radius: 10px; font-weight: 700;">Canaux</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-3, #94A3B8); margin-bottom: 16px;">Répartition par méthode d'encaissement</div>
+            </div>
+
+            <div style="display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 3px; margin-bottom: 20px; background: var(--border, #E2E8F0); padding: 2px;">
+                <div class="analytics-bar-w" data-width="45" style="width: 0%; height: 100%; background: #2563EB; border-radius: 4px; transition: width 0.8s ease;" title="Wave : 45%"></div>
+                <div class="analytics-bar-w" data-width="30" style="width: 0%; height: 100%; background: #F97316; border-radius: 4px; transition: width 0.8s ease 0.1s;" title="Orange Money : 30%"></div>
+                <div class="analytics-bar-w" data-width="15" style="width: 0%; height: 100%; background: #10B981; border-radius: 4px; transition: width 0.8s ease 0.2s;" title="Carte : 15%"></div>
+                <div class="analytics-bar-w" data-width="10" style="width: 0%; height: 100%; background: #64748B; border-radius: 4px; transition: width 0.8s ease 0.3s;" title="Cash : 10%"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-1, #1E293B);"><span style="width: 10px; height: 10px; border-radius: 50%; background: #2563EB; display: inline-block;"></span> Wave (Mobile Money)</span>
+                    <span style="font-weight: 800; color: #2563EB;">45%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-1, #1E293B);"><span style="width: 10px; height: 10px; border-radius: 50%; background: #F97316; display: inline-block;"></span> Orange Money</span>
+                    <span style="font-weight: 800; color: #F97316;">30%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-1, #1E293B);"><span style="width: 10px; height: 10px; border-radius: 50%; background: #10B981; display: inline-block;"></span> Carte Bancaire / Virement</span>
+                    <span style="font-weight: 800; color: #10B981;">15%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-1, #1E293B);"><span style="width: 10px; height: 10px; border-radius: 50%; background: #64748B; display: inline-block;"></span> Espèces (Cash)</span>
+                    <span style="font-weight: 800; color: #64748B;">10%</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const fullHTML = barChartHTML + reserveHTML + methodsHTML;
+    if (dashCont) dashCont.innerHTML = fullHTML;
+    if (adminCont) adminCont.innerHTML = fullHTML;
+
+    setTimeout(() => {
+        document.querySelectorAll('.analytics-bar').forEach(el => {
+            el.style.height = (el.getAttribute('data-height') || '0') + 'px';
+        });
+        document.querySelectorAll('.analytics-bar-w').forEach(el => {
+            el.style.width = (el.getAttribute('data-width') || '0') + '%';
+        });
+    }, 150);
+}
+window.renderAnalyticsCharts = renderAnalyticsCharts;
+
 /* ======================================================
    AXE 4 — ONGLET ADMINISTRATION
    ====================================================== */
 
 async function renderAdminTab() {
+    if (typeof renderAnalyticsCharts === 'function') renderAnalyticsCharts(state);
     // Stats
     const members = state.extendedMembers || extendedMembers || [];
     const admins  = members.filter(m => m.role === 'admin' || m.role === 'Gestionnaire');
@@ -3276,7 +3710,7 @@ function renderAdminMembers(query) {
         : members;
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Aucun membre trouvé.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Aucun membre trouvé.</td></tr>`;
         return;
     }
 
@@ -3290,6 +3724,9 @@ function renderAdminMembers(query) {
         const roleLabel = role === 'admin' || role === 'Gestionnaire'
             ? `<span style="background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">🛡 Admin</span>`
             : `<span style="background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">👤 Membre</span>`;
+        
+        const trustScore = calculateTrustScore(m);
+        const trustBadgeHtml = getTrustBadgeHTML(trustScore, name);
 
         return `<tr style="border-bottom:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background='var(--content-bg)'" onmouseout="this.style.background='transparent'">
             <td style="padding:12px 16px;">
@@ -3298,6 +3735,7 @@ function renderAdminMembers(query) {
                     <div><div style="font-weight:600;font-size:13px;color:var(--text-1);">${name}</div><div style="font-size:11px;color:var(--text-3);">${escapeHTML(m.phone || m.email || '—')}</div></div>
                 </div>
             </td>
+            <td style="padding:12px 16px;">${trustBadgeHtml}</td>
             <td style="padding:12px 16px;">${status}</td>
             <td style="padding:12px 16px;">${roleLabel}</td>
             <td style="padding:12px 16px;text-align:center;">

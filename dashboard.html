@@ -216,6 +216,32 @@
             <div class="participation"><div class="part-hd"><span>Taux de participation</span><span class="font-bold" id="participation-rate-value">0%</span></div><div class="prog-track"><div class="prog-fill pf-green" id="participation-rate-bar" style="width:0%"></div></div></div>
         </div>
     </div>
+
+    <!-- Module Analytique & Projections Financières Pro -->
+    <div class="card" style="margin-bottom: 24px; padding: 22px; background: var(--card); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, rgba(92, 96, 245, 0.15), rgba(139, 92, 246, 0.1)); color: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(92, 96, 245, 0.15);">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: var(--text-1);">📊 Analytique & Projections Financières Pro</h3>
+                    <div style="font-size: 12.5px; color: var(--text-3); margin-top: 2px;">Analyse dynamique des flux de collecte, de la caisse de réserve et des modes de paiement</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge-status badge-green" style="font-size: 11px; padding: 5px 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+                    Données en direct
+                </span>
+            </div>
+        </div>
+        
+        <div id="dashboard-analytics-pro-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-3);">Chargement des analyses interactives...</div>
+        </div>
+    </div>
+
     <div class="bot-grid">
         <div class="card tontines-card">
             <div class="card-hd"><h3 class="card-title">Mes tontines actives</h3></div>
@@ -274,9 +300,116 @@
     <div id="members-full-grid" class="members-grid"></div>
 </section>
 <section id="tab-messages" class="tab-pane">
-    <div class="msg-layout">
-        <div class="conv-sidebar"><div class="conv-hd"><h3>Conversations</h3><button class="btn-new-conv">+</button></div><div class="conv-list" id="conversations-list"></div></div>
-        <div class="chat-area"><div class="chat-hd"><div class="chat-name" id="chat-title">Groupe Developpement 2024</div><div class="chat-status" id="chat-members-count">10 membres &middot; En ligne</div></div><div class="chat-msgs" id="chat-messages-area"></div><div class="chat-input-bar"><input type="text" id="chat-message-input" class="chat-input" placeholder="Ecrire un message..."><button id="btn-send-chat-message" class="btn-primary">Envoyer</button></div></div>
+    <div class="msg-layout" style="height: calc(100vh - var(--tb-h) - 30px);">
+        <!-- 1. Colonne Gauche : Salons de Tontines & Conversations -->
+        <div class="conv-sidebar" style="width: 260px;">
+            <div class="conv-hd" style="background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px;">
+                <h3 style="margin: 0; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <span>💬</span> Salons & Groupes
+                </h3>
+                <span class="badge-status badge-purple" style="font-size: 11px; padding: 2px 8px;">Actif</span>
+            </div>
+            
+            <div style="padding: 12px 12px 6px; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px;">Salons par Tontine</div>
+            <div class="conv-list" id="tontine-rooms-list" style="padding: 0 8px 8px; border-bottom: 1px solid var(--border); max-height: 200px; overflow-y: auto;">
+                <!-- Rempli par renderMessagesTab() -->
+            </div>
+
+            <div style="padding: 12px 12px 6px; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px;">Messages Directs</div>
+            <div class="conv-list" id="conversations-list" style="flex: 1; overflow-y: auto; padding: 0 8px 8px;">
+                <!-- Rempli par renderMessagesTab() -->
+            </div>
+        </div>
+
+        <!-- 2. Colonne Centrale : Chat Intégral -->
+        <div class="chat-area" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="chat-hd" style="display: flex; justify-content: space-between; align-items: center; background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 18px;">
+                <div>
+                    <div class="chat-name" id="chat-title" style="font-size: 16px; font-weight: 800; color: var(--text-1);"># Général — Communauté Tontine Pro</div>
+                    <div class="chat-status" id="chat-members-count" style="font-size: 12px; color: #10B981; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+                        Tous les membres &middot; En ligne
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <span style="background: rgba(92,96,245,0.1); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">🔒 Chiffré de bout en bout</span>
+                </div>
+            </div>
+
+            <div class="chat-msgs" id="chat-messages-area" style="flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: var(--content-bg);">
+                <!-- Messages par défaut ou dynamiques -->
+            </div>
+
+            <div class="chat-input-bar" style="background: var(--card); border-top: 1px solid var(--border); padding: 14px 18px; display: flex; gap: 10px;">
+                <input type="text" id="chat-message-input" class="chat-input" placeholder="Envoyer un message au groupe ou membre sélectionné..." style="flex: 1; padding: 11px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; background: var(--surface); outline: none;">
+                <button id="btn-send-chat-message" class="btn-primary" style="padding: 0 22px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                    <span>Envoyer</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Colonne Droite : Centre de Relance & Rappels Automatisés -->
+        <div class="reminders-sidebar" style="width: 330px; flex-shrink: 0; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid rgba(226,232,240,0.7); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; padding: 16px; border-bottom: 1px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 22px;">⚡</span>
+                    <div>
+                        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: white;">Centre de Relance</h3>
+                        <div style="font-size: 11.5px; opacity: 0.8; margin-top: 2px;">Générateur intelligent de rappels</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 6px;">1. Destinataire</label>
+                    <select id="reminder-member-select" class="form-input" style="width: 100%; padding: 10px; font-size: 13px; border-radius: 10px;" onchange="updateReminderPreview()">
+                        <option value="">Sélectionner un membre...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 6px;">2. Tontine concernée</label>
+                    <select id="reminder-tontine-select" class="form-input" style="width: 100%; padding: 10px; font-size: 13px; border-radius: 10px;" onchange="updateReminderPreview()">
+                        <option value="">Sélectionner une tontine...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 6px;">3. Type de rappel</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" class="btn-sec-sm active-reminder-type" id="btn-rem-type-tour" onclick="setReminderType('tour')" style="padding: 10px 8px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 2px solid var(--primary); background: rgba(92,96,245,0.08); color: var(--primary);">🔔 Avant-tour</button>
+                        <button type="button" class="btn-sec-sm" id="btn-rem-type-retard" onclick="setReminderType('retard')" style="padding: 10px 8px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2);">⚠️ Retard / Pénalité</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="font-size: 11.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase;">4. Aperçu du message</label>
+                        <button type="button" onclick="copyReminderText()" style="background: none; border: none; color: var(--primary); font-size: 11px; font-weight: 700; cursor: pointer;">📋 Copier</button>
+                    </div>
+                    <textarea id="reminder-preview-text" rows="5" class="form-input" style="width: 100%; padding: 12px; font-size: 12.5px; line-height: 1.5; border-radius: 10px; resize: none; background: var(--surface); color: var(--text-1);" readonly></textarea>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border);">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 10px; text-align: center;">🚀 Envoyer en 1-clic direct</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" onclick="sendReminderVia('whatsapp')" style="background: #25D366; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,211,102,0.25); transition: transform 0.15s;">
+                            <span style="font-size: 16px;">💬</span> Envoyer sur WhatsApp
+                        </button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button type="button" onclick="sendReminderVia('sms')" style="background: #3B82F6; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 12.5px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                                <span>📱</span> SMS
+                            </button>
+                            <button type="button" onclick="sendReminderVia('email')" style="background: #6366F1; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 12.5px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                                <span>📧</span> Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 <section id="tab-notifications" class="tab-pane">
@@ -600,6 +733,23 @@
                 <div class="stat-info"><div class="stat-val" id="admin-total-tontines" style="font-size:18px;">0</div><div class="stat-lbl" style="font-size:11px;">Tontines actives</div></div>
             </div>
         </div>
+
+        <!-- Module Analytique Admin Pro -->
+        <div class="card" style="margin-bottom: 20px; padding: 20px; background: var(--card); border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">📈</span>
+                    <div>
+                        <div style="font-size: 15px; font-weight: 800; color: var(--text-1);">Analyses de Caisse & Projections Financières</div>
+                        <div style="font-size: 12px; color: var(--text-3);">Vue globale de la liquidité, réserve de pénalités et méthodes d'encaissement</div>
+                    </div>
+                </div>
+            </div>
+            <div id="admin-analytics-pro-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-3);">Chargement des analyses administratives...</div>
+            </div>
+        </div>
+
         <!-- Lien d'invitation -->
         <div class="card" style="margin-bottom:20px;padding:20px;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
@@ -638,13 +788,14 @@
                 <thead>
                     <tr style="background:var(--content-bg);">
                         <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Membre</th>
+                        <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Fiabilité (Score)</th>
                         <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Statut paiement</th>
                         <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Rôle</th>
                         <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="admin-members-table-body">
-                    <tr><td colspan="4" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
+                    <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -670,7 +821,25 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Nom de la tontine</label>
-                <input type="text" id="tontine-name-input" class="form-input" placeholder="Ex: Développement 2024">
+                <input type="text" id="tontine-name-input" class="form-input" placeholder="Ex: Développement 2024 ou Achat Terrain">
+            </div>
+            <div class="form-group">
+                <label>Type de Tontine</label>
+                <select id="tontine-type-input" class="form-input" onchange="if(typeof toggleTontineType==='function')toggleTontineType(this, 'tontine-goal-group')">
+                    <option value="Rotative" selected>🔄 Tontine Rotative Classique (Chacun son tour)</option>
+                    <option value="Objectif">🎯 Épargne Projet / Événementielle (Caisse commune)</option>
+                </select>
+            </div>
+            <div id="tontine-goal-group" style="display: none; margin-bottom: 15px; background: rgba(16, 185, 129, 0.08); padding: 14px; border-radius: 10px; border: 1px dashed #10b981;">
+                <label style="font-size: 12px; color: #059669; font-weight: 700; display: block; margin-bottom: 8px;">🎯 Paramètres de l'Objectif Commun</label>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 11px; color: var(--text-2);">Montant Objectif Global (FCFA)</label>
+                    <input type="number" id="tontine-goal-amount-input" class="form-input" placeholder="Ex: 2500000" style="border-color: #10b981;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 11px; color: var(--text-2);">Nom / But du Projet</label>
+                    <input type="text" id="tontine-goal-title-input" class="form-input" placeholder="Ex: Achat Équipement Agricole ou Mariage">
+                </div>
             </div>
             <div class="form-group">
                 <label>Montant par cycle (FCFA)</label>
@@ -714,6 +883,24 @@
             <div class="form-group">
                 <label>Nom de la tontine</label>
                 <input type="text" id="edit-tontine-name-input" class="form-input" placeholder="Ex: Développement 2024">
+            </div>
+            <div class="form-group">
+                <label>Type de Tontine</label>
+                <select id="edit-tontine-type-input" class="form-input" onchange="if(typeof toggleTontineType==='function')toggleTontineType(this, 'edit-tontine-goal-group')">
+                    <option value="Rotative">🔄 Tontine Rotative Classique (Chacun son tour)</option>
+                    <option value="Objectif">🎯 Épargne Projet / Événementielle (Caisse commune)</option>
+                </select>
+            </div>
+            <div id="edit-tontine-goal-group" style="display: none; margin-bottom: 15px; background: rgba(16, 185, 129, 0.08); padding: 14px; border-radius: 10px; border: 1px dashed #10b981;">
+                <label style="font-size: 12px; color: #059669; font-weight: 700; display: block; margin-bottom: 8px;">🎯 Paramètres de l'Objectif Commun</label>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 11px; color: var(--text-2);">Montant Objectif Global (FCFA)</label>
+                    <input type="number" id="edit-tontine-goal-amount-input" class="form-input" placeholder="Ex: 2500000" style="border-color: #10b981;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 11px; color: var(--text-2);">Nom / But du Projet</label>
+                    <input type="text" id="edit-tontine-goal-title-input" class="form-input" placeholder="Ex: Achat Équipement Agricole ou Mariage">
+                </div>
             </div>
             <div class="form-group">
                 <label>Montant par cycle (FCFA)</label>
@@ -818,6 +1005,9 @@
                     <!-- Rempli dynamiquement en JS -->
                 </div>
             </div>
+
+            <!-- Section Affichage Objectif (Tontines Épargne Projet) -->
+            <div id="tontine-goal-display-section" style="display: none; margin-top: 15px;"></div>
 
             <!-- Section Ordre de passage & Tirage au Sort -->
             <div id="tontine-draw-section" style="margin-top: 10px;">

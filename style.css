@@ -1155,3 +1155,69 @@ body.readonly-mode::before { content:"Mode Démo - Lecture seule"; position:fixe
 .ussd-pin-input:focus {
     border-color: var(--primary);
 }
+
+/* ==========================================
+   AXE 6 : TONTINE TRUST SCORE (BADGES & MODAL)
+   ========================================== */
+.trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+}
+.trust-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.trust-badge-platinum {
+    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+.trust-badge-gold {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+}
+.trust-badge-silver {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+    box-shadow: 0 2px 6px rgba(100, 116, 139, 0.2);
+}
+.trust-badge-risk {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    animation: pulse-red-trust 2s infinite;
+}
+@keyframes pulse-red-trust {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.03); }
+}
+
+/* ======================================================
+   AXE 6 — PHASE 3 : ANALYTICS PRO STYLES
+   ====================================================== */
+.analytics-bar {
+    cursor: pointer;
+}
+.analytics-bar:hover {
+    filter: brightness(1.15);
+    transform: scaleY(1.04);
+}
+.analytics-bar-w {
+    cursor: pointer;
+}
+.analytics-bar-w:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 8px rgba(92, 96, 245, 0.4);
+}
