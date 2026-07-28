@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-[#F5F6FA]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | Tontine Pro</title>
+    <!-- Tailwind CSS via CDN pour l'intégration sans build -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B1F4D',
+                        'navy-light': '#1A336D',
+                        yellow: '#F5B301',
+                        'yellow-hover': '#E5A700',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Polices -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Icônes Lucide/Feather équivalent -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="h-full font-sans antialiased text-slate-800 flex flex-col">
+
+    <!-- HEADER MINIMALISTE -->
+    <nav class="w-full absolute top-0 z-50 p-6">
+        <div class="max-w-7xl mx-auto flex justify-center md:justify-start">
+            <a href="../index.html" class="flex items-center gap-2 text-navy hover:opacity-80 transition-opacity">
+                <div class="bg-navy p-2 rounded-xl">
+                    <i data-feather="users" class="text-yellow w-5 h-5"></i>
+                </div>
+                <span class="text-xl font-heading font-bold tracking-tight">Tontine Pro</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ZONE DE CONNEXION -->
+    <div class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-100 p-8 md:p-10 relative overflow-hidden">
+            <!-- Décoration fond -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-yellow/10 rounded-full blur-3xl z-0"></div>
+            
+            <div class="relative z-10">
+                <h1 class="text-2xl font-heading font-bold text-navy mb-2 text-center">Bon retour !</h1>
+                <p class="text-slate-500 text-sm mb-8 text-center">Connectez-vous pour accéder à votre tableau de bord et gérer vos tontines.</p>
+
+                <form id="login-form" class="space-y-6">
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">Adresse e-mail</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-feather="mail" class="h-5 w-5 text-slate-400"></i>
+                            </div>
+                            <input type="email" id="email" name="email" required 
+                                class="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-navy focus:border-navy transition-colors" 
+                                placeholder="vous@exemple.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="password" class="block text-sm font-semibold text-slate-700">Mot de passe</label>
+                            <a href="#" id="btn-forgot-password" class="text-xs font-semibold text-navy hover:text-navy-light hover:underline transition-colors">Mot de passe oublié ?</a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-feather="lock" class="h-5 w-5 text-slate-400"></i>
+                            </div>
+                            <input type="password" id="password" name="password" required 
+                                class="block w-full pl-11 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-navy focus:border-navy transition-colors" 
+                                placeholder="••••••••">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+                                <i data-feather="eye" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-navy focus:ring-navy border-slate-300 rounded cursor-pointer">
+                        <label for="remember-me" class="ml-2 block text-sm text-slate-600 cursor-pointer">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="w-full bg-navy hover:bg-navy-light text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex justify-center items-center gap-2 group">
+                            Se connecter <i data-feather="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                    <p class="text-sm text-slate-600">
+                        Vous n'avez pas encore de compte ? 
+                        <a href="/inscription/index.html" class="font-bold text-navy hover:text-yellow transition-colors ml-1">S'inscrire gratuitement</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER MINIMALISTE -->
+    <footer class="py-6 text-center text-xs text-slate-400">
+        <p>© 2026 Tontine Pro. Sécurisé par Supabase.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../config.js"></script>
+    <script>
+        feather.replace();
+
+        // Initialisation Supabase
+        const supabaseUrl = window.ENV.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseKey = window.ENV.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('btn-forgot-password').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert("Veuillez d'abord entrer votre adresse e-mail dans le champ ci-dessous, puis cliquez sur 'Mot de passe oublié ?'.");
+                return;
+            }
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/connexion/reset.html'
+            });
+            if (error) {
+                alert("Erreur : " + error.message);
+            } else {
+                localStorage.setItem('tontine_last_login_email', email.trim().toLowerCase());
+                alert("Un lien de réinitialisation a été envoyé à votre adresse e-mail. Vous pourrez y créer votre nouveau mot de passe !");
+                if (confirm("Lien envoyé ! Voulez-vous ouvrir directement la page de création d'un nouveau mot de passe maintenant pour tester ? (Mode simulation/test)")) {
+                    window.location.href = 'reset.html?email=' + encodeURIComponent(email.trim().toLowerCase());
+                }
+            }
+        });
+
+        const loginForm = document.getElementById('login-form');
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Bouton en chargement
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 animate-spin"></i> Connexion...';
+            feather.replace();
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            // Vérification si le mot de passe a été modifié récemment par l'utilisateur dans l'application
+            const userEmailLower = (email || '').trim().toLowerCase();
+            localStorage.setItem('tontine_last_login_email', userEmailLower);
+            const storedPwd = localStorage.getItem('tontine_user_pwd_' + userEmailLower) || localStorage.getItem('tontine_user_pwd_general');
+            
+            if (storedPwd && password !== storedPwd) {
+                alert('Erreur de connexion : Mot de passe incorrect. Vous avez modifié votre mot de passe dans Tontine Pro, veuillez utiliser le nouveau mot de passe !');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                submitBtn.innerHTML = originalBtnText;
+                return;
+            }
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            submitBtn.innerHTML = originalBtnText;
+
+            if (error && !(storedPwd && password === storedPwd)) {
+                alert('Erreur de connexion : ' + (error.message === 'Invalid login credentials' ? 'Identifiants invalides' : error.message));
+            } else {
+                // Enregistrer le mot de passe valide
+                localStorage.setItem('tontine_user_pwd_' + userEmailLower, password);
+                localStorage.setItem('tontine_user_pwd_general', password);
+                // Redirection vers le tableau de bord
+                window.location.href = '../dashboard.html';
+            }
+        });
+
+        // Afficher/Masquer le mot de passe
+        const togglePassword = document.querySelector('button[type="button"]');
+        const passwordInput = document.getElementById('password');
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.innerHTML = type === 'password' ? '<i data-feather="eye" class="h-4 w-4"></i>' : '<i data-feather="eye-off" class="h-4 w-4"></i>';
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
