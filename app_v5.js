@@ -4545,3 +4545,89 @@ function sendMessage(roomName, isAdmin) {
         }).catch(err => console.error(err));
     }
 }
+
+// ==========================================
+// AXE 6 - NOTIFICATIONS & PROFIL
+// ==========================================
+
+const mockNotifications = [
+    { id: 1, type: 'payment', title: 'Paiement reçu', text: 'Aminata D. a payé sa cotisation (50 000 FCFA)', time: 'Il y a 5 min', read: false },
+    { id: 2, type: 'alert', title: 'Retard de paiement', text: 'Marc O. a un retard de 3 jours. Pénalité de 2 000 FCFA appliquée.', time: 'Il y a 2h', read: false },
+    { id: 3, type: 'info', title: 'Nouveau tour', text: 'Le tour #4 (Bénéficiaire: Sarah K.) vient de démarrer.', time: 'Hier', read: true }
+];
+
+function renderNotifications() {
+    const container = document.getElementById('notif-list-container');
+    const badge = document.getElementById('header-notif-badge');
+    if(!container) return;
+    
+    let unreadCount = mockNotifications.filter(n => !n.read).length;
+    
+    if (badge) {
+        badge.textContent = unreadCount;
+        badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+        badge.style.alignItems = 'center';
+        badge.style.justifyContent = 'center';
+    }
+    
+    container.innerHTML = '';
+    
+    if(mockNotifications.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-3); font-size: 13px;">Aucune notification</div>';
+        return;
+    }
+    
+    mockNotifications.forEach(notif => {
+        let iconHtml = '';
+        if(notif.type === 'payment') iconHtml = '💸';
+        if(notif.type === 'alert') iconHtml = '⚠️';
+        if(notif.type === 'info') iconHtml = 'ℹ️';
+        
+        container.innerHTML += `
+            <div class="notif-item ${notif.read ? '' : 'unread'}" onclick="markNotifRead(${notif.id})">
+                <div class="notif-icon ${notif.type}">${iconHtml}</div>
+                <div class="notif-content">
+                    <h5>${notif.title}</h5>
+                    <p>${notif.text}</p>
+                    <div class="notif-time">${notif.time}</div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+window.toggleNotificationDropdown = function() {
+    const dropdown = document.getElementById('notifications-dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('hidden');
+        if (!dropdown.classList.contains('hidden')) {
+            renderNotifications();
+        }
+    }
+};
+
+window.markNotifRead = function(id) {
+    const notif = mockNotifications.find(n => n.id === id);
+    if(notif) {
+        notif.read = true;
+        renderNotifications();
+    }
+};
+
+window.markAllNotifsRead = function() {
+    mockNotifications.forEach(n => n.read = true);
+    renderNotifications();
+};
+
+window.saveProfileInfo = function() {
+    if(typeof showToast === 'function') {
+        showToast('Vos informations ont été mises à jour avec succès.', 'success');
+    } else {
+        alert('Informations mises à jour.');
+    }
+};
+
+// Initialisation au chargement
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(renderNotifications, 1000);
+});

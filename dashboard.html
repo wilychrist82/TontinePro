@@ -129,10 +129,21 @@
         <button class="btn-primary" id="btn-toggle-role-mode" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); font-weight: 600; transition: all 0.2s;" onclick="toggleRoleSimulator()" title="Cliquer pour simuler la vue Simple Membre ou Administrateur">
             <span>👁️ Vue :</span> <strong id="lbl-current-role-mode">Admin 👑</strong>
         </button>
-        <button class="tb-btn" id="btn-notifications-toggle" onclick="switchTab('notifications')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span class="tb-badge" style="display:none">0</span>
-        </button>
+        <div style="position: relative;">
+            <button class="tb-btn" id="btn-notifications-toggle" onclick="toggleNotificationDropdown()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="tb-badge" id="header-notif-badge" style="display:none">0</span>
+            </button>
+            <div id="notifications-dropdown" class="notif-dropdown hidden">
+                <div class="notif-header">
+                    <h4>Notifications</h4>
+                    <span class="notif-mark-read" onclick="markAllNotifsRead()">Tout marquer lu</span>
+                </div>
+                <div class="notif-list" id="notif-list-container">
+                    <!-- Notifications injectées par JS -->
+                </div>
+            </div>
+        </div>
         <button class="tb-btn" id="btn-theme-toggle">
             <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             <svg class="icon-sun hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -1522,6 +1533,82 @@
             </div>
         </div>
     </div>
+<section id="tab-profile" class="tab-pane">
+    <div class="section-hd">
+        <div>
+            <h2>Mon Profil</h2>
+            <p>Gérez vos informations personnelles et vos paramètres de sécurité.</p>
+        </div>
+    </div>
+    
+    <div class="profile-layout" style="display: grid; grid-template-columns: 1fr 2.5fr; gap: 24px; margin-top: 20px;">
+        <!-- Avatar & Info -->
+        <div class="card" style="text-align: center; padding: 40px 20px;">
+            <div class="profile-avatar-wrapper" style="position: relative; width: 120px; height: 120px; margin: 0 auto 20px;">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--surface); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <button style="position: absolute; bottom: 0; right: 0; background: #6366f1; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(99,102,241,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </button>
+            </div>
+            <h3 style="margin: 0 0 5px 0; font-size: 20px; color: var(--text-1); font-weight: 800;" id="profile-name-display">Utilisateur Pro</h3>
+            <div style="color: var(--text-2); font-size: 14px; margin-bottom: 15px;">utilisateur@tontine.pro</div>
+            <span style="background: rgba(16,185,129,0.1); color: #10b981; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Compte Vérifié
+            </span>
+        </div>
+        
+        <!-- Formulaires -->
+        <div class="card" style="padding: 30px;">
+            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: var(--text-1); border-bottom: 1px solid var(--border); padding-bottom: 15px; font-weight: 700;">Informations Personnelles</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Nom Complet</label>
+                    <input type="text" class="form-input" id="profile-input-name" value="Utilisateur Pro" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Adresse E-mail</label>
+                    <input type="email" class="form-input" value="utilisateur@tontine.pro" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Téléphone Mobile Money</label>
+                    <input type="text" class="form-input" value="+225 0102030405" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Pays de résidence</label>
+                    <select class="form-input" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                        <option>Côte d'Ivoire</option>
+                        <option>Sénégal</option>
+                        <option>Cameroun</option>
+                        <option>Togo</option>
+                    </select>
+                </div>
+            </div>
+            <div style="text-align: right; margin-bottom: 40px;">
+                <button class="btn-primary" onclick="saveProfileInfo()" style="padding: 10px 20px; font-weight: 600; border-radius: 8px;">Enregistrer les modifications</button>
+            </div>
+
+            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: var(--text-1); border-bottom: 1px solid var(--border); padding-bottom: 15px; font-weight: 700;">Sécurité du compte</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Mot de passe actuel</label>
+                    <input type="password" class="form-input" placeholder="••••••••" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                </div>
+                <div></div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Nouveau mot de passe</label>
+                    <input type="password" class="form-input" placeholder="Nouveau mot de passe" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px;">Confirmer mot de passe</label>
+                    <input type="password" class="form-input" placeholder="Confirmer mot de passe" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-1);">
+                </div>
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn-primary" onclick="showToast('Mot de passe mis à jour avec succès', 'success')" style="background: #10b981; border: none; box-shadow: 0 4px 15px rgba(16,185,129,0.3); padding: 10px 20px; font-weight: 600; border-radius: 8px;">Mettre à jour la sécurité</button>
+            </div>
+        </div>
+    </div>
+</section>
 </div>
 
 <!-- Modal VIP Premium Tontine Pro -->
