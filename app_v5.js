@@ -2236,7 +2236,8 @@ async function renderMembersTab(searchQuery = '') {
         const tontinesCount = m.tontines !== undefined ? m.tontines : 1;
 
         const currentRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
-        const isAdminUser = currentRole === 'admin' || currentRole === 'gestionnaire';
+        const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
+        const isAdminUser = (currentRole === 'admin' || currentRole === 'gestionnaire' || currentRole === 'administrateur') && !isInvitedMember;
         const actionBtn = (isLate && isAdminUser) ? 
             `<button onclick="sendReminder('${escapeHTML(name)}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; font-weight:600;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
             `<button onclick="openMemberStatementModal('', '${escapeHTML(name)}'); return false;" style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight:600;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Profil & Relevé</button>`;
@@ -2358,7 +2359,7 @@ async function renderMessagesTab() {
     const roomsList = document.getElementById('tontine-rooms-list');
     if (roomsList) {
         let roomsHTML = `
-            <div class="conv-item active-conv" style="cursor:pointer; padding: 10px; border-radius: 8px; margin-bottom: 4px;" onclick="switchTontineRoom('# Général — Communauté', 'Tous les membres &middot; En ligne', null)">
+            <div class="conv-item active-conv" style="cursor:pointer; padding: 10px; border-radius: 8px; margin-bottom: 4px;" onclick="switchTontineRoom('# Général - Communauté', 'Tous les membres &middot; En ligne', null)">
                 <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(92,96,245,0.15); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;">#</div>
                 <div style="flex: 1; min-width: 0;">
                     <div style="font-weight: 700; font-size: 13px; color: var(--text-1);"># Général</div>
@@ -2428,7 +2429,7 @@ async function renderMessagesTab() {
     }
 
     // Initialisation Chat par défaut
-    switchTontineRoom('# Général — Communauté', 'Tous les membres &middot; En ligne', null);
+    switchTontineRoom('# Général - Communauté', 'Tous les membres &middot; En ligne', null);
 
     // 3. Initialisation Centre de Relance
     const memSelect = document.getElementById('reminder-member-select');
@@ -2474,16 +2475,20 @@ function switchTontineRoom(roomName, countText, tontineId) {
             inputEl.placeholder = "Seul le gestionnaire peut publier sur ce mur.";
             sendBtn.disabled = true;
             sendBtn.style.opacity = '0.5';
+            inputEl.style.cursor = 'not-allowed';
+            inputEl.style.backgroundColor = '#f1f5f9';
         } else {
             inputEl.disabled = false;
             inputEl.placeholder = "Écrivez votre message...";
             sendBtn.disabled = false;
             sendBtn.style.opacity = '1';
+            inputEl.style.cursor = 'text';
+            inputEl.style.backgroundColor = 'transparent';
         }
         
         // On attache l'action d'envoi
-        sendBtn.onclick = () => sendMessage(roomName, isAdmin);
-        inputEl.onkeydown = (e) => { if(e.key === 'Enter') sendMessage(roomName, isAdmin); };
+        sendBtn.onclick = () => { if (!sendBtn.disabled) sendMessage(roomName, isAdmin); };
+        inputEl.onkeydown = (e) => { if(e.key === 'Enter' && !inputEl.disabled) sendMessage(roomName, isAdmin); };
     }
 
     if (msgsEl) {
@@ -3987,6 +3992,12 @@ function applyRoleRestrictions() {
         if (card) card.style.display = isAdmin ? '' : 'none';
     });
     
+    // Masquer l'encart "Passez au Premium" pour les membres simples dans la sidebar
+    const premiumSidebarBox = document.querySelector('.sb-premium');
+    if (premiumSidebarBox) {
+        premiumSidebarBox.style.display = isAdmin ? 'flex' : 'none';
+    }
+    
     // Gérer l'Espace Membre vs l'Espace Admin
     const memberDashboard = document.getElementById('member-dashboard-view');
     const adminDashboard = document.getElementById('admin-dashboard-view');
@@ -4448,7 +4459,7 @@ function exportMemberStatementToPDF() {
 
     const opt = {
         margin:       0.4,
-        filename:     `Releve_Bancaire_${memberName.replace(/\s+/g, '_')}_${startDate.substring(0,4)}.pdf`,
+        filename:     `Releve_de_la_Tontine_${memberName.replace(/\s+/g, '_')}_${startDate.substring(0,4)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -4478,7 +4489,7 @@ window.exportMemberStatementToPDF = exportMemberStatementToPDF;
 
 
 function sendMessage(roomName, isAdmin) {
-    if (roomName === '# Général — Communauté' && !isAdmin) {
+    if (roomName.startsWith('#') && !isAdmin) {
         if(typeof showToast === 'function') showToast("Le groupe général est réservé aux annonces du gestionnaire.", "error");
         return;
     }
