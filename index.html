@@ -312,9 +312,9 @@
                         <div>
                             <div class="flex justify-between mb-2">
                                 <label class="text-sm font-semibold text-white/90">Montant de la cotisation</label>
-                                <span class="text-yellow font-bold" id="sim-amount-display">50 000 FCFA</span>
+                                <span class="text-yellow font-bold" id="sim-amount-display">10 000 FCFA</span>
                             </div>
-                            <input type="range" id="sim-amount" min="5000" max="500000" step="5000" value="50000" class="w-full accent-yellow bg-white/20 h-2 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="sim-amount" min="1000" max="1000000" step="1000" value="10000" class="w-full accent-yellow bg-white/20 h-2 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between mb-2">
@@ -324,10 +324,15 @@
                             <input type="range" id="sim-members" min="2" max="50" step="1" value="10" class="w-full accent-yellow bg-white/20 h-2 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-white/90 mb-3">Fréquence des tours</label>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-sm font-semibold text-white/90">Fréquence des tours</label>
+                                <span class="text-yellow font-bold" id="sim-freq-display">7 jours</span>
+                            </div>
+                            <input type="range" id="sim-freq-days" min="1" max="30" step="1" value="7" class="w-full accent-yellow bg-white/20 h-2 rounded-lg appearance-none cursor-pointer mb-3">
                             <div class="flex gap-2">
-                                <button type="button" class="sim-freq-btn flex-1 bg-yellow text-navy font-bold py-2.5 rounded-xl transition-colors" data-freq="hebdomadaire">Hebdo</button>
-                                <button type="button" class="sim-freq-btn flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-xl transition-colors" data-freq="mensuelle">Mensuelle</button>
+                                <button type="button" class="sim-freq-btn flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition-colors text-sm" data-days="1">Quotidien</button>
+                                <button type="button" class="sim-freq-btn flex-1 bg-yellow text-navy font-bold py-2 rounded-xl transition-colors text-sm" data-days="7">Hebdo</button>
+                                <button type="button" class="sim-freq-btn flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition-colors text-sm" data-days="30">Mensuel</button>
                             </div>
                         </div>
                     </div>
@@ -1164,48 +1169,64 @@
         // Simulator Logic
         const simAmount = document.getElementById('sim-amount');
         const simMembers = document.getElementById('sim-members');
+        const simFreqDays = document.getElementById('sim-freq-days');
         const simFreqBtns = document.querySelectorAll('.sim-freq-btn');
         
         const displayAmount = document.getElementById('sim-amount-display');
         const displayMembers = document.getElementById('sim-members-display');
+        const displayFreq = document.getElementById('sim-freq-display');
         const displayTotal = document.getElementById('sim-total-display');
         const displayDuration = document.getElementById('sim-duration-display');
-
-        let currentFreq = 'hebdomadaire';
 
         function updateSimulator() {
             const amount = parseInt(simAmount.value);
             const members = parseInt(simMembers.value);
+            const freqDays = parseInt(simFreqDays.value);
             const total = amount * members;
+            const totalDays = freqDays * members;
             
             // Format numbers
             displayAmount.textContent = new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
             displayMembers.textContent = members + ' membres';
+            displayFreq.textContent = freqDays === 1 ? '1 jour' : freqDays + ' jours';
             displayTotal.innerHTML = new Intl.NumberFormat('fr-FR').format(total) + ' <span class="text-xl font-normal opacity-70">FCFA</span>';
             
+            // Sync buttons visual state if matches exactly
+            simFreqBtns.forEach(b => {
+                if (parseInt(b.getAttribute('data-days')) === freqDays) {
+                    b.classList.remove('bg-white/10', 'text-white');
+                    b.classList.add('bg-yellow', 'text-navy');
+                } else {
+                    b.classList.remove('bg-yellow', 'text-navy');
+                    b.classList.add('bg-white/10', 'text-white');
+                }
+            });
+
             // Duration
-            if (currentFreq === 'hebdomadaire') {
-                displayDuration.textContent = members + ' semaines';
+            let durationText = '';
+            if (totalDays % 30 === 0) {
+                durationText = (totalDays / 30) + ' mois';
+            } else if (totalDays % 7 === 0) {
+                durationText = (totalDays / 7) + ' semaines';
             } else {
-                displayDuration.textContent = members + ' mois';
+                if (totalDays > 30) {
+                    const m = Math.floor(totalDays / 30);
+                    const d = totalDays % 30;
+                    durationText = m + ' mois et ' + d + ' j';
+                } else {
+                    durationText = totalDays + ' jours';
+                }
             }
+            displayDuration.textContent = durationText;
         }
 
         simAmount.addEventListener('input', updateSimulator);
         simMembers.addEventListener('input', updateSimulator);
+        simFreqDays.addEventListener('input', updateSimulator);
         
         simFreqBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                // Reset styles
-                simFreqBtns.forEach(b => {
-                    b.classList.remove('bg-yellow', 'text-navy');
-                    b.classList.add('bg-white/10', 'text-white');
-                });
-                // Set active style
-                e.target.classList.remove('bg-white/10', 'text-white');
-                e.target.classList.add('bg-yellow', 'text-navy');
-                
-                currentFreq = e.target.getAttribute('data-freq');
+                simFreqDays.value = e.target.getAttribute('data-days');
                 updateSimulator();
             });
         });
