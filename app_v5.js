@@ -3414,7 +3414,7 @@ const PAY_METHOD_CONFIG = {
     },
     wallet: {
         label: '💼 Portefeuille Tontine Pro',
-        help: 'Le montant sera déduit du solde d\\'avance du membre.',
+        help: "Le montant sera déduit du solde d'avance du membre.",
         placeholder: 'Avance',
         opName: 'Portefeuille',
         badge: 'Avance',
@@ -3511,7 +3511,7 @@ async function payGoStep3() {
         const titleEl = document.getElementById('pay-processing-title');
         const subEl = document.getElementById('pay-processing-sub');
         if (titleEl) titleEl.textContent = _selectedPayMethod === 'wallet' ? 'Déduction du portefeuille...' : 'Enregistrement en caisse...';
-        if (subEl) subEl.textContent = _selectedPayMethod === 'wallet' ? 'Mise à jour du solde d\\'avance' : 'Émission du reçu horodaté par le gestionnaire';
+        if (subEl) subEl.textContent = _selectedPayMethod === 'wallet' ? "Mise à jour du solde d'avance" : 'Émission du reçu horodaté par le gestionnaire';
         await executeFinalPayment();
         return;
     }
