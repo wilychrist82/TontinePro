@@ -4365,52 +4365,6 @@ function exportMemberStatementToPDF() {
             </tr>
         `;
     }
-}
-
-function sendMessage(roomName, isAdmin) {
-    if (roomName === '# Général — Communauté' && !isAdmin) {
-        if(typeof showToast === 'function') showToast("Le groupe général est réservé aux annonces du gestionnaire.", "error");
-        return;
-    }
-    const inputEl = document.getElementById('chat-message-input');
-    const msgsEl = document.getElementById('chat-messages-area');
-    if (!inputEl || !inputEl.value.trim() || !msgsEl) return;
-    
-    const text = inputEl.value.trim();
-    inputEl.value = '';
-    
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-    
-    let senderName = state.user ? state.user.name.split('@')[0] : 'Moi';
-    senderName = senderName.charAt(0).toUpperCase() + senderName.slice(1);
-    
-    if (isAdmin) senderName += ' (Gestionnaire)';
-    const initial = senderName.charAt(0).toUpperCase();
-    const bgColor = isAdmin ? '#6366F1' : '#10B981';
-    
-    const newMsgHTML = `
-        <div style="display: flex; gap: 10px; align-items: flex-start;">
-            <div style="width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">${initial}</div>
-            <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; border-radius: 14px; border-top-left-radius: 4px; max-width: 80%;">
-                <div style="font-size: 11.5px; font-weight: 700; color: ${bgColor}; margin-bottom: 4px;">${escapeHTML(senderName)}</div>
-                <div style="font-size: 13.5px; color: var(--text-1); line-height: 1.4;">${escapeHTML(text)}</div>
-                <div style="font-size: 10px; color: var(--text-3); text-align: right; margin-top: 4px;">${timeStr}</div>
-            </div>
-        </div>
-    `;
-    
-    msgsEl.innerHTML += newMsgHTML;
-    msgsEl.scrollTop = msgsEl.scrollHeight;
-    
-    if (typeof DataService !== 'undefined' && DataService.createMessage) {
-        DataService.createMessage({
-            content: text,
-            room: roomName
-        }).catch(err => console.error(err));
-    }
-}
-
     const element = document.createElement('div');
     element.innerHTML = `
         <div style="padding: 35px; font-family: 'Inter', Helvetica, Arial, sans-serif; color: #1E293B; background: white; max-width: 800px; margin: 0 auto;">
@@ -4522,3 +4476,48 @@ window.setStatementPeriod = setStatementPeriod;
 window.previewMemberStatement = previewMemberStatement;
 window.exportMemberStatementToPDF = exportMemberStatementToPDF;
 
+
+
+function sendMessage(roomName, isAdmin) {
+    if (roomName === '# Général — Communauté' && !isAdmin) {
+        if(typeof showToast === 'function') showToast("Le groupe général est réservé aux annonces du gestionnaire.", "error");
+        return;
+    }
+    const inputEl = document.getElementById('chat-message-input');
+    const msgsEl = document.getElementById('chat-messages-area');
+    if (!inputEl || !inputEl.value.trim() || !msgsEl) return;
+    
+    const text = inputEl.value.trim();
+    inputEl.value = '';
+    
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+    
+    let senderName = state.user ? state.user.name.split('@')[0] : 'Moi';
+    senderName = senderName.charAt(0).toUpperCase() + senderName.slice(1);
+    
+    if (isAdmin) senderName += ' (Gestionnaire)';
+    const initial = senderName.charAt(0).toUpperCase();
+    const bgColor = isAdmin ? '#6366F1' : '#10B981';
+    
+    const newMsgHTML = `
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">${initial}</div>
+            <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; border-radius: 14px; border-top-left-radius: 4px; max-width: 80%;">
+                <div style="font-size: 11.5px; font-weight: 700; color: ${bgColor}; margin-bottom: 4px;">${escapeHTML(senderName)}</div>
+                <div style="font-size: 13.5px; color: var(--text-1); line-height: 1.4;">${escapeHTML(text)}</div>
+                <div style="font-size: 10px; color: var(--text-3); text-align: right; margin-top: 4px;">${timeStr}</div>
+            </div>
+        </div>
+    `;
+    
+    msgsEl.innerHTML += newMsgHTML;
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    
+    if (typeof DataService !== 'undefined' && DataService.createMessage) {
+        DataService.createMessage({
+            content: text,
+            room: roomName
+        }).catch(err => console.error(err));
+    }
+}
