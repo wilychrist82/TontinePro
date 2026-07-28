@@ -414,3 +414,25 @@ window.SupabaseService.insertMember = insertMember;
 window.SupabaseService.insertMessage = insertMessage;
 window.SupabaseService.insertPayment = insertPayment;
 window.SupabaseService.fetchPaymentsForReports = fetchPaymentsForReports;
+
+async function updateUserAvatar(base64Image) {
+    const client = getSupabaseClient();
+    if (!client) return { error: new Error('Non connecté') };
+    
+    try {
+        const { data: userData, error: userErr } = await client.auth.getUser();
+        if (userErr || !userData?.user) return { error: userErr || new Error('Utilisateur non trouvé') };
+        
+        const { data, error } = await client
+            .from('profiles')
+            .update({ avatar_url: base64Image })
+            .eq('id', userData.user.id)
+            .select();
+            
+        return { data, error };
+    } catch (e) {
+        return { error: e.message };
+    }
+}
+
+window.SupabaseService.updateUserAvatar = updateUserAvatar;

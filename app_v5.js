@@ -4732,6 +4732,12 @@ window.updateProfilePhoto = function(input) {
                     console.error("Erreur de quota localStorage:", err);
                 }
                 
+                if (typeof window.SupabaseService !== 'undefined' && window.SupabaseService.updateUserAvatar) {
+                    window.SupabaseService.updateUserAvatar(compressedDataUrl).then(({error}) => {
+                        if (error) console.warn("Supabase avatar sync error:", error);
+                    });
+                }
+                
                 const sidebarAvatar = document.querySelector('.user-avatar img');
                 if(sidebarAvatar) sidebarAvatar.src = compressedDataUrl;
                 
