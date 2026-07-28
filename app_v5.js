@@ -2207,6 +2207,17 @@ async function renderMembersTab(searchQuery = '') {
 
     let members = await DataService.getMembers().catch(() => []);
     
+    const customAvatar = localStorage.getItem('user_profile_avatar');
+    if (customAvatar) {
+        members = members.map(m => {
+            const mName = m.name || m.full_name || '';
+            const uName = (state.user && state.user.name) ? state.user.name : 'Utilisateur';
+            if (mName === uName || mName.includes('AGBOGAN') || mName === 'Utilisateur Pro') {
+                m.avatar = customAvatar;
+            }
+            return m;
+        });
+    }
     if (searchQuery) {
         const lowerQ = searchQuery.toLowerCase();
         members = members.filter(m => {
@@ -2238,12 +2249,29 @@ async function renderMembersTab(searchQuery = '') {
         const currentRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
         const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
         const isAdminUser = (currentRole === 'admin' || currentRole === 'gestionnaire' || currentRole === 'administrateur') && !isInvitedMember;
+        
+        // --- GESTION AVANCES (Portefeuille) ---
+        const savedAdvances = JSON.parse(localStorage.getItem('tontine_advances') || '{}');
+        const advanceAmount = savedAdvances[name] || 0;
+        
+        let advanceHtml = '';
+        let creditBtnHtml = '';
+        if (isAdminUser) {
+            advanceHtml = `
+            <div style="background: rgba(99, 102, 241, 0.05); padding: 8px 12px; border-radius: 8px; border: 1px dashed rgba(99, 102, 241, 0.3); margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; color: var(--text-2); font-weight: 600;"><span style="font-size:14px;">💼</span> Avance :</span>
+                <span style="font-weight: 800; color: #4f46e5; font-size: 14px;">${new Intl.NumberFormat('fr-FR').format(advanceAmount)} FCFA</span>
+            </div>`;
+            
+            creditBtnHtml = `<button onclick="openCreditAdvanceModal('${escapeHTML(name)}', ${advanceAmount})" style="background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight:600;" onmouseover="this.style.background='#c7d2fe';">Créditer</button>`;
+        }
+
         const actionBtn = (isLate && isAdminUser) ? 
             `<button onclick="sendReminder('${escapeHTML(name)}', 'whatsapp')" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; font-weight:600;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Relancer</button>` : 
             `<button onclick="openMemberStatementModal('', '${escapeHTML(name)}'); return false;" style="background: var(--bg-hover); color: var(--text-2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight:600;" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='var(--bg-hover)';">Profil & Relevé</button>`;
 
         return `
-        <div class="member-card-full" style="transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0, 0, 0, 0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)';">
+        <div class="member-card-full" style="transition: transform 0.2s, box-shadow 0.2s; padding-bottom:12px;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 20px rgba(0, 0, 0, 0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow)';">
             <div class="member-card-top" style="justify-content: space-between; align-items: flex-start;">
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <img src="${avatar}" alt="${escapeHTML(name)}" class="member-avatar-large"
@@ -2261,7 +2289,9 @@ async function renderMembersTab(searchQuery = '') {
                 ${trustBadgeHtml}
             </div>
             
-            <div class="member-stats-row" style="grid-template-columns: 1fr 1fr;">
+            ${advanceHtml}
+            
+            <div class="member-stats-row" style="grid-template-columns: 1fr 1fr; margin-top: 10px;">
                 <div class="member-stat-mini">
                     <span class="member-stat-mini-val">${tontinesCount}</span>
                     <span class="member-stat-mini-label">Tontine(s)</span>
@@ -2273,6 +2303,7 @@ async function renderMembersTab(searchQuery = '') {
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: auto;">
+                ${creditBtnHtml}
                 ${actionBtn}
             </div>
         </div>`;
@@ -3380,6 +3411,16 @@ const PAY_METHOD_CONFIG = {
         badgeClass: 'background:#e2e8f0;color:#475569;',
         icon: '💵',
         defaultPrefix: 'Wilfried '
+    },
+    wallet: {
+        label: '💼 Portefeuille Tontine Pro',
+        help: 'Le montant sera déduit du solde d\\'avance du membre.',
+        placeholder: 'Avance',
+        opName: 'Portefeuille',
+        badge: 'Avance',
+        badgeClass: 'background:#eef2ff;color:#4f46e5;',
+        icon: '💼',
+        defaultPrefix: 'Solde '
     }
 };
 
@@ -3422,6 +3463,15 @@ function payGoStep2() {
 
     if (!memId) { showToast('Veuillez sélectionner un membre.', 'error'); return; }
     if (!amt || parseFloat(amt) <= 0) { showToast('Veuillez entrer un montant valide.', 'error'); return; }
+    
+    if (_selectedPayMethod === 'wallet') {
+        const savedAdvances = JSON.parse(localStorage.getItem('tontine_advances') || '{}');
+        const currentBalance = savedAdvances[memName] || 0;
+        if (parseFloat(amt) > currentBalance) {
+            showToast(`Solde d'avance insuffisant (${new Intl.NumberFormat('fr-FR').format(currentBalance)} FCFA dispo).`, 'error');
+            return;
+        }
+    }
 
     const inp = document.getElementById('pay-dynamic-input');
     _payAccountDetail = (inp && inp.value.trim() !== '') ? inp.value.trim() : (PAY_METHOD_CONFIG[_selectedPayMethod]?.defaultPrefix + 'XX');
@@ -3454,14 +3504,14 @@ async function payGoStep3() {
     const sim = document.getElementById('pay-ussd-simulator');
     const proc = document.getElementById('pay-step-processing');
 
-    // Si paiement Cash, validation directe en caisse sans USSD
-    if (_selectedPayMethod === 'cash') {
+    // Si paiement Cash ou Portefeuille, validation directe
+    if (_selectedPayMethod === 'cash' || _selectedPayMethod === 'wallet') {
         if (sim) sim.style.display = 'none';
         if (proc) proc.style.display = '';
         const titleEl = document.getElementById('pay-processing-title');
         const subEl = document.getElementById('pay-processing-sub');
-        if (titleEl) titleEl.textContent = 'Enregistrement en caisse...';
-        if (subEl) subEl.textContent = 'Émission du reçu horodaté par le gestionnaire';
+        if (titleEl) titleEl.textContent = _selectedPayMethod === 'wallet' ? 'Déduction du portefeuille...' : 'Enregistrement en caisse...';
+        if (subEl) subEl.textContent = _selectedPayMethod === 'wallet' ? 'Mise à jour du solde d\\'avance' : 'Émission du reçu horodaté par le gestionnaire';
         await executeFinalPayment();
         return;
     }
@@ -3524,8 +3574,17 @@ async function executeFinalPayment() {
     const memId = memSel ? memSel.value : '';
     const memName = memSel && memSel.selectedIndex > 0 ? memSel.options[memSel.selectedIndex].text : 'Membre';
 
-    const opPrefix = { moov_money: 'MOOV-', yas_mix: 'YAS-', orange_money: 'OM-', wave: 'WAVE-', mtn_money: 'MTN-', card: 'CB-', cash: 'CASH-' }[_selectedPayMethod] || 'TP-';
+    const opPrefix = { moov_money: 'MOOV-', yas_mix: 'YAS-', orange_money: 'OM-', wave: 'WAVE-', mtn_money: 'MTN-', card: 'CB-', cash: 'CASH-', wallet: 'WLT-' }[_selectedPayMethod] || 'TP-';
     const refNum = opPrefix + Date.now().toString(36).toUpperCase();
+    
+    // Déduction si wallet
+    if (_selectedPayMethod === 'wallet') {
+        const savedAdvances = JSON.parse(localStorage.getItem('tontine_advances') || '{}');
+        const currentBalance = savedAdvances[memName] || 0;
+        savedAdvances[memName] = currentBalance - amt;
+        localStorage.setItem('tontine_advances', JSON.stringify(savedAdvances));
+        if (typeof renderMembersTab === 'function') renderMembersTab();
+    }
 
     const { data, error } = await DataService.createPayment({
         member_id: memId,
@@ -4627,7 +4686,125 @@ window.saveProfileInfo = function() {
     }
 };
 
+window.updateProfilePhoto = function(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (!file.type.startsWith('image/')) {
+            if(typeof showToast === 'function') showToast('Veuillez sélectionner une image valide.', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const MAX_SIZE = 250;
+                let width = tempImg.width;
+                let height = tempImg.height;
+                
+                if (width > height) {
+                    if (width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    }
+                } else {
+                    if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(tempImg, 0, 0, width, height);
+                
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                
+                const avatarImg = document.getElementById('profile-avatar-img');
+                if(avatarImg) avatarImg.src = compressedDataUrl;
+                
+                try {
+                    localStorage.setItem('user_profile_avatar', compressedDataUrl);
+                } catch(err) {
+                    console.error("Erreur de quota localStorage:", err);
+                }
+                
+                const sidebarAvatar = document.querySelector('.user-avatar img');
+                if(sidebarAvatar) sidebarAvatar.src = compressedDataUrl;
+                
+                if(typeof renderMembersTab === 'function') {
+                    renderMembersTab(); 
+                }
+                
+                if(typeof showToast === 'function') {
+                    showToast('Photo de profil mise à jour avec succès.', 'success');
+                }
+            };
+            tempImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// --- GESTION AVANCES (Portefeuille) ---
+window.openCreditAdvanceModal = function(memberName, currentBalance) {
+    document.getElementById('credit-advance-member-name').innerText = memberName;
+    document.getElementById('credit-advance-member-id').value = memberName;
+    document.getElementById('credit-advance-current-balance').innerText = new Intl.NumberFormat('fr-FR').format(currentBalance) + ' FCFA';
+    document.getElementById('credit-advance-amount').value = '';
+    
+    document.getElementById('credit-advance-modal').classList.remove('hidden');
+};
+
 // Initialisation au chargement
 document.addEventListener('DOMContentLoaded', () => {
+    
+    const btnCloseAdvance = document.getElementById('btn-close-credit-advance');
+    if (btnCloseAdvance) {
+        btnCloseAdvance.addEventListener('click', () => {
+            document.getElementById('credit-advance-modal').classList.add('hidden');
+        });
+    }
+    
+    const btnSubmitAdvance = document.getElementById('btn-submit-credit-advance');
+    if (btnSubmitAdvance) {
+        btnSubmitAdvance.addEventListener('click', () => {
+            const memberName = document.getElementById('credit-advance-member-id').value;
+            const amountInput = document.getElementById('credit-advance-amount').value;
+            const amount = parseInt(amountInput, 10);
+            
+            if (!amount || amount <= 0) {
+                if(typeof showToast === 'function') showToast('Veuillez entrer un montant valide.', 'error');
+                return;
+            }
+            
+            const savedAdvances = JSON.parse(localStorage.getItem('tontine_advances') || '{}');
+            const current = savedAdvances[memberName] || 0;
+            savedAdvances[memberName] = current + amount;
+            
+            localStorage.setItem('tontine_advances', JSON.stringify(savedAdvances));
+            
+            if(typeof showToast === 'function') showToast(`Portefeuille de ${memberName} crédité de ${new Intl.NumberFormat('fr-FR').format(amount)} FCFA.`, 'success');
+            
+            document.getElementById('credit-advance-modal').classList.add('hidden');
+            
+            // Rafraichir l'onglet membres
+            if (typeof renderMembersTab === 'function') renderMembersTab();
+        });
+    }
+
     setTimeout(renderNotifications, 1000);
+    
+    // Restaurer l'avatar personnalisé s'il existe
+    const savedAvatar = localStorage.getItem('user_profile_avatar');
+    if (savedAvatar) {
+        const profileImg = document.getElementById('profile-avatar-img');
+        if (profileImg) profileImg.src = savedAvatar;
+        
+        const sidebarAvatar = document.querySelector('.user-avatar img');
+        if (sidebarAvatar) sidebarAvatar.src = savedAvatar;
+    }
 });
