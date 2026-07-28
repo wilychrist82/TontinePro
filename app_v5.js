@@ -2458,6 +2458,16 @@ function switchTontineRoom(roomName, countText, tontineId) {
     if (titleEl) titleEl.textContent = roomName;
     if (countEl) countEl.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block; margin-right: 6px;"></span>` + countText;
 
+    // Mise à jour visuelle de la liste des salons (gauche)
+    document.querySelectorAll('.conv-item').forEach(el => {
+        el.classList.remove('active-conv');
+        const textContent = el.textContent || '';
+        const cleanRoom = roomName.replace('# ', '').replace('@', '').trim();
+        if (cleanRoom && textContent.includes(cleanRoom)) {
+            el.classList.add('active-conv');
+        }
+    });
+
     // Vérification du rôle actuel
     const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
     let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
@@ -2483,7 +2493,7 @@ function switchTontineRoom(roomName, countText, tontineId) {
             sendBtn.disabled = false;
             sendBtn.style.opacity = '1';
             inputEl.style.cursor = 'text';
-            inputEl.style.backgroundColor = 'transparent';
+            inputEl.style.backgroundColor = '#ffffff';
         }
         
         // On attache l'action d'envoi
@@ -3992,10 +4002,14 @@ function applyRoleRestrictions() {
         if (card) card.style.display = isAdmin ? '' : 'none';
     });
     
-    // Masquer l'encart "Passez au Premium" pour les membres simples dans la sidebar
+    // Masquer l'encart "Passez au Premium" et la colonne "Centre de Relance" pour les membres simples
     const premiumSidebarBox = document.querySelector('.sb-premium');
     if (premiumSidebarBox) {
         premiumSidebarBox.style.display = isAdmin ? 'flex' : 'none';
+    }
+    const remindersSidebar = document.querySelector('.reminders-sidebar');
+    if (remindersSidebar) {
+        remindersSidebar.style.display = isAdmin ? 'flex' : 'none';
     }
     
     // Gérer l'Espace Membre vs l'Espace Admin
