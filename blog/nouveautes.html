@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveautés Produit | Blog Tontine Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { navy: '#0B1F4D', 'navy-light': '#1A336D', yellow: '#F5B301', 'yellow-hover': '#E5A700' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'] },
+                    animation: { 'marquee': 'marquee 25s linear infinite' },
+                    keyframes: { marquee: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } } }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-[#F5F6FA] text-slate-800 font-sans antialiased overflow-x-hidden flex flex-col min-h-screen">
+
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-navy/95 backdrop-blur-md shadow-lg py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <a href="../index.html" class="flex items-center gap-2 text-white">
+                <div class="bg-white/10 p-2 rounded-xl"><i data-feather="users" class="text-yellow w-6 h-6"></i></div>
+                <span class="text-xl font-heading font-bold tracking-tight">Tontine Pro</span>
+            </a>
+            <div class="hidden md:flex space-x-8 text-white/80 font-medium">
+                <a href="../index.html" class="hover:text-white transition-colors">Accueil</a>
+                <a href="../index.html#fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a>
+                <a href="../index.html#tarifs" class="hover:text-white transition-colors">Tarifs</a>
+                <a href="../index.html#a-propos" class="hover:text-white transition-colors">À propos</a>
+                <a href="index.html" class="text-yellow transition-colors font-bold">Blog</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="../connexion/" class="text-white font-medium hover:text-yellow transition-colors">Se connecter</a>
+                <a href="../inscription/index.html" class="bg-yellow hover:bg-yellow-hover text-navy font-bold py-2.5 px-6 rounded-full transition-transform hover:scale-105 shadow-lg shadow-yellow/20">S'inscrire gratuitement</a>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none"><i data-feather="menu"></i></button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-navy pt-24 px-6 md:hidden flex-col space-y-6 text-white text-lg font-medium hidden">
+        <a href="../index.html" class="mobile-link">Accueil</a>
+        <a href="../index.html#fonctionnalites" class="mobile-link">Fonctionnalités</a>
+        <a href="../index.html#tarifs" class="mobile-link">Tarifs</a>
+        <a href="../index.html#a-propos" class="mobile-link">À propos</a>
+        <a href="index.html" class="text-yellow mobile-link font-bold">Blog</a>
+        <hr class="border-white/10" />
+        <a href="../connexion/" class="mobile-link">Se connecter</a>
+        <a href="../inscription/index.html" class="bg-yellow text-navy text-center font-bold py-3 rounded-full mobile-link">S'inscrire gratuitement</a>
+    </div>
+
+    <section class="bg-navy pt-32 pb-16 relative overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-10" style="background-image: url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;"></div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10 text-white">
+            <h1 class="text-4xl md:text-5xl font-heading font-extrabold mb-4">Le Blog <span class="text-yellow">Tontine Pro</span></h1>
+            <p class="text-white/80 text-lg max-w-2xl mx-auto">Découvrez tous nos articles et actualités.</p>
+        </div>
+    </section>
+
+    <div class="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
+            <div class="flex space-x-8 py-4 min-w-max text-sm font-medium text-slate-500">
+                <a href="index.html" class="hover:text-navy transition-colors">Tous les articles</a>
+                <a href="education.html" class="hover:text-navy transition-colors">Éducation Financière</a>
+                <a href="budget.html" class="hover:text-navy transition-colors">Gestion du budget</a>
+                <a href="histoire.html" class="hover:text-navy transition-colors">Histoire des tontines</a>
+                <a href="nouveautes.html" class="text-navy font-bold border-b-2 border-navy pb-1">Nouveautés Produit</a>
+            </div>
+        </div>
+    </div>
+
+    <section class="bg-purple-50 border-b border-purple-100 py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="w-16 h-16 bg-white text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-purple-100">
+                <i data-feather="star" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-3xl font-heading font-bold text-navy mb-4">Nouveautés Produit</h2>
+            <p class="text-slate-600 text-lg leading-relaxed">
+                Tontine Pro évolue en permanence pour répondre à vos attentes. Découvrez dans cette rubrique toutes les dernières mises à jour de l'application, les nouvelles intégrations Mobile Money, et les fonctionnalités inédites développées par notre équipe technique.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-16 flex-1 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="bg-white rounded-3xl p-12 border border-slate-200 inline-block shadow-sm">
+                <div class="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-feather="loader" class="w-8 h-8 animate-spin"></i>
+                </div>
+                <h3 class="text-xl font-bold text-navy mb-2">Des nouveautés arrivent très vite</h3>
+                <p class="text-slate-500">Notre équipe prépare de nouveaux articles pour cette rubrique.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOGOS PAIEMENT -->
+    <section class="border-t border-slate-200 py-8 bg-white overflow-hidden relative">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-6">
+            <span class="text-slate-400 font-semibold tracking-wider text-sm uppercase text-center">PAIEMENTS SÉCURISÉS VIA</span>
+            
+            <div class="w-full relative overflow-hidden flex items-center">
+                <!-- Wrapper for seamless scroll (animating to -50% requires the content to be exactly duplicated) -->
+                <div class="flex items-center gap-16 whitespace-nowrap animate-marquee w-max">
+                    <!-- Set 1 -->
+                    <div class="flex items-center gap-16">
+                        <!-- Flooz -->
+                        <div class="text-2xl font-black text-[#FF3C00] tracking-tighter">FLOOZ</div>
+                        <!-- YasMixx -->
+                        <div class="flex items-center">
+                            <span class="text-2xl font-black text-yellow">yas</span>
+                            <span class="text-2xl font-black text-[#003B7B]">mixx</span>
+                        </div>
+                        <!-- Orange -->
+                        <div class="text-2xl font-bold text-[#FF7900] tracking-tight">orange</div>
+                        <!-- Wave -->
+                        <div class="text-[28px] font-black text-[#1CC1F3] tracking-tighter">wave</div>
+                        <!-- MTN -->
+                        <div class="text-xl font-black text-[#00529B] bg-[#FFCC00] px-2 py-1 rounded-lg leading-none">MTN</div>
+                    </div>
+                    <!-- Set 2 for seamless loop -->
+                    <div class="flex items-center gap-16 ml-16">
+                        <!-- Flooz -->
+                        <div class="text-2xl font-black text-[#FF3C00] tracking-tighter">FLOOZ</div>
+                        <!-- YasMixx -->
+                        <div class="flex items-center">
+                            <span class="text-2xl font-black text-yellow">yas</span>
+                            <span class="text-2xl font-black text-[#003B7B]">mixx</span>
+                        </div>
+                        <!-- Orange -->
+                        <div class="text-2xl font-bold text-[#FF7900] tracking-tight">orange</div>
+                        <!-- Wave -->
+                        <div class="text-[28px] font-black text-[#1CC1F3] tracking-tighter">wave</div>
+                        <!-- MTN -->
+                        <div class="text-xl font-black text-[#00529B] bg-[#FFCC00] px-2 py-1 rounded-lg leading-none">MTN</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy pt-16 pb-8 text-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div class="space-y-4 lg:col-span-1">
+                    <div class="flex items-center gap-2 text-white mb-6">
+                        <div class="bg-white/10 p-2 rounded-xl"><i data-feather="users" class="w-6 h-6 text-yellow"></i></div>
+                        <span class="text-2xl font-heading font-bold tracking-tight">Tontine Pro</span>
+                    </div>
+                    <p class="text-white/60 leading-relaxed text-sm">
+                        Gérez vos tontines en toute confiance, en toute simplicité. La solution n°1 en Afrique francophone.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-6 text-white">Liens utiles</h4>
+                    <ul class="space-y-3 text-sm text-white/70">
+                        <li><a href="../index.html#fonctionnalites" class="hover:text-yellow transition-colors">Fonctionnalités</a></li>
+                        <li><a href="../index.html#tarifs" class="hover:text-yellow transition-colors">Tarifs</a></li>
+                        <li><a href="../index.html#a-propos" class="hover:text-yellow transition-colors">À propos</a></li>
+                        <li><a href="index.html" class="hover:text-yellow transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col items-center">
+                    <h4 class="font-bold text-lg mb-6 text-white text-center">Nous suivre</h4>
+                    <div class="flex justify-center gap-8 items-center w-full">
+                        <a href="https://www.facebook.com/profile.php?id=100092648312962" target="_blank" class="hover:-translate-y-1 transition-transform" title="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/><path fill="#FFF" d="M16.671 12.073l.532-3.469h-3.328V6.354c0-.949.465-1.874 1.956-1.874h1.539V1.527s-1.374-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669V8.604H7.078v3.469h3.047v8.385a12.09 12.09 0 0 0 3.75 0v-8.385h2.796z"/></svg>
+                        </a>
+                        <a href="https://www.instagram.com/wilfriedo25/" target="_blank" class="hover:-translate-y-1 transition-transform" title="Instagram">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FD1D1D"/><stop offset="50%" stop-color="#F56040"/><stop offset="100%" stop-color="#833AB4"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" fill="#FFF" rx="4"/><path fill="url(#ig)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.20 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- App download buttons removed temporarily -->
+            </div>
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
+                <div>© 2026 Tontine Pro. Tous droits réservés.</div>
+                <div class="flex gap-6">
+                    <a href="../conditions.html" class="hover:text-white transition-colors">Conditions d'utilisation</a>
+                    <a href="../confidentialite.html" class="hover:text-white transition-colors">Politique de confidentialité</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        feather.replace();
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            const icon = menu.classList.contains('hidden') ? 'menu' : 'x';
+            btn.innerHTML = `<i data-feather="${icon}"></i>`;
+            feather.replace();
+        });
+
+        // Mémorisation de la section cible lors d'un clic vers la page d'accueil
+        document.querySelectorAll('a[href*="#"]').forEach(link => {
+            link.addEventListener('click', () => {
+                const href = link.getAttribute('href');
+                if (href && (href.includes('index.html#') || href.startsWith('#'))) {
+                    const hash = href.substring(href.indexOf('#'));
+                    if (['#fonctionnalites', '#tarifs', '#a-propos'].includes(hash)) {
+                        sessionStorage.setItem('scrollToSection', hash);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
