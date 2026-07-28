@@ -2272,7 +2272,6 @@ async function renderMembersTab(searchQuery = '') {
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: auto;">
-                <button onclick="openMemberStatementModal('', '${escapeHTML(name)}'); return false;" style="background: rgba(92, 96, 245, 0.1); color: var(--primary); border: 1px solid rgba(92, 96, 245, 0.2); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight:600; cursor: pointer; display: flex; align-items: center; gap: 4px;">📄 Relevé PDF</button>
                 ${actionBtn}
             </div>
         </div>`;
