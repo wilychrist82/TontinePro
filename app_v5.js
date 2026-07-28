@@ -1699,7 +1699,11 @@ function shareDrawCertWhatsApp() {
         msg += `${idx === 0 ? '👑' : '👤'} *Tour #${idx + 1} (${drawMonth})* : ${name}\n`;
     });
 
-    msg += `\n🛡️ _Ordre certifié par algorithme aléatoire équitable. Toute modification annule ce certificat et alerte le groupe._`;
+    msg += `\n🛡️ _Ordre certifié par algorithme aléatoire équitable._\n`;
+    if (tontine.certCode) {
+        msg += `🔍 *Vérifiez l'authenticité de ce tirage ici* :\n`;
+        msg += `https://tontine.pro/verify.html?cert=${tontine.certCode}\n`;
+    }
 
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
