@@ -926,6 +926,65 @@ function setupQuickActions() {
 }
 
 // --- 7. RENDERING FUNCTIONS ---
+function renderMemberDashboard() {
+    let tontineCount = 0;
+    let totalContributed = 0;
+    
+    // Identifier le membre actuel
+    const myName = state.user ? state.user.name.split('@')[0].toLowerCase() : '';
+    let myMemberRecord = state.extendedMembers ? state.extendedMembers.find(m => m.name.toLowerCase().includes(myName) || m.id === state.user.id) : null;
+    
+    if (myMemberRecord) {
+        totalContributed = myMemberRecord.contributed || 0;
+    }
+    
+    // Pour le tableau des obligations:
+    const obligationsTable = document.getElementById('member-obligations-table');
+    if (obligationsTable) {
+        obligationsTable.innerHTML = '';
+        const tontinesList = state.activeTontines || [];
+        tontinesList.forEach(t => {
+            tontineCount++;
+            const amount = t.amount;
+            const dueStr = t.frequency;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><div style="font-weight:600;color:var(--text-1);">${escapeHTML(t.name)}</div></td>
+                <td><div style="font-weight:700;color:var(--text-1);">${formatCurrency(amount)}</div></td>
+                <td><div style="font-size:12px;color:var(--text-2);">${escapeHTML(dueStr)}</div></td>
+                <td><span class="badge-status badge-purple">À payer</span></td>
+            `;
+            obligationsTable.appendChild(tr);
+        });
+        
+        if (tontinesList.length === 0) {
+            obligationsTable.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-3);">Aucune tontine active pour le moment.</td></tr>';
+        }
+    }
+    
+    const countEl = document.getElementById('member-tontines-count');
+    if (countEl) countEl.innerText = tontineCount;
+    
+    const contribEl = document.getElementById('member-total-contributed');
+    if (contribEl) contribEl.innerText = formatCurrency(totalContributed);
+    
+    // Calcul simpliste du prochain tour (pour la démo du membre)
+    const nextTurnText = document.getElementById('member-next-turn-text');
+    const nextTurnAmt = document.getElementById('member-next-turn-amount');
+    
+    if (state.activeTontines && state.activeTontines.length > 0 && nextTurnText && nextTurnAmt) {
+        const nextT = state.activeTontines[0];
+        nextTurnText.innerText = 'Tontine: ' + nextT.name;
+        // Approximation de la cagnotte : montant * max membres
+        const maxMem = parseInt(nextT.members.split('/')[1] || 10);
+        nextTurnAmt.innerText = formatCurrency(nextT.amount * maxMem);
+    } else if (nextTurnText && nextTurnAmt) {
+        nextTurnText.innerText = 'Aucun tour prévu';
+        nextTurnAmt.innerText = '-';
+    }
+}
+
 function renderDashboard() {
     // Intelligent greeting
     const greetingEl = document.getElementById('dashboard-greeting');
@@ -2328,25 +2387,44 @@ async function renderMessagesTab() {
     // 2. Messages Directs
     const convList = document.getElementById('conversations-list');
     if (convList) {
-        const messages = await DataService.getRecentMessages().catch(() => []);
-        if (!messages || messages.length === 0) {
-            convList.innerHTML = '<p style="padding:16px;color:var(--color-text-muted);font-size:12px">Aucun message direct.</p>';
-        } else {
-            convList.innerHTML = messages.map(msg => {
-                const icon = msg.type === 'group' ? 'users' : msg.type === 'system' ? 'bell' : 'user';
-                const safeSender = escapeHTML(msg.sender).replace(/'/g, "\\'");
-                const countText = `Message direct &middot; En ligne`;
-                return `
-                <div class="conv-item" style="cursor:pointer; padding: 10px; border-radius: 8px;" onclick="switchTontineRoom('${safeSender}', '${countText}', null)">
-                    <div class="msg-avatar ${msg.type}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(99,102,241,0.1);color:#6366f1;">
+        const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
+        let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+        if (isInvitedMember) role = 'membre';
+        const isAdmin = (role === 'admin' || role === 'gestionnaire' || role === 'administrateur');
+
+        if (!isAdmin) {
+            // Le membre voit un seul contact : Support / Gestionnaire
+            convList.innerHTML = `
+                <div class="conv-item" style="cursor:pointer; padding: 10px; border-radius: 8px;" onclick="switchTontineRoom('@Gestionnaire (Support)', 'En ligne', null)">
+                    <div class="msg-avatar" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(99,102,241,0.1);color:#6366f1;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
                     <div style="flex:1;min-width:0">
-                        <div style="font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(msg.sender)}</div>
-                        <div style="font-size:11.5px;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(msg.text)}</div>
+                        <div style="font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Gestionnaire (Support)</div>
+                        <div style="font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Besoin d'aide ? Contactez-moi</div>
                     </div>
-                </div>`;
-            }).join('');
+                </div>
+            `;
+        } else {
+            // Le gestionnaire voit la liste de tous les membres pour les contacter en privé
+            let membersHtml = '';
+            members.forEach(m => {
+                const name = m.name || m.full_name || 'Membre';
+                const initial = name[0].toUpperCase();
+                const safeName = escapeHTML(name).replace(/'/g, "\\'");
+                membersHtml += `
+                    <div class="conv-item" style="cursor:pointer; padding: 10px; border-radius: 8px;" onclick="switchTontineRoom('@${safeName}', 'Membre', null)">
+                        <div class="msg-avatar" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(16,185,129,0.1);color:#10B981;font-weight:bold;font-size:14px;">
+                            ${initial}
+                        </div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(name)}</div>
+                            <div style="font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Message direct</div>
+                        </div>
+                    </div>
+                `;
+            });
+            convList.innerHTML = membersHtml;
         }
     }
 
@@ -2379,6 +2457,35 @@ function switchTontineRoom(roomName, countText, tontineId) {
     
     if (titleEl) titleEl.textContent = roomName;
     if (countEl) countEl.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block; margin-right: 6px;"></span>` + countText;
+
+    // Vérification du rôle actuel
+    const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
+    let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    if (isInvitedMember) role = 'membre';
+    const isAdmin = (role === 'admin' || role === 'gestionnaire' || role === 'administrateur');
+
+    const inputEl = document.getElementById('chat-message-input');
+    const sendBtn = document.getElementById('btn-send-chat-message');
+    
+    if (inputEl && sendBtn) {
+        const isGroup = roomName.startsWith('#');
+        
+        if (!isAdmin && isGroup) {
+            inputEl.disabled = true;
+            inputEl.placeholder = "Seul le gestionnaire peut publier sur ce mur.";
+            sendBtn.disabled = true;
+            sendBtn.style.opacity = '0.5';
+        } else {
+            inputEl.disabled = false;
+            inputEl.placeholder = "Écrivez votre message...";
+            sendBtn.disabled = false;
+            sendBtn.style.opacity = '1';
+        }
+        
+        // On attache l'action d'envoi
+        sendBtn.onclick = () => sendMessage(roomName, isAdmin);
+        inputEl.onkeydown = (e) => { if(e.key === 'Enter') sendMessage(roomName, isAdmin); };
+    }
 
     if (msgsEl) {
         msgsEl.innerHTML = `
@@ -3527,6 +3634,16 @@ function renderPaymentsTable(transactions) {
         const dateStr = t.date ? new Date(t.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '—';
         const amtFormatted = new Intl.NumberFormat('fr-FR').format(parseFloat(t.amount) || 0);
         const initials = (t.member || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        
+        let actionBtn = '';
+        if (t.status === 'Validé' || t.status === 'valide') {
+            const txDataStr = encodeURIComponent(JSON.stringify(t));
+            actionBtn = `<button onclick="generatePaymentReceiptPDF('${txDataStr}')" class="btn-sec-sm" style="padding:4px 8px;font-size:11px;display:flex;align-items:center;gap:4px;" title="Télécharger le reçu PDF">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Reçu
+            </button>`;
+        }
+        
         return `<tr style="border-bottom:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background='var(--content-bg)'" onmouseout="this.style.background='transparent'">
             <td style="padding:12px 16px;">
                 <div style="display:flex;align-items:center;gap:10px;">
@@ -3538,8 +3655,55 @@ function renderPaymentsTable(transactions) {
             <td style="padding:12px 16px;font-size:12px;color:var(--text-2);">${methodBadge(t.method, t.account || t.account_detail)}</td>
             <td style="padding:12px 16px;">${statusBadge(t.status)}</td>
             <td style="padding:12px 16px;font-size:12px;color:var(--text-3);">${dateStr}</td>
+            <td style="padding:12px 16px;text-align:right;">${actionBtn}</td>
         </tr>`;
     }).join('');
+}
+
+function generatePaymentReceiptPDF(txDataStr) {
+    try {
+        const t = JSON.parse(decodeURIComponent(txDataStr));
+        const template = document.getElementById('payment-receipt-template');
+        if (!template) return;
+        
+        // Remplir les données
+        document.getElementById('receipt-id').innerText = 'TX-' + (t.id || Math.floor(Math.random() * 1000000));
+        document.getElementById('receipt-date').innerText = t.date ? new Date(t.date).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
+        document.getElementById('receipt-member-name').innerText = escapeHTML(t.member || 'Membre Inconnu');
+        document.getElementById('receipt-tontine-name').innerText = escapeHTML(t.tontine || 'Tontine Principale');
+        
+        let methodLbl = PAY_METHOD_LABELS[t.method] || t.method || 'Espèces';
+        if (t.account || t.account_detail) methodLbl += ' (' + (t.account || t.account_detail) + ')';
+        document.getElementById('receipt-method').innerText = escapeHTML(methodLbl);
+        
+        document.getElementById('receipt-description').innerText = escapeHTML(t.title || 'Cotisation périodique');
+        
+        const amtFormatted = new Intl.NumberFormat('fr-FR').format(parseFloat(t.amount) || 0) + ' FCFA';
+        document.getElementById('receipt-amount-row').innerText = amtFormatted;
+        document.getElementById('receipt-total').innerText = amtFormatted;
+        
+        template.style.display = 'block';
+        if (typeof showGlobalLoader === 'function') showGlobalLoader();
+        
+        const opt = {
+            margin:       0.5,
+            filename:     'Recu_Paiement_' + (t.member || 'Membre').replace(/\s+/g, '_') + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        
+        if (window.html2pdf) {
+            html2pdf().set(opt).from(template).save().then(() => {
+                template.style.display = 'none';
+                if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                if (typeof showToast === 'function') showToast("Reçu téléchargé avec succès !");
+            });
+        }
+    } catch (e) {
+        console.error("Erreur génération reçu PDF", e);
+        if (typeof showToast === 'function') showToast("Erreur lors de la génération du reçu.", 'error');
+    }
 }
 
 function filterPayments(btn, filter) {
@@ -3823,6 +3987,22 @@ function applyRoleRestrictions() {
         const card = document.getElementById(id);
         if (card) card.style.display = isAdmin ? '' : 'none';
     });
+    
+    // Gérer l'Espace Membre vs l'Espace Admin
+    const memberDashboard = document.getElementById('member-dashboard-view');
+    const adminDashboard = document.getElementById('admin-dashboard-view');
+    if (memberDashboard && adminDashboard) {
+        if (isAdmin) {
+            memberDashboard.style.display = 'none';
+            adminDashboard.style.display = '';
+        } else {
+            adminDashboard.style.display = 'none';
+            memberDashboard.style.display = '';
+            if (typeof renderMemberDashboard === 'function') {
+                renderMemberDashboard();
+            }
+        }
+    }
 
     // Masquer complètement ou afficher les boutons sensibles d'administration
     ['btn-quick-create-tontine', 'btn-quick-validate-pay', 'btn-quick-add-member', 'btn-close-current-round', 'btn-trigger-draw'].forEach(id => {
@@ -3942,7 +4122,7 @@ function updateUserPassword(btnEl) {
         return;
     }
 
-    const userEmail = (state && state.user && state.user.email) ? state.user.email.trim().toLowerCase() : 'user@tontine.pro';
+    const userEmail = (state && state.user && state.user.email) ? state.user.email.trim().toLowerCase() : (localStorage.getItem('tontine_last_login_email') || 'user@tontine.pro');
     const storedPwd = localStorage.getItem('tontine_user_pwd_' + userEmail) || localStorage.getItem('tontine_user_pwd_general');
     
     if (storedPwd && currVal !== storedPwd) {
@@ -3957,15 +4137,26 @@ function updateUserPassword(btnEl) {
         return;
     }
 
-    // Enregistrer immédiatement le nouveau mot de passe (pour interdire l'ancien lors des prochaines connexions)
+    // Enregistrer immédiatement le nouveau mot de passe (et écraser tous les anciens mots de passe stockés en cache)
     localStorage.setItem('tontine_user_pwd_' + userEmail, newVal);
     localStorage.setItem('tontine_user_pwd_general', newVal);
+    if (localStorage.getItem('tontine_last_login_email')) {
+        localStorage.setItem('tontine_user_pwd_' + localStorage.getItem('tontine_last_login_email'), newVal);
+    }
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('tontine_user_pwd_')) {
+            localStorage.setItem(k, newVal);
+        }
+    }
 
     // Mettre à jour sur le serveur Supabase
     if (typeof getSupabaseClient === 'function') {
         const client = getSupabaseClient();
         if (client && client.auth) {
-            client.auth.updateUser({ password: newVal }).catch(e => {});
+            client.auth.updateUser({ password: newVal }).then(({ error }) => {
+                if (error) console.warn("Erreur Supabase sync pwd:", error.message);
+            }).catch(e => {});
         }
     }
 
@@ -4174,6 +4365,51 @@ function exportMemberStatementToPDF() {
             </tr>
         `;
     }
+}
+
+function sendMessage(roomName, isAdmin) {
+    if (roomName === '# Général — Communauté' && !isAdmin) {
+        if(typeof showToast === 'function') showToast("Le groupe général est réservé aux annonces du gestionnaire.", "error");
+        return;
+    }
+    const inputEl = document.getElementById('chat-message-input');
+    const msgsEl = document.getElementById('chat-messages-area');
+    if (!inputEl || !inputEl.value.trim() || !msgsEl) return;
+    
+    const text = inputEl.value.trim();
+    inputEl.value = '';
+    
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+    
+    let senderName = state.user ? state.user.name.split('@')[0] : 'Moi';
+    senderName = senderName.charAt(0).toUpperCase() + senderName.slice(1);
+    
+    if (isAdmin) senderName += ' (Gestionnaire)';
+    const initial = senderName.charAt(0).toUpperCase();
+    const bgColor = isAdmin ? '#6366F1' : '#10B981';
+    
+    const newMsgHTML = `
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">${initial}</div>
+            <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; border-radius: 14px; border-top-left-radius: 4px; max-width: 80%;">
+                <div style="font-size: 11.5px; font-weight: 700; color: ${bgColor}; margin-bottom: 4px;">${escapeHTML(senderName)}</div>
+                <div style="font-size: 13.5px; color: var(--text-1); line-height: 1.4;">${escapeHTML(text)}</div>
+                <div style="font-size: 10px; color: var(--text-3); text-align: right; margin-top: 4px;">${timeStr}</div>
+            </div>
+        </div>
+    `;
+    
+    msgsEl.innerHTML += newMsgHTML;
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    
+    if (typeof DataService !== 'undefined' && DataService.createMessage) {
+        DataService.createMessage({
+            content: text,
+            room: roomName
+        }).catch(err => console.error(err));
+    }
+}
 
     const element = document.createElement('div');
     element.innerHTML = `

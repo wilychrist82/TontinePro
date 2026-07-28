@@ -145,6 +145,34 @@
 <div class="content-scroll">
 <section id="tab-home" class="tab-pane active">
 
+    <!-- Vue Membre Simplifiée -->
+    <div id="member-dashboard-view" style="display:none;">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon s-purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                <div class="stat-info"><div class="stat-val" id="member-tontines-count">0</div><div class="stat-lbl">Tontines actives</div><div class="stat-sub">Où je participe</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon s-green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 4v16"/><path d="M2 10h20"/></svg></div>
+                <div class="stat-info"><div class="stat-val val-green" id="member-total-contributed">0 FCFA</div><div class="stat-lbl">Total cotisé</div><div class="stat-sub">Historique complet</div></div>
+            </div>
+            <div class="stat-card" style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; padding: 20px;">
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 16px;">⏳ Mon Prochain Tour</h3>
+                    <p style="margin: 0; font-size: 13px; color: var(--text-3);" id="member-next-turn-text">Calcul en cours...</p>
+                </div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--primary);" id="member-next-turn-amount">-</div>
+            </div>
+        </div>
+        <div class="card tontines-card" style="margin-top:20px;">
+            <div class="card-hd"><h3 class="card-title">Mes obligations ce mois-ci</h3></div>
+            <div class="tbl-wrap"><table class="data-tbl"><thead><tr><th>Tontine</th><th>Montant dû</th><th>Échéance</th><th>Statut</th></tr></thead><tbody id="member-obligations-table"><tr><td colspan="4" style="text-align:center;">Chargement...</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- Vue Administrateur -->
+    <div id="admin-dashboard-view">
+
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon s-purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
@@ -269,6 +297,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </section>
 <section id="tab-circle" class="tab-pane">
@@ -696,10 +725,11 @@
                         <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Méthode</th>
                         <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Statut</th>
                         <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Date</th>
+                        <th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Action</th>
                     </tr>
                 </thead>
                 <tbody id="payments-table-body">
-                    <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
+                    <tr><td colspan="6" style="padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1555,6 +1585,79 @@
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Modèle caché pour le reçu PDF -->
+<div id="payment-receipt-template" style="display: none; padding: 40px; background: white; color: #1e293b; font-family: 'Inter', sans-serif; max-width: 800px; margin: 0 auto; position: relative;">
+    <!-- En-tête du Reçu -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 30px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 40px; height: 40px; background: #6366F1; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #1e293b;">Tontine Pro</h1>
+            </div>
+            <p style="margin: 5px 0 0 0; font-size: 14px; color: #64748b;">La solution n°1 de gestion de tontines.</p>
+        </div>
+        <div style="text-align: right;">
+            <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #1e293b; text-transform: uppercase; letter-spacing: 1px;">Reçu</h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; color: #64748b; font-weight: 600;">N° <span id="receipt-id">TX-123456</span></p>
+            <p style="margin: 2px 0 0 0; font-size: 14px; color: #64748b;">Date : <span id="receipt-date">01/01/2026</span></p>
+        </div>
+    </div>
+
+    <!-- Informations du Membre -->
+    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between;">
+        <div>
+            <p style="margin: 0; font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Reçu de :</p>
+            <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: 700; color: #1e293b;" id="receipt-member-name">Nom du Membre</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="margin: 0; font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Tontine :</p>
+            <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #1e293b;" id="receipt-tontine-name">Tontine Principale</p>
+        </div>
+    </div>
+
+    <!-- Détails de la Transaction -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+        <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0;">
+                <th style="padding: 12px 0; text-align: left; font-size: 14px; color: #64748b; font-weight: 600;">Description</th>
+                <th style="padding: 12px 0; text-align: center; font-size: 14px; color: #64748b; font-weight: 600;">Moyen de paiement</th>
+                <th style="padding: 12px 0; text-align: right; font-size: 14px; color: #64748b; font-weight: 600;">Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 16px 0; font-size: 16px; font-weight: 500; color: #1e293b;" id="receipt-description">Cotisation périodique</td>
+                <td style="padding: 16px 0; text-align: center; font-size: 15px; color: #475569;" id="receipt-method">Wave Mobile Money</td>
+                <td style="padding: 16px 0; text-align: right; font-size: 16px; font-weight: 700; color: #1e293b;" id="receipt-amount-row">50 000 FCFA</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2" style="padding: 20px 0; text-align: right; font-size: 16px; font-weight: 700; color: #64748b;">TOTAL PAYÉ :</td>
+                <td style="padding: 20px 0; text-align: right; font-size: 24px; font-weight: 800; color: #10b981;" id="receipt-total">50 000 FCFA</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Sceau de validation -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px;">
+        <div style="width: 120px; text-align: center;">
+            <div style="border-bottom: 1px solid #cbd5e1; height: 30px; margin-bottom: 10px;"></div>
+            <span style="font-size: 12px; color: #64748b; font-weight: 600;">Le Gestionnaire</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; border: 2px solid #10b981; color: #10b981; padding: 15px 25px; border-radius: 8px; transform: rotate(-5deg); opacity: 0.9;">
+            <span style="font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">Payé & Validé</span>
+            <span style="font-size: 12px; font-weight: 600; margin-top: 5px;">Certifié Tontine Pro</span>
+        </div>
+    </div>
+    
+    <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-size: 11px; color: #94a3b8;">
+        Document généré automatiquement. Conservez ce reçu comme preuve de paiement.
     </div>
 </div>
 
