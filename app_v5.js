@@ -2042,6 +2042,12 @@ async function switchTab(tabId) {
         case 'reports':
             await renderReportsTab();
             break;
+        case 'member-stats':
+            await renderMemberStatsTab();
+            break;
+        case 'votes':
+            await renderVotesTab();
+            break;
         case 'payments':
             await renderPaymentsTab();
             break;
@@ -2660,23 +2666,51 @@ async function renderNotificationsTab() {
 
     if (!state.notifs) {
         let notifs = await DataService.getNotifications().catch(() => []);
-        // Fallback : 12 notifications mockées si Supabase ne renvoie rien
+        // Fallback : Génération dynamique intelligente si pas de base de données
         if (!notifs || notifs.length === 0) {
-            notifs = [
-                { type: 'payment', title: 'Cotisation reçue — Awa Diop (35 000 FCFA)',        created_at: new Date(Date.now() - 1  * 3600000).toISOString(), read: false },
-                { type: 'payment', title: 'Cotisation reçue — Moussa Koné (35 000 FCFA)',      created_at: new Date(Date.now() - 2  * 3600000).toISOString(), read: false },
-                { type: 'round',   title: 'Tour #3 — Clôture dans 2 jours (Dév. 2024)',        created_at: new Date(Date.now() - 3  * 3600000).toISOString(), read: false },
-                { type: 'payment', title: 'Retard signalé — Jean Dupont',                       created_at: new Date(Date.now() - 5  * 3600000).toISOString(), read: true  },
-                { type: 'system',  title: 'Nouvelle tontine créée : Aide Familiale',            created_at: new Date(Date.now() - 8  * 3600000).toISOString(), read: true  },
-                { type: 'round',   title: 'Bénéficiaire désigné — Prochain tour : Awa Diop',   created_at: new Date(Date.now() - 12 * 3600000).toISOString(), read: true  },
-                { type: 'payment', title: 'Paiement validé — 35 000 FCFA par Koffi Alain',    created_at: new Date(Date.now() - 24 * 3600000).toISOString(), read: true  },
-                { type: 'system',  title: 'Rappel : Échéance du 18 Juillet 2026',              created_at: new Date(Date.now() - 30 * 3600000).toISOString(), read: true  },
-                { type: 'round',   title: 'Tour #2 clôturé avec succès',                       created_at: new Date(Date.now() - 48 * 3600000).toISOString(), read: true  },
-                { type: 'payment', title: 'Paiement Mobile Money confirmé',                    created_at: new Date(Date.now() - 52 * 3600000).toISOString(), read: true  },
-                { type: 'system',  title: 'Membre invité : Fatou Bah a rejoint Aide Familiale',created_at: new Date(Date.now() - 60 * 3600000).toISOString(), read: true  },
-                { type: 'system',  title: 'Rapport mensuel de Juin 2026 disponible',           created_at: new Date(Date.now() - 72 * 3600000).toISOString(), read: true  },
-            ];
+            notifs = [];
+            let timeOffset = 1;
+            
+            // 1. Générer des rappels dynamiques selon les tontines actives
+            if (state.activeTontines && state.activeTontines.length > 0) {
+                state.activeTontines.forEach((t, idx) => {
+                    // On détermine le texte selon la fréquence (jour, semaine, mois)
+                    let freqText = "à la prochaine échéance";
+                    if (t.frequency === 'quotidien') freqText = "demain";
+                    if (t.frequency === 'hebdomadaire') freqText = "dans 7 jours";
+                    if (t.frequency === 'mensuel') freqText = "le mois prochain";
+                    
+                    notifs.push({
+                        type: 'round',
+                        title: `Rappel : Le prochain tour de la tontine « ${t.name} » approche (${freqText}).`,
+                        created_at: new Date(Date.now() - timeOffset * 3600000).toISOString(),
+                        read: false
+                    });
+                    timeOffset += 2;
+                });
+            }
+
+            // 2. Ajouter quelques notifications système/paiement de base
+            notifs.push(
+                { type: 'payment', title: 'Cotisation reçue — Awa Diop (35 000 FCFA)', created_at: new Date(Date.now() - timeOffset * 3600000).toISOString(), read: false },
+                { type: 'system',  title: 'Nouvelle fonctionnalité : Le centre de notifications dynamique est activé !', created_at: new Date(Date.now() - (timeOffset+2) * 3600000).toISOString(), read: false },
+                { type: 'payment', title: 'Paiement Mobile Money confirmé', created_at: new Date(Date.now() - 24 * 3600000).toISOString(), read: true },
+                { type: 'system',  title: 'Rapport mensuel généré avec succès', created_at: new Date(Date.now() - 48 * 3600000).toISOString(), read: true }
+            );
         }
+        
+        // Exposer une fonction globale pour ajouter de vraies notifications dynamiquement
+        window.addNotification = (type, title) => {
+            if (!state.notifs) state.notifs = [];
+            state.notifs.unshift({
+                type: type,
+                title: title,
+                created_at: new Date().toISOString(),
+                read: false
+            });
+            renderNotificationsTab(); // Refresh l'UI
+        };
+
         state.notifs = notifs;
     }
     
@@ -4768,6 +4802,182 @@ window.openCreditAdvanceModal = function(memberName, currentBalance) {
     document.getElementById('credit-advance-amount').value = '';
     
     document.getElementById('credit-advance-modal').classList.remove('hidden');
+};
+
+// --- AXE 6 : MES STATISTIQUES PERSONNELLES ---
+async function renderMemberStatsTab() {
+    let totalContributions = 0;
+    let nextPayoutAmount = 0;
+    let nextPayoutDateStr = "Aucun tour prévu";
+    let totalPenalties = 0;
+    const historyList = [];
+
+    // On simule les données pour l'utilisateur connecté (Ex: Wilfried ou le nom actuel du profile)
+    const currentUserName = document.querySelector('.sb-uname')?.textContent || "Utilisateur";
+
+    // Calculs basés sur les transactions globales
+    const transactions = _payAllTransactions || [];
+    transactions.forEach(tx => {
+        if (tx.member === currentUserName || currentUserName === "Utilisateur") {
+            if (tx.type === 'in' && tx.status === 'validated') {
+                totalContributions += tx.amount;
+            }
+            if (tx.type === 'penalty') {
+                totalPenalties += tx.amount;
+            }
+            historyList.push(tx);
+        }
+    });
+
+    // Chercher le prochain tour dans les tontines actives
+    if (state.activeTontines && state.activeTontines.length > 0) {
+        const t = state.activeTontines[0]; // On prend la première tontine active
+        nextPayoutAmount = t.amount * (t.members?.length || 5);
+        
+        let freqText = "Bientôt";
+        if (t.frequency === 'quotidien') freqText = "Demain";
+        if (t.frequency === 'hebdomadaire') freqText = "Dans 7 jours";
+        if (t.frequency === 'mensuel') freqText = "Le mois prochain";
+        
+        nextPayoutDateStr = `${freqText} (${t.name})`;
+    }
+
+    const elTotal = document.getElementById('my-total-contributions');
+    const elPayoutAmount = document.getElementById('my-next-payout-amount');
+    const elPayoutDate = document.getElementById('my-next-payout-date');
+    const elPenalties = document.getElementById('my-total-penalties');
+    const elHistory = document.getElementById('my-transactions-list');
+
+    if (elTotal) elTotal.textContent = new Intl.NumberFormat('fr-FR').format(totalContributions) + ' FCFA';
+    if (elPayoutAmount) elPayoutAmount.textContent = new Intl.NumberFormat('fr-FR').format(nextPayoutAmount) + ' FCFA';
+    if (elPayoutDate) elPayoutDate.textContent = nextPayoutDateStr;
+    if (elPenalties) elPenalties.textContent = new Intl.NumberFormat('fr-FR').format(totalPenalties) + ' FCFA';
+
+    if (elHistory) {
+        if (historyList.length === 0) {
+            elHistory.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-3);">Aucune transaction pour le moment.</td></tr>`;
+        } else {
+            elHistory.innerHTML = historyList.slice(0, 10).map(tx => {
+                const badgeClass = tx.status === 'validated' ? 'badge-green' : (tx.status === 'pending' ? 'badge-orange' : 'badge-red');
+                const badgeText = tx.status === 'validated' ? 'Validé' : (tx.status === 'pending' ? 'En attente' : 'Échoué');
+                const typeIcon = tx.type === 'in' ? '🟢 Cotisation' : (tx.type === 'out' ? '🔴 Retrait' : '⚠️ Pénalité');
+                
+                return `
+                <tr>
+                    <td style="font-size:13px; color:var(--text-2);">${tx.date}</td>
+                    <td style="font-weight:600; color:var(--text-1);">${tx.tontine || 'Général'}</td>
+                    <td style="font-size:13px;">${typeIcon}</td>
+                    <td style="font-weight:700; color:var(--text-1);">${new Intl.NumberFormat('fr-FR').format(tx.amount)} F</td>
+                    <td><span class="badge-status ${badgeClass}">${badgeText}</span></td>
+                </tr>`;
+            }).join('');
+        }
+    }
+}
+
+// --- AXE 6 : MODULE DE SONDAGES / VOTES ---
+let activePolls = [
+    {
+        id: 1,
+        question: "Doit-on augmenter la cotisation mensuelle à 15 000 FCFA ?",
+        choices: [
+            { text: "Oui, je suis d'accord", votes: 4 },
+            { text: "Non, on garde 10 000 FCFA", votes: 2 }
+        ],
+        voted: false
+    }
+];
+
+function renderVotesTab() {
+    const container = document.getElementById('polls-container');
+    const btnCreate = document.getElementById('btn-create-poll');
+    
+    if (btnCreate) {
+        btnCreate.style.display = checkPermission('edit_tontine') ? 'block' : 'none';
+    }
+
+    if (!container) return;
+    
+    if (activePolls.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: var(--surface); border-radius: 12px; color: var(--text-3);">Aucun sondage en cours.</div>`;
+        return;
+    }
+
+    container.innerHTML = activePolls.map(poll => {
+        const totalVotes = poll.choices.reduce((sum, c) => sum + c.votes, 0);
+        
+        const choicesHtml = poll.choices.map((choice, idx) => {
+            const percent = totalVotes > 0 ? Math.round((choice.votes / totalVotes) * 100) : 0;
+            return `
+            <div style="margin-top: 12px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px; color:var(--text-1);">
+                    <span>${choice.text}</span>
+                    <span>${percent}% (${choice.votes})</span>
+                </div>
+                <div style="position:relative; height:36px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; cursor:${poll.voted ? 'default' : 'pointer'};" ${!poll.voted ? `onclick="votePoll(${poll.id}, ${idx})"` : ''}>
+                    <div style="position:absolute; top:0; left:0; height:100%; width:${percent}%; background:rgba(16, 185, 129, 0.2); transition: width 0.5s;"></div>
+                    ${!poll.voted ? `<div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--primary); opacity:0.8;">VOTER</div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+
+        return `
+        <div class="card" style="border-top: 4px solid var(--primary);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <div style="width:32px; height:32px; border-radius:50%; background:rgba(99, 102, 241, 0.1); display:flex; align-items:center; justify-content:center;">📊</div>
+                <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-1); line-height:1.4;">${poll.question}</h3>
+            </div>
+            <div style="font-size:12px; color:var(--text-3); margin-bottom:16px;">Total des votes : ${totalVotes}</div>
+            ${choicesHtml}
+        </div>`;
+    }).join('');
+}
+
+window.openCreatePollModal = () => {
+    document.getElementById('poll-question-input').value = '';
+    document.getElementById('poll-choice1-input').value = '';
+    document.getElementById('poll-choice2-input').value = '';
+    document.getElementById('create-poll-modal').classList.remove('hidden');
+};
+
+window.submitNewPoll = () => {
+    const q = document.getElementById('poll-question-input').value;
+    const c1 = document.getElementById('poll-choice1-input').value;
+    const c2 = document.getElementById('poll-choice2-input').value;
+    
+    if(!q || !c1 || !c2) {
+        showToast("Veuillez remplir la question et au moins deux choix.", "error");
+        return;
+    }
+    
+    activePolls.unshift({
+        id: Date.now(),
+        question: q,
+        choices: [
+            { text: c1, votes: 0 },
+            { text: c2, votes: 0 }
+        ],
+        voted: false
+    });
+    
+    document.getElementById('create-poll-modal').classList.add('hidden');
+    showToast("Sondage publié avec succès !", "success");
+    
+    if(window.addNotification) {
+        window.addNotification('system', `Nouveau sondage : ${q}`);
+    }
+    
+    renderVotesTab();
+};
+
+window.votePoll = (pollId, choiceIdx) => {
+    const poll = activePolls.find(p => p.id === pollId);
+    if(poll && !poll.voted) {
+        poll.choices[choiceIdx].votes += 1;
+        poll.voted = true;
+        renderVotesTab();
+        showToast("Votre vote a été pris en compte.", "success");
+    }
 };
 
 // Initialisation au chargement

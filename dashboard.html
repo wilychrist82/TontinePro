@@ -56,6 +56,14 @@
             <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <span>Messages</span><span class="menu-badge" style="display:none">0</span>
         </button>
+        <button class="nav-item" data-tab="member-stats">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Mes Stats</span>
+        </button>
+        <button class="nav-item" data-tab="votes">
+            <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+            <span>Sondages</span>
+        </button>
         <button class="nav-item" data-tab="notifications">
             <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span>Notifications</span><span class="menu-badge" style="display:none">0</span>
@@ -338,6 +346,61 @@
         </div>
     </div>
     <div id="members-full-grid" class="members-grid"></div>
+</section>
+
+<section id="tab-member-stats" class="tab-pane">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <div>
+            <h2 class="page-title" style="margin-bottom: 4px;">Mes Statistiques Personnelles</h2>
+            <p style="color:var(--text-3); font-size:13px;">Suivez vos contributions et vos prochains encaissements.</p>
+        </div>
+        <button class="btn-sec-sm" onclick="renderMemberStatsTab()">Actualiser</button>
+    </div>
+    
+    <div class="reports-grid">
+        <div class="card" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white;">
+            <h3 class="card-title" style="color: rgba(255,255,255,0.8); border-bottom: none;">Total Cotisé</h3>
+            <div style="font-size:28px; font-weight:800; margin:10px 0;" id="my-total-contributions">0 FCFA</div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.9);">Depuis votre inscription</div>
+        </div>
+        <div class="card">
+            <h3 class="card-title">Prochain Encaissement</h3>
+            <div style="font-size:20px; font-weight:700; color:var(--text-1); margin:10px 0;" id="my-next-payout-amount">0 FCFA</div>
+            <div style="font-size:13px; color:var(--primary); font-weight:600;" id="my-next-payout-date">Aucun tour prévu</div>
+        </div>
+        <div class="card">
+            <h3 class="card-title">Pénalités & Retards</h3>
+            <div style="font-size:20px; font-weight:700; color:#EF4444; margin:10px 0;" id="my-total-penalties">0 FCFA</div>
+            <div style="font-size:12px; color:var(--text-3);">À régulariser rapidement</div>
+        </div>
+    </div>
+    
+    <div class="card" style="margin-top:20px;">
+        <h3 class="card-title">Historique de mes transactions</h3>
+        <div class="tbl-wrap">
+            <table class="data-tbl">
+                <thead><tr><th>Date</th><th>Tontine</th><th>Type</th><th>Montant</th><th>Statut</th></tr></thead>
+                <tbody id="my-transactions-list">
+                    <!-- Rempli par JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section id="tab-votes" class="tab-pane">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <div>
+            <h2 class="page-title" style="margin-bottom: 4px;">Sondages & Votes</h2>
+            <p style="color:var(--text-3); font-size:13px;">Participez aux décisions de vos groupes.</p>
+        </div>
+        <button class="btn-primary admin-only" onclick="openCreatePollModal()" style="display:none;" id="btn-create-poll">
+            + Créer un sondage
+        </button>
+    </div>
+    <div id="polls-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:20px;">
+        <!-- Rempli par JS -->
+    </div>
 </section>
 <section id="tab-messages" class="tab-pane">
     <div class="msg-layout" style="height: calc(100vh - var(--tb-h) - 30px);">
@@ -1650,6 +1713,32 @@
                     Rester sur le Plan Gratuit pour le moment
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Creation Sondage -->
+<div class="modal-overlay hidden" id="create-poll-modal">
+    <div class="modal-box" style="max-width: 450px;">
+        <div class="modal-hd">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 8px;">
+                <span>🗳️</span> Nouveau Sondage
+            </h3>
+            <button onclick="document.getElementById('create-poll-modal').classList.add('hidden'); window.modalHistoryPushed=false;" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <div class="form-group">
+                <label class="form-lbl">Question pour la communauté</label>
+                <input type="text" id="poll-question-input" class="form-input" placeholder="Ex: Doit-on augmenter la cotisation à 15 000 FCFA ?">
+            </div>
+            <div class="form-group">
+                <label class="form-lbl">Choix 1</label>
+                <input type="text" id="poll-choice1-input" class="form-input" value="Oui, je suis d'accord">
+            </div>
+            <div class="form-group">
+                <label class="form-lbl">Choix 2</label>
+                <input type="text" id="poll-choice2-input" class="form-input" value="Non, on garde l'ancien montant">
+            </div>
+            <button class="btn-primary btn-block" onclick="submitNewPoll()" style="margin-top: 15px;">Lancer le sondage</button>
         </div>
     </div>
 </div>
