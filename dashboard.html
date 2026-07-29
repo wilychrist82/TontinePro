@@ -193,7 +193,13 @@
         </div>
         <div class="stat-card">
             <div class="stat-icon s-green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 4v16"/><path d="M2 10h20"/></svg></div>
-            <div class="stat-info"><div class="stat-val val-green" id="stats-total-pool-label">0 <span class="stat-cur">FCFA</span></div><div class="stat-lbl">Montant total en jeu</div><div class="stat-sub">Toutes vos tontines</div></div>
+            <div class="stat-info">
+                <div class="stat-val val-green" id="stats-total-pool-label" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: -1px;">
+                    0 <span class="stat-cur" style="font-size: 16px; font-weight: 700; opacity: 0.8; letter-spacing: 0;">FCFA</span>
+                </div>
+                <div class="stat-lbl">Montant total en jeu</div>
+                <div class="stat-sub">Toutes vos tontines</div>
+            </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon s-yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -205,28 +211,14 @@
         </div>
     </div>
     <div class="mid-grid">
-        <div class="card donut-card">
-            <h3 class="card-title">Vue d&apos;ensemble</h3>
-            <div class="donut-layout">
-                <div class="donut-wrap">
-                    <svg width="155" height="155" viewBox="0 0 36 36" class="donut-svg">
-                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#E8ECEF" stroke-width="3.5"/>
-                        <circle id="donut-seg-received" cx="18" cy="18" r="15.915" fill="none" stroke="#5C60F5" stroke-width="3.5" stroke-dasharray="78 22" stroke-dashoffset="25"/>
-                        <circle id="donut-seg-pending" cx="18" cy="18" r="15.915" fill="none" stroke="#A78BFA" stroke-width="3.5" stroke-dasharray="18 82" stroke-dashoffset="-53"/>
-                        <circle id="donut-seg-delayed" cx="18" cy="18" r="15.915" fill="none" stroke="#EF4444" stroke-width="3.5" stroke-dasharray="4 96" stroke-dashoffset="-71"/>
-                    </svg>
-                    <div class="donut-center">
-                        <div class="donut-pct" id="donut-completion-percent">0%</div>
-                        <div class="donut-lbl-c">Complete</div>
-                    </div>
-                </div>
-                <div class="donut-legend">
-                    <div class="lg-item"><span class="lg-dot ld-blue"></span><div><div class="lg-name">Paiements recus</div><div class="lg-val" id="legend-val-received"><strong>0%</strong> (0 FCFA)</div></div></div>
-                    <div class="lg-item"><span class="lg-dot ld-purple"></span><div><div class="lg-name">En attente</div><div class="lg-val" id="legend-val-pending"><strong>0%</strong> (0 FCFA)</div></div></div>
-                    <div class="lg-item"><span class="lg-dot ld-red"></span><div><div class="lg-name">Retards</div><div class="lg-val" id="legend-val-delayed"><strong>0%</strong> (0 FCFA)</div></div></div>
-                </div>
+        <div class="card donut-card" style="display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h3 class="card-title" style="margin:0;">Évolution des paiements (FCFA)</h3>
+                <span style="font-size: 12px; color: var(--text-3); font-weight: 600;">30 derniers jours</span>
             </div>
-            <a href="#" class="card-link btn-go-to-reports" onclick="switchTab('reports'); return false;">Voir le rapport detaille &rarr;</a>
+            <div style="flex:1; position:relative; min-height:220px;">
+                <canvas id="dashboard-curve-chart"></canvas>
+            </div>
         </div>
         <div class="card next-rd-card">
             <h3 class="card-title"><span class="t-emoji">&#x1F3C6;</span> Prochain tour a venir</h3>
@@ -304,7 +296,6 @@
                 <h3 class="card-title">Actions rapides</h3>
                 <div class="qa-grid">
                     <button class="qa-btn qa-purple" id="btn-quick-create-tontine"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span>Creer une tontine</span></button>
-                    <button class="qa-btn qa-green" id="btn-quick-send-msg"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span>Envoyer message</span></button>
                     <button class="qa-btn qa-yellow" id="btn-quick-validate-pay"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>Valider paiement</span></button>
                     <button class="qa-btn qa-blue" id="btn-quick-view-reports"><div class="qa-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><span>Voir rapports</span></button>
                 </div>
@@ -522,9 +513,40 @@
     <div id="notifications-feed" class="notif-feed"></div>
 </section>
 <section id="tab-calendar" class="tab-pane">
-    <div class="cal-layout">
-        <div class="card cal-card"><div class="cal-nav"><button id="btn-cal-prev" class="cal-nav-btn">&#8249;</button><h3 id="cal-month-title">Juillet 2026</h3><button id="btn-cal-next" class="cal-nav-btn">&#8250;</button></div><div class="cal-days-hd"><span>Dim</span><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span></div><div class="cal-grid" id="calendar-grid"></div></div>
-        <div class="card upcoming-card"><h3 class="card-title">Evenements a venir</h3><div id="upcoming-events-list"></div></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
+        <div>
+            <h2 class="page-title" style="margin-bottom: 4px;">Calendrier des événements</h2>
+            <p style="color:var(--text-3); font-size:14px;">Gérez vos échéances et réunions à venir.</p>
+        </div>
+        <button class="btn-primary" style="background:#6366f1; border:none; padding:10px 20px; border-radius:10px; font-weight:600;">+ Nouvel événement</button>
+    </div>
+    <div class="cal-layout" style="display:grid; grid-template-columns: 2fr 1fr; gap:25px; align-items:start;">
+        <div class="card cal-card" style="padding:0; overflow:hidden; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.03); border:1px solid var(--border);">
+            <div class="cal-nav" style="display:flex; justify-content:space-between; align-items:center; padding:20px 25px; border-bottom:1px solid var(--border); background:#fff;">
+                <button id="btn-cal-prev" class="cal-nav-btn" style="width:36px; height:36px; border-radius:10px; border:1px solid #e2e8f0; background:#f8fafc; color:#475569; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h3 id="cal-month-title" style="margin:0; font-size:18px; font-weight:800; color:var(--text-1); letter-spacing:-0.5px;">Juillet 2026</h3>
+                <button id="btn-cal-next" class="cal-nav-btn" style="width:36px; height:36px; border-radius:10px; border:1px solid #e2e8f0; background:#f8fafc; color:#475569; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="cal-days-hd" style="display:grid; grid-template-columns:repeat(7, 1fr); text-align:center; padding:15px 0; background:#f8fafc; font-size:12px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border);">
+                <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span style="color:#6366f1;">Sam</span><span style="color:#ef4444;">Dim</span>
+            </div>
+            <div class="cal-grid" id="calendar-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); padding:10px;">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+        <div class="card upcoming-card" style="border-radius:16px; border:none; box-shadow:0 10px 30px rgba(0,0,0,0.03); background:linear-gradient(to bottom, #ffffff, #f8fafc);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                <div style="width:36px; height:36px; border-radius:10px; background:rgba(99, 102, 241, 0.1); color:#6366f1; display:flex; align-items:center; justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                <h3 class="card-title" style="margin:0; font-size:16px; border:none; padding:0;">Événements à venir</h3>
+            </div>
+            <div id="upcoming-events-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+        </div>
     </div>
 </section>
 <section id="tab-reports" class="tab-pane">

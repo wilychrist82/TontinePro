@@ -193,7 +193,7 @@ async function init() {
     // DYNAMIC DATA LOAD
     await loadDynamicData();
     renderDashboard();
-    animateDonutChart();
+    animateDashboardCurve();
     hideGlobalLoader();
 
     // Démarrer la visite guidée si c'est la première fois
@@ -912,7 +912,7 @@ function setupQuickActions() {
 
             // Mettre à jour l'interface
             renderDashboard();
-            if (typeof animateDonutChart === 'function') animateDonutChart();
+            if (typeof animateDashboardCurve === 'function') animateDashboardCurve();
             
             // Si on est sur l'onglet mes tontines, le mettre à jour aussi
             if (typeof updateCircleView === 'function') {
@@ -1936,24 +1936,71 @@ function renderActivityFeed() {
     }
 };
 
-function animateDonutChart() {
-    const donutCircle = document.querySelector('.donut-segment');
-    const pctLabel = document.getElementById('donut-percentage');
-    if (!donutCircle || !pctLabel) return;
+window.dashboardChartInstance = null;
+function animateDashboardCurve() {
+    const ctx = document.getElementById('dashboard-curve-chart');
+    if (!ctx) return;
+    
+    if (window.dashboardChartInstance) {
+        window.dashboardChartInstance.destroy();
+    }
 
-    let targetPct = state.donut.receivedPercent || 0;
-    const circumference = 2 * Math.PI * 15.9155;
-    const offset = circumference - (targetPct / 100) * circumference;
-    donutCircle.style.strokeDashoffset = offset;
+    // Données simulées pour la courbe d'évolution (Style Shopify)
+    const labels = ['1er', '5', '10', '15', '20', '25', '30'];
+    
+    // Total validé des paiements pour rendre ça un peu plus dynamique si possible, sinon statique
+    let baseVal = state.payments.validated > 0 ? state.payments.validated : 150000;
+    const dataPoints = [baseVal*0.1, baseVal*0.25, baseVal*0.2, baseVal*0.45, baseVal*0.4, baseVal*0.7, baseVal];
 
-    let currentPct = 0;
-    const interval = setInterval(() => {
-        if (currentPct >= targetPct) clearInterval(interval);
-        else {
-            currentPct++;
-            pctLabel.textContent = currentPct + '%';
+    window.dashboardChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Évolution (FCFA)',
+                data: dataPoints,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                tension: 0.4, // courbe lisse
+                fill: true,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#10b981',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 12,
+                    titleFont: { size: 13, family: 'Inter, sans-serif' },
+                    bodyFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    display: false,
+                    beginAtZero: true
+                },
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    ticks: { color: '#94a3b8', font: { family: 'Inter, sans-serif', size: 12 } }
+                }
+            }
         }
-    }, 20);
+    });
 }
 
 // --- 8. HELPERS ---
@@ -2062,7 +2109,7 @@ async function switchTab(tabId) {
         case 'home':
             await loadDynamicData();
             renderDashboard();
-            animateDonutChart();
+            animateDashboardCurve();
             break;
     }
 }
@@ -4648,13 +4695,68 @@ function sendMessage(roomName, isAdmin) {
 // AXE 6 - NOTIFICATIONS & PROFIL
 // ==========================================
 
-const mockNotifications = [
-    { id: 1, type: 'payment', title: 'Paiement reçu', text: 'Aminata D. a payé sa cotisation (50 000 FCFA)', time: 'Il y a 5 min', read: false },
-    { id: 2, type: 'alert', title: 'Retard de paiement', text: 'Marc O. a un retard de 3 jours. Pénalité de 2 000 FCFA appliquée.', time: 'Il y a 2h', read: false },
-    { id: 3, type: 'info', title: 'Nouveau tour', text: 'Le tour #4 (Bénéficiaire: Sarah K.) vient de démarrer.', time: 'Hier', read: true }
-];
+let mockNotifications = [];
+
+function generateDynamicNotifications() {
+    mockNotifications = [];
+    let notifId = 1;
+
+    // 1. Alertes de retards simulés ou basés sur les pénalités
+    if (_payAllTransactions) {
+        const penalties = _payAllTransactions.filter(tx => tx.type === 'penalty');
+        if (penalties.length > 0) {
+            const lastPenalty = penalties[penalties.length - 1];
+            mockNotifications.push({
+                id: notifId++,
+                type: 'alert',
+                title: 'Retard de paiement',
+                text: `${lastPenalty.member} a un retard. Pénalité de ${new Intl.NumberFormat('fr-FR').format(lastPenalty.amount)} FCFA appliquée.`,
+                time: lastPenalty.date || 'Récemment',
+                read: false
+            });
+        }
+    }
+
+    // 2. Rappels d'échéance basés sur les tontines actives
+    if (state.activeTontines && state.activeTontines.length > 0) {
+        state.activeTontines.forEach(t => {
+            let freqText = "bientôt";
+            if(t.frequency === 'quotidien') freqText = "demain";
+            if(t.frequency === 'hebdomadaire') freqText = "cette semaine";
+            if(t.frequency === 'mensuel') freqText = "le mois prochain";
+            
+            mockNotifications.push({
+                id: notifId++,
+                type: 'info',
+                title: `Rappel : ${t.name}`,
+                text: `Le prochain tour de la tontine « ${t.name} » approche (${freqText}).`,
+                time: 'Aujourd\'hui',
+                read: false
+            });
+        });
+    }
+
+    // 3. Paiements récents
+    if (_payAllTransactions) {
+        const recentIns = _payAllTransactions.filter(tx => tx.type === 'in' && tx.status === 'validated');
+        if (recentIns.length > 0) {
+            const lastIn = recentIns[recentIns.length - 1];
+            mockNotifications.push({
+                id: notifId++,
+                type: 'payment',
+                title: 'Paiement reçu',
+                text: `${lastIn.member} a payé sa cotisation (${new Intl.NumberFormat('fr-FR').format(lastIn.amount)} FCFA)`,
+                time: lastIn.date || 'Récemment',
+                read: false
+            });
+        }
+    }
+}
 
 function renderNotifications() {
+    if (mockNotifications.length === 0) {
+        generateDynamicNotifications();
+    }
     const container = document.getElementById('notif-list-container');
     const badge = document.getElementById('header-notif-badge');
     if(!container) return;
@@ -4705,10 +4807,16 @@ window.toggleNotificationDropdown = function() {
 };
 
 window.markNotifRead = function(id) {
-    const notif = mockNotifications.find(n => n.id === id);
-    if(notif) {
-        notif.read = true;
+    const idx = mockNotifications.findIndex(n => n.id === id);
+    if(idx !== -1) {
+        mockNotifications.splice(idx, 1);
         renderNotifications();
+        
+        // Hide dropdown if empty
+        if (mockNotifications.length === 0) {
+            const dropdown = document.getElementById('notifications-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+        }
     }
 };
 
@@ -4805,7 +4913,7 @@ window.openCreditAdvanceModal = function(memberName, currentBalance) {
 };
 
 // --- AXE 6 : MES STATISTIQUES PERSONNELLES ---
-async function renderMemberStatsTab() {
+window.renderMemberStatsTab = async function(showFeedback = false) {
     let totalContributions = 0;
     let nextPayoutAmount = 0;
     let nextPayoutDateStr = "Aucun tour prévu";
@@ -4873,6 +4981,10 @@ async function renderMemberStatsTab() {
             }).join('');
         }
     }
+    
+    if (showFeedback && typeof showToast === 'function') {
+        showToast("Statistiques actualisées avec succès.", "success");
+    }
 }
 
 // --- AXE 6 : MODULE DE SONDAGES / VOTES ---
@@ -4921,11 +5033,16 @@ function renderVotesTab() {
             </div>`;
         }).join('');
 
+        const deleteBtnHtml = `<button onclick="deletePoll(${poll.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; padding:4px;" title="Supprimer ce sondage">🗑️</button>`;
+
         return `
-        <div class="card" style="border-top: 4px solid var(--primary);">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-                <div style="width:32px; height:32px; border-radius:50%; background:rgba(99, 102, 241, 0.1); display:flex; align-items:center; justify-content:center;">📊</div>
-                <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-1); line-height:1.4;">${poll.question}</h3>
+        <div class="card" style="border-top: 4px solid var(--primary); position: relative;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="width:32px; height:32px; border-radius:50%; background:rgba(99, 102, 241, 0.1); display:flex; align-items:center; justify-content:center;">📊</div>
+                    <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-1); line-height:1.4;">${poll.question}</h3>
+                </div>
+                ${deleteBtnHtml}
             </div>
             <div style="font-size:12px; color:var(--text-3); margin-bottom:16px;">Total des votes : ${totalVotes}</div>
             ${choicesHtml}
@@ -4977,6 +5094,14 @@ window.votePoll = (pollId, choiceIdx) => {
         poll.voted = true;
         renderVotesTab();
         showToast("Votre vote a été pris en compte.", "success");
+    }
+};
+
+window.deletePoll = (pollId) => {
+    if(confirm("Voulez-vous vraiment supprimer ce sondage ?")) {
+        activePolls = activePolls.filter(p => p.id !== pollId);
+        renderVotesTab();
+        showToast("Sondage supprimé.", "success");
     }
 };
 
