@@ -672,19 +672,40 @@ function setupQuickActions() {
                                 data: dataPoints,
                                 borderColor: '#5C60F5',
                                 backgroundColor: 'rgba(92, 96, 245, 0.08)',
-                                borderWidth: 1.5,
+                                borderWidth: 3,
                                 fill: true,
-                                tension: 0.1 // 0.1 pour l'effet "dents de scie"
+                                tension: 0.4,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#5C60F5',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
                             }]
                         },
                         options: { 
                             responsive: true, 
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { display: false }
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#1e293b',
+                                    padding: 12,
+                                    titleFont: { size: 13, family: 'Inter, sans-serif' },
+                                    bodyFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
+                                    displayColors: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
+                                        }
+                                    }
+                                }
                             },
                             scales: {
-                                y: { beginAtZero: true }
+                                y: { beginAtZero: true, display: false },
+                                x: {
+                                    grid: { display: false, drawBorder: false },
+                                    ticks: { color: '#94a3b8', font: { family: 'Inter, sans-serif', size: 12 } }
+                                }
                             }
                         }
                     });
@@ -2032,10 +2053,20 @@ function toggleActionMenu(event, id) {
 
 // Global click listener to close dropdowns when clicking outside
 document.addEventListener('click', (event) => {
+    // 1. Fermer les menus d'action
     if (!event.target.closest('.action-menu-container')) {
         document.querySelectorAll('.action-dropdown.show').forEach(dropdown => {
             dropdown.classList.remove('show');
         });
+    }
+    
+    // 2. Fermer le dropdown des notifications
+    const notifDropdown = document.getElementById('notifications-dropdown');
+    const notifToggle = document.getElementById('btn-notifications-toggle');
+    if (notifDropdown && !notifDropdown.classList.contains('hidden')) {
+        if (!event.target.closest('#notifications-dropdown') && !event.target.closest('#btn-notifications-toggle')) {
+            notifDropdown.classList.add('hidden');
+        }
     }
 });
 function toggleTheme() {
@@ -3289,6 +3320,10 @@ window.applyChartPeriod = function() {
     reportsChartInstance.data.labels = labels;
     reportsChartInstance.data.datasets[0].data = dataPoints;
     reportsChartInstance.update();
+    
+    if (typeof showToast === 'function') {
+        showToast("Graphique mis à jour !", "success");
+    }
 };
 
 // --- AXE 3 : EXPORTS & RELANCES ---
@@ -4805,7 +4840,8 @@ function renderNotifications() {
     });
 }
 
-window.toggleNotificationDropdown = function() {
+window.toggleNotificationDropdown = function(event) {
+    if (event) event.stopPropagation();
     const dropdown = document.getElementById('notifications-dropdown');
     if (dropdown) {
         dropdown.classList.toggle('hidden');
