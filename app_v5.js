@@ -646,73 +646,81 @@ function setupQuickActions() {
             totalEl.textContent = "Chargement...";
             delayEl.textContent = "...";
 
-            const data = await DataService.getReportsData().catch(() => null);
-            if (data) {
-                totalEl.textContent = new Intl.NumberFormat('fr-FR').format(data.totalCollected) + " FCFA";
-                delayEl.textContent = data.delayRate + "%";
+            let data = await DataService.getReportsData().catch(() => null);
+            
+            // Mode Démo / Fallback si pas de données de la DB
+            if (!data) {
+                data = {
+                    totalCollected: 0,
+                    delayRate: 0,
+                    chartData: {
+                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août'],
+                        dataPoints: [120000, 210000, 160000, 280000, 190000, 310000, 240000, 350000]
+                    }
+                };
+            }
 
-                let labels = data.chartData.labels;
-                let dataPoints = data.chartData.dataPoints;
+            totalEl.textContent = new Intl.NumberFormat('fr-FR').format(data.totalCollected) + " FCFA";
+            delayEl.textContent = data.delayRate + "%";
 
-                // Génération d'une courbe en dents de scie pour la démo s'il manque des données historiques
-                if (labels.length <= 1) {
-                    labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août'];
-                    dataPoints = [120000, 210000, 160000, 280000, 190000, 310000, 240000, 350000];
-                }
+            let labels = data.chartData.labels;
+            let dataPoints = data.chartData.dataPoints;
 
-                const ctx = document.getElementById('payments-evolution-chart');
-                if (ctx && window.Chart) {
-                    if (reportsChartInstance) reportsChartInstance.destroy();
-                    reportsChartInstance = new window.Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Cotisations perçues (FCFA)',
-                                data: dataPoints,
-                                borderColor: '#5C60F5',
-                                backgroundColor: 'rgba(92, 96, 245, 0.08)',
-                                borderWidth: 3,
-                                fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#ffffff',
-                                pointBorderColor: '#5C60F5',
-                                pointBorderWidth: 2,
-                                pointRadius: 4,
-                                pointHoverRadius: 6
-                            }]
-                        },
-                        options: { 
-                            responsive: true, 
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    backgroundColor: '#1e293b',
-                                    padding: 12,
-                                    titleFont: { size: 13, family: 'Inter, sans-serif' },
-                                    bodyFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
-                                    displayColors: false,
-                                    callbacks: {
-                                        label: function(context) {
-                                            return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
-                                        }
+            // Génération d'une courbe en dents de scie pour la démo s'il manque des données historiques
+            if (labels.length <= 1) {
+                labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août'];
+                dataPoints = [120000, 210000, 160000, 280000, 190000, 310000, 240000, 350000];
+            }
+
+            const ctx = document.getElementById('payments-evolution-chart');
+            if (ctx && typeof Chart !== 'undefined') {
+                if (reportsChartInstance) reportsChartInstance.destroy();
+                reportsChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Cotisations perçues (FCFA)',
+                            data: dataPoints,
+                            borderColor: '#5C60F5',
+                            backgroundColor: 'rgba(92, 96, 245, 0.08)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#5C60F5',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                padding: 12,
+                                titleFont: { size: 13, family: 'Inter, sans-serif' },
+                                bodyFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
                                     }
                                 }
-                            },
-                            scales: {
-                                y: { beginAtZero: true, display: false },
-                                x: {
-                                    grid: { display: false, drawBorder: false },
-                                    ticks: { color: '#94a3b8', font: { family: 'Inter, sans-serif', size: 12 } }
-                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, display: false },
+                            x: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: { color: '#94a3b8', font: { family: 'Inter, sans-serif', size: 12 } }
                             }
                         }
-                    });
-                }
-            } else {
-                totalEl.textContent = "0 FCFA";
-                delayEl.textContent = "0%";
+                    }
+                });
             }
         });
     }
@@ -4322,7 +4330,7 @@ function updateUserProfile(btnEl) {
     showToast("✔ Informations de profil mises à jour avec succès !", "success");
 }
 
-function updateUserPassword(btnEl) {
+async function updateUserPassword(btnEl) {
     const currInp = document.getElementById('current-password-input');
     const newInp = document.getElementById('new-password-input');
 
@@ -4350,47 +4358,68 @@ function updateUserPassword(btnEl) {
         return;
     }
 
-    // Enregistrer immédiatement le nouveau mot de passe (et écraser tous les anciens mots de passe stockés en cache)
-    localStorage.setItem('tontine_user_pwd_' + userEmail, newVal);
-    localStorage.setItem('tontine_user_pwd_general', newVal);
-    if (localStorage.getItem('tontine_last_login_email')) {
-        localStorage.setItem('tontine_user_pwd_' + localStorage.getItem('tontine_last_login_email'), newVal);
-    }
-    for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('tontine_user_pwd_')) {
-            localStorage.setItem(k, newVal);
-        }
-    }
-
-    // Mettre à jour sur le serveur Supabase
-    if (typeof getSupabaseClient === 'function') {
-        const client = getSupabaseClient();
-        if (client && client.auth) {
-            client.auth.updateUser({ password: newVal }).then(({ error }) => {
-                if (error) console.warn("Erreur Supabase sync pwd:", error.message);
-            }).catch(e => {});
-        }
-    }
-
-    // Réinitialiser les champs
-    if (currInp) currInp.value = '';
-    if (newInp) newInp.value = '';
-
-    const strengthLbl = document.getElementById('strength-label');
-    if (strengthLbl) strengthLbl.textContent = "Mot de passe modifié et sécurisé ✔";
-
     if (btnEl) {
-        const origText = btnEl.textContent;
-        btnEl.textContent = "🔒 Mot de passe Modifié !";
-        btnEl.style.background = "#10B981";
-        setTimeout(() => {
-            btnEl.textContent = origText;
-            btnEl.style.background = "";
-        }, 2500);
+        btnEl.disabled = true;
+        btnEl.innerHTML = "Mise à jour en cours...";
     }
 
-    showToast("🔒 Mot de passe mis à jour avec succès ! Votre ancien mot de passe ne fonctionnera plus pour vous connecter.", "success");
+    try {
+        // Mettre à jour sur le serveur Supabase d'abord
+        if (typeof getSupabaseClient === 'function') {
+            const client = getSupabaseClient();
+            if (client && client.auth) {
+                const { error } = await client.auth.updateUser({ password: newVal });
+                if (error) {
+                    throw new Error(error.message);
+                }
+            }
+        }
+
+        // Si tout s'est bien passé sur Supabase (ou si hors ligne), enregistrer localement
+        localStorage.setItem('tontine_user_pwd_' + userEmail, newVal);
+        localStorage.setItem('tontine_user_pwd_general', newVal);
+        if (localStorage.getItem('tontine_last_login_email')) {
+            localStorage.setItem('tontine_user_pwd_' + localStorage.getItem('tontine_last_login_email'), newVal);
+        }
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith('tontine_user_pwd_')) {
+                localStorage.setItem(k, newVal);
+            }
+        }
+
+        // Réinitialiser les champs
+        if (currInp) currInp.value = '';
+        if (newInp) newInp.value = '';
+
+        const strengthLbl = document.getElementById('strength-label');
+        if (strengthLbl) strengthLbl.textContent = "Mot de passe modifié et sécurisé ✔";
+
+        if (btnEl) {
+            const origText = "Mettre a jour";
+            btnEl.textContent = "🔒 Mot de passe Modifié !";
+            btnEl.style.background = "#10B981";
+            setTimeout(() => {
+                btnEl.textContent = origText;
+                btnEl.style.background = "";
+            }, 2500);
+        }
+
+        showToast("🔒 Mot de passe mis à jour avec succès ! Votre ancien mot de passe ne fonctionnera plus pour vous connecter.", "success");
+
+    } catch (e) {
+        console.error(e);
+        let errorMsg = e.message;
+        if (errorMsg.includes("Auth session missing") || errorMsg.includes("User not found")) {
+            errorMsg = "Session expirée. Veuillez vous déconnecter et vous reconnecter avec votre mot de passe actuel avant de le changer.";
+        }
+        showToast("⚠ Erreur : " + errorMsg, "error");
+    } finally {
+        if (btnEl && btnEl.textContent === "Mise à jour en cours...") {
+            btnEl.disabled = false;
+            btnEl.innerHTML = "Mettre a jour";
+        }
+    }
 }
 
 function openPremiumDiscoverModal() {
