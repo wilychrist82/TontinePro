@@ -1936,71 +1936,80 @@ function renderActivityFeed() {
     }
 };
 
-window.dashboardChartInstance = null;
+        window.dashboardChartInstance = null;
 function animateDashboardCurve() {
-    const ctx = document.getElementById('dashboard-curve-chart');
-    if (!ctx) return;
-    
-    if (window.dashboardChartInstance) {
-        window.dashboardChartInstance.destroy();
-    }
+    try {
+        if (typeof Chart === 'undefined') {
+            console.warn("Chart.js n'est pas encore chargé.");
+            return;
+        }
 
-    // Données simulées pour la courbe d'évolution (Style Shopify)
-    const labels = ['1er', '5', '10', '15', '20', '25', '30'];
-    
-    // Total validé des paiements pour rendre ça un peu plus dynamique si possible, sinon statique
-    let baseVal = state.payments.validated > 0 ? state.payments.validated : 150000;
-    const dataPoints = [baseVal*0.1, baseVal*0.25, baseVal*0.2, baseVal*0.45, baseVal*0.4, baseVal*0.7, baseVal];
+        const ctx = document.getElementById('dashboard-curve-chart');
+        if (!ctx) return;
+        
+        if (window.dashboardChartInstance) {
+            window.dashboardChartInstance.destroy();
+        }
 
-    window.dashboardChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Évolution (FCFA)',
-                data: dataPoints,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderWidth: 3,
-                tension: 0.4, // courbe lisse
-                fill: true,
-                pointBackgroundColor: '#ffffff',
-                pointBorderColor: '#10b981',
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1e293b',
-                    padding: 12,
-                    titleFont: { size: 13, family: 'Inter, sans-serif' },
-                    bodyFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
-                    displayColors: false,
-                    callbacks: {
-                        label: function(context) {
-                            return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
+        // Données simulées pour la courbe d'évolution (Style Shopify)
+        const labels = ['1er', '5', '10', '15', '20', '25', '30'];
+        
+        // Total validé des paiements pour rendre ça un peu plus dynamique si possible, sinon statique
+        let baseVal = (state.stats && state.stats.validatedPaymentsToday > 0) ? (state.stats.validatedPaymentsToday * 10000) : 150000;
+        const dataPoints = [baseVal*0.1, baseVal*0.25, baseVal*0.2, baseVal*0.45, baseVal*0.4, baseVal*0.7, baseVal];
+
+        window.dashboardChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Évolution (FCFA)',
+                    data: dataPoints,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4, // courbe lisse
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#10b981',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        titleFont: { size: 13, family: 'Inter, sans-serif' },
+                        bodyFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
+                            }
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    display: false,
-                    beginAtZero: true
                 },
-                x: {
-                    grid: { display: false, drawBorder: false },
-                    ticks: { color: '#94a3b8', font: { family: 'Inter, sans-serif', size: 12 } }
+                scales: {
+                    y: {
+                        display: false,
+                        beginAtZero: true
+                    },
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { color: '#94a3b8', font: { family: 'Inter, sans-serif', size: 12 } }
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (e) {
+        console.error("Erreur lors de la création de la courbe: ", e);
+    }
 }
 
 // --- 8. HELPERS ---
