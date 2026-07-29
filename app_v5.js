@@ -1702,7 +1702,8 @@ function shareDrawCertWhatsApp() {
     msg += `\n🛡️ _Ordre certifié par algorithme aléatoire équitable._\n`;
     if (tontine.certCode) {
         msg += `🔍 *Vérifiez l'authenticité de ce tirage ici* :\n`;
-        msg += `https://tontine.pro/verify.html?cert=${tontine.certCode}\n`;
+        const baseUrl = window.location.origin;
+        msg += `${baseUrl}/verify.html?cert=${tontine.certCode}\n`;
     }
 
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
