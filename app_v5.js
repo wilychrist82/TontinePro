@@ -4209,10 +4209,16 @@ function checkPermission(action) {
 function applyRoleRestrictions() {
     const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
     let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    
     if (isInvitedMember) {
         role = 'membre';
         if (state.user) state.user.role = 'Membre';
+    } else {
+        // Règle utilisateur: Si connecté sur le grand lien principal (sans invitation), forcer le rôle Admin.
+        role = 'admin';
+        if (state.user) state.user.role = 'admin';
     }
+    
     if (role === 'administrateur') role = 'admin';
     const isAdmin = (role === 'admin' || role === 'gestionnaire') && !isInvitedMember;
 
