@@ -136,7 +136,7 @@ async function init() {
             const { data: { session }, error } = await DataService.getSession();
             if (error || !session) {
                 alert('Vous avez été déconnecté.');
-                window.location.href = 'connexion/index.html';
+                window.location.href = 'connexion/index.html' + window.location.search;
                 return; // On arrête l'initialisation du dashboard
             }
             
