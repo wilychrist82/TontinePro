@@ -4140,13 +4140,20 @@ function renderAdminMembers(query) {
             <td style="padding:12px 16px;">${status}</td>
             <td style="padding:12px 16px;">${roleLabel}</td>
             <td style="padding:12px 16px;text-align:center;">
-                <div style="display:flex; gap:8px; justify-content:center;">
-                    <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;${role === 'admin' || role === 'Gestionnaire' ? 'border-color:#ef4444;color:#ef4444;' : 'background:#6366f1;color:white;border:none;'}" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
-                        ${role === 'admin' || role === 'Gestionnaire' ? '🚫 Retirer droits' : '🤝 Déléguer Admin'}
+                <div class="action-menu-container" style="display:inline-block; position:relative;">
+                    <button class="btn-action-dots" onclick="toggleActionMenu(event, 'member-${escapeHTML(m.id)}')" style="width: 24px; height: 24px; color: #1E293B; background:transparent; border:none; cursor:pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                     </button>
-                    <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;border-color:#ef4444;color:#ef4444;" onclick="deleteMember('${escapeHTML(m.id)}','${escapeHTML(name)}')">
-                        🗑️ Supprimer
-                    </button>
+                    <div class="action-dropdown" id="dropdown-member-${escapeHTML(m.id)}" style="text-align:left;">
+                        <a class="action-dropdown-item" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            ${role === 'admin' || role === 'Gestionnaire' ? 'Retirer droits' : 'Déléguer Admin'}
+                        </a>
+                        <a class="action-dropdown-item danger" onclick="deleteMember('${escapeHTML(m.id)}','${escapeHTML(name)}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            Supprimer
+                        </a>
+                    </div>
                 </div>
             </td>
         </tr>`;
