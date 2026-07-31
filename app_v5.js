@@ -269,7 +269,19 @@ async function loadDynamicData() {
         if (messages && messages.length > 0) state.recentMessages = messages;
 
         const members = await DataService.getMembers().catch(() => []);
-        if (members && members.length > 0) extendedMembers = members;
+        if (members && members.length > 0) {
+            extendedMembers = members;
+            state.extendedMembers = members;
+            
+            // Synchroniser le rôle si l'utilisateur est connecté
+            if (state.user && state.user.name) {
+                const myName = state.user.name.split('@')[0].toLowerCase();
+                let myMemberRecord = extendedMembers.find(m => m.name.toLowerCase().includes(myName) || m.id === state.user.id);
+                if (myMemberRecord && myMemberRecord.role) {
+                    state.user.role = myMemberRecord.role;
+                }
+            }
+        }
 
         const transactions = await DataService.getTransactions().catch(() => []);
         let demoTxs = JSON.parse(localStorage.getItem('demo_transactions') || 'null');
@@ -4145,7 +4157,17 @@ function toggleMemberRole(memberId, memberName, currentRole) {
     if (found) {
         found.role = newRole;
         showToast(`🤝 Délégation mise à jour pour ${memberName} : ${newRole === 'admin' ? '🛡 Administrateur (Intérim)' : '👤 Simple Membre'}`, 'success');
+        
+        // Sauvegarder dans localStorage pour persister les rôles
+        localStorage.setItem('tontine_extended_members', JSON.stringify(members));
+
         renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
+        
+        // Mettre à jour le rôle actuel si on s'est auto-modifié
+        if (state.user && (found.name.toLowerCase().includes(state.user.name.split('@')[0].toLowerCase()) || found.id === state.user.id)) {
+            state.user.role = newRole;
+            if (typeof applyRoleRestrictions === 'function') applyRoleRestrictions();
+        }
     }
 }
 

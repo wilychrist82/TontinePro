@@ -135,13 +135,20 @@ const DataService = (() => {
                     progression: t.progression || 0,
                     status: t.status,
                     isDrawOfficial: t.is_draw_official,
-                    certCode: t.cert_code,
                     certTime: t.cert_time,
-                    drawOrder: t.draw_order
+                    drawOrder: t.draw_order,
+                    type: t.type || 'Rotative',
+                    goalAmount: t.goal_amount || 0,
+                    goalTitle: t.goal_title || ''
                 }));
             }
         }
-        return [];
+        const fallbackTontines = [
+            { id: 1, name: 'Tontine Entrepreneurs', amount: 50000, frequency: 'Mensuel', members: '8/10', progression: 80, status: 'En cours', type: 'Rotative', isDrawOfficial: false },
+            { id: 2, name: 'Caisse Épargne Terrain 2026', amount: 25000, frequency: 'Mensuel', members: '12/15', progression: 65, status: 'En cours', type: 'Objectif', goalAmount: 3000000, goalTitle: 'Achat terrain communautaire' },
+            { id: 3, name: 'Solidarité Commerçants', amount: 100000, frequency: 'Hebdomadaire', members: '5/5', progression: 100, status: 'Terminée', type: 'Rotative', isDrawOfficial: true, certCode: '#CERT-8F39', certTime: '2026-07-20 14:30' }
+        ];
+        return fallbackTontines;
     }
 
     /**
@@ -164,7 +171,22 @@ const DataService = (() => {
                 }));
             }
         }
-        return [];
+        
+        let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || 'null');
+        if (localMembers && localMembers.length > 0) {
+            return localMembers;
+        }
+
+        const fallbackMembers = [
+            { id: 'mem-1', name: 'Amadou Diallo', phone: '+225 07 01 02 03', email: 'amadou@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 2, contributed: 150000, trust: 98, avatar: 'https://ui-avatars.com/api/?name=Amadou+Diallo&background=06b6d4&color=fff&bold=true' },
+            { id: 'mem-2', name: 'Kossi Agbé', phone: '+228 90 11 22 33', email: 'kossi@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 2, contributed: 100000, trust: 85, avatar: 'https://ui-avatars.com/api/?name=Kossi+Agbe&background=f59e0b&color=fff&bold=true' },
+            { id: 'mem-3', name: 'Awa Ndiaye', phone: '+221 77 444 55 66', email: 'awa@tontinepro.com', role: 'Membre actif', status: 'En retard', tontines: 1, contributed: 25000, trust: 45, avatar: 'https://ui-avatars.com/api/?name=Awa+Ndiaye&background=ef4444&color=fff&bold=true' },
+            { id: 'mem-4', name: 'Jean-Paul Koffi', phone: '+225 05 88 99 00', email: 'jp@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 3, contributed: 225000, trust: 92, avatar: 'https://ui-avatars.com/api/?name=Jean-Paul&background=3b82f6&color=fff&bold=true' },
+            { id: 'mem-5', name: 'Fatou Diop', phone: '+221 70 123 45 67', email: 'fatou@tontinepro.com', role: 'Membre actif', status: 'En retard', tontines: 1, contributed: 10000, trust: 60, avatar: 'https://ui-avatars.com/api/?name=Fatou+Diop&background=64748b&color=fff&bold=true' },
+            { id: 'mem-6', name: 'David Mensah', phone: '+233 24 555 6677', email: 'david@tontinepro.com', role: 'Administrateur', status: 'À jour', tontines: 2, contributed: 180000, trust: 100, avatar: 'https://ui-avatars.com/api/?name=David+Mensah&background=8b5cf6&color=fff&bold=true' },
+            { id: 'mem-7', name: 'Sophie Lemoine', phone: '+33 6 12 34 56 78', email: 'sophie@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 1, contributed: 50000, trust: 80, avatar: 'https://ui-avatars.com/api/?name=Sophie+Lemoine&background=10b981&color=fff&bold=true' }
+        ];
+        return fallbackMembers;
     }
 
     /**
@@ -332,7 +354,10 @@ const DataService = (() => {
                     current_members: 0,
                     max_members: data.max_members,
                     progression: 0,
-                    status: 'En cours'
+                    status: 'En cours',
+                    type: data.type || 'Rotative',
+                    goalAmount: data.goal_amount || 0,
+                    goalTitle: data.goal_title || ''
                 }],
                 error: null
             };
@@ -360,7 +385,7 @@ const DataService = (() => {
     }
 
     async function createMessage(data) {
-        if (!isSupabaseConnected || !window.SupabaseService.insertMessage) return { error: "Mode hors-ligne" };
+        if (!isSupabaseConnected || !window.SupabaseService.insertMessage) return { error: null };
         return await window.SupabaseService.insertMessage(data);
     }
 
@@ -385,12 +410,18 @@ const DataService = (() => {
     }
 
     async function deleteTontine(tontineId) {
-        if (!isSupabaseConnected || !window.SupabaseService.deleteTontine) return { error: "Mode hors-ligne" };
+        if (!isSupabaseConnected || !window.SupabaseService.deleteTontine) {
+            console.log('[DataService] Suppression tontine locale (Mode Démo)', tontineId);
+            return { error: null };
+        }
         return await window.SupabaseService.deleteTontine(tontineId);
     }
 
     async function updateTontine(tontineId, payload) {
-        if (!isSupabaseConnected || !window.SupabaseService.updateTontine) return { error: "Mode hors-ligne" };
+        if (!isSupabaseConnected || !window.SupabaseService.updateTontine) {
+            console.log('[DataService] Modification tontine locale (Mode Démo)', tontineId, payload);
+            return { error: null };
+        }
         return await window.SupabaseService.updateTontine(tontineId, payload);
     }
 
