@@ -4208,23 +4208,31 @@ function checkPermission(action) {
 
 function applyRoleRestrictions() {
     const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
-    let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : null;
+    let dbRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : '';
     
-    if (isInvitedMember) {
-        role = 'membre';
-        if (state.user) state.user.role = 'Membre';
+    let finalRole = 'membre'; // Par défaut
+
+    if (dbRole === 'admin' || dbRole === 'gestionnaire' || dbRole === 'administrateur') {
+        // 1. Explicitement Admin dans la base de données (ex: droit délégué)
+        finalRole = 'admin';
+    } else if (dbRole === 'membre') {
+        // 2. Explicitement Membre dans la base de données (ex: droit retiré)
+        finalRole = 'membre';
     } else {
-        // Règle utilisateur: Sur le grand lien principal, on force Admin SAUF si l'utilisateur a été explicitement rétrogradé à 'membre'
-        if (role !== 'membre') {
-            role = 'admin';
-            if (state.user) state.user.role = 'admin';
+        // 3. Pas de rôle explicite (nouveau compte, ou "Membre actif" par défaut)
+        // On se fie au lien utilisé !
+        if (isInvitedMember) {
+            finalRole = 'membre'; // Lien d'invitation copié
+        } else {
+            finalRole = 'admin'; // Grand lien
         }
     }
-    
-    if (role === 'administrateur') role = 'admin';
-    if (!role) role = 'membre'; // Sécurité finale
-    
-    const isAdmin = (role === 'admin' || role === 'gestionnaire') && !isInvitedMember;
+
+    if (state.user) {
+        state.user.role = finalRole === 'admin' ? 'admin' : 'Membre';
+    }
+
+    const isAdmin = (finalRole === 'admin');
 
     // Afficher/masquer les onglets Administration et Audit Trail dans la sidebar
     ['btn-nav-admin', 'btn-nav-audit'].forEach(id => {
