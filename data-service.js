@@ -175,16 +175,22 @@ const DataService = (() => {
             }
         }
         
-        if (membersList.length === 0) {
-            membersList = [
-                { id: 'mem-1', name: 'Amadou Diallo', phone: '+225 07 01 02 03', email: 'amadou@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 2, contributed: 150000, trust: 98, avatar: 'https://ui-avatars.com/api/?name=Amadou+Diallo&background=06b6d4&color=fff&bold=true' },
-                { id: 'mem-2', name: 'Kossi Agbé', phone: '+228 90 11 22 33', email: 'kossi@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 2, contributed: 100000, trust: 85, avatar: 'https://ui-avatars.com/api/?name=Kossi+Agbe&background=f59e0b&color=fff&bold=true' },
-                { id: 'mem-3', name: 'Awa Ndiaye', phone: '+221 77 444 55 66', email: 'awa@tontinepro.com', role: 'Membre actif', status: 'En retard', tontines: 1, contributed: 25000, trust: 45, avatar: 'https://ui-avatars.com/api/?name=Awa+Ndiaye&background=ef4444&color=fff&bold=true' },
-                { id: 'mem-4', name: 'Jean-Paul Koffi', phone: '+225 05 88 99 00', email: 'jp@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 3, contributed: 225000, trust: 92, avatar: 'https://ui-avatars.com/api/?name=Jean-Paul&background=3b82f6&color=fff&bold=true' },
-                { id: 'mem-5', name: 'Fatou Diop', phone: '+221 70 123 45 67', email: 'fatou@tontinepro.com', role: 'Membre actif', status: 'En retard', tontines: 1, contributed: 10000, trust: 60, avatar: 'https://ui-avatars.com/api/?name=Fatou+Diop&background=64748b&color=fff&bold=true' },
-                { id: 'mem-6', name: 'David Mensah', phone: '+233 24 555 6677', email: 'david@tontinepro.com', role: 'Administrateur', status: 'À jour', tontines: 2, contributed: 180000, trust: 100, avatar: 'https://ui-avatars.com/api/?name=David+Mensah&background=8b5cf6&color=fff&bold=true' },
-                { id: 'mem-7', name: 'Sophie Lemoine', phone: '+33 6 12 34 56 78', email: 'sophie@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 1, contributed: 50000, trust: 80, avatar: 'https://ui-avatars.com/api/?name=Sophie+Lemoine&background=10b981&color=fff&bold=true' }
-            ];
+        const fallbackMembers = [
+            { id: 'mem-1', name: 'Amadou Diallo', phone: '+225 07 01 02 03', email: 'amadou@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 2, contributed: 150000, trust: 98, avatar: 'https://ui-avatars.com/api/?name=Amadou+Diallo&background=06b6d4&color=fff&bold=true' },
+            { id: 'mem-2', name: 'Kossi Agbé', phone: '+228 90 11 22 33', email: 'kossi@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 2, contributed: 100000, trust: 85, avatar: 'https://ui-avatars.com/api/?name=Kossi+Agbe&background=f59e0b&color=fff&bold=true' },
+            { id: 'mem-3', name: 'Awa Ndiaye', phone: '+221 77 444 55 66', email: 'awa@tontinepro.com', role: 'Membre actif', status: 'En retard', tontines: 1, contributed: 25000, trust: 45, avatar: 'https://ui-avatars.com/api/?name=Awa+Ndiaye&background=ef4444&color=fff&bold=true' },
+            { id: 'mem-4', name: 'Jean-Paul Koffi', phone: '+225 05 88 99 00', email: 'jp@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 3, contributed: 225000, trust: 92, avatar: 'https://ui-avatars.com/api/?name=Jean-Paul&background=3b82f6&color=fff&bold=true' },
+            { id: 'mem-5', name: 'Fatou Diop', phone: '+221 70 123 45 67', email: 'fatou@tontinepro.com', role: 'Membre actif', status: 'En retard', tontines: 1, contributed: 10000, trust: 60, avatar: 'https://ui-avatars.com/api/?name=Fatou+Diop&background=64748b&color=fff&bold=true' },
+            { id: 'mem-6', name: 'David Mensah', phone: '+233 24 555 6677', email: 'david@tontinepro.com', role: 'Administrateur', status: 'À jour', tontines: 2, contributed: 180000, trust: 100, avatar: 'https://ui-avatars.com/api/?name=David+Mensah&background=8b5cf6&color=fff&bold=true' },
+            { id: 'mem-7', name: 'Sophie Lemoine', phone: '+33 6 12 34 56 78', email: 'sophie@tontinepro.com', role: 'Membre actif', status: 'À jour', tontines: 1, contributed: 50000, trust: 80, avatar: 'https://ui-avatars.com/api/?name=Sophie+Lemoine&background=10b981&color=fff&bold=true' }
+        ];
+
+        if (membersList.length < 5) {
+            fallbackMembers.forEach(dummy => {
+                if (!membersList.find(m => m.id === dummy.id)) {
+                    membersList.push(dummy);
+                }
+            });
         }
 
         // Overlay roles from localStorage to ensure delegated roles persist locally
