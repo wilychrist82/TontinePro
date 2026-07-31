@@ -4140,12 +4140,58 @@ function renderAdminMembers(query) {
             <td style="padding:12px 16px;">${status}</td>
             <td style="padding:12px 16px;">${roleLabel}</td>
             <td style="padding:12px 16px;text-align:center;">
-                <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;${role === 'admin' || role === 'Gestionnaire' ? 'border-color:#ef4444;color:#ef4444;' : 'background:#6366f1;color:white;border:none;'}" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
-                    ${role === 'admin' || role === 'Gestionnaire' ? '🚫 Retirer droits' : '🤝 Déléguer Admin'}
-                </button>
+                <div style="display:flex; gap:8px; justify-content:center;">
+                    <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;${role === 'admin' || role === 'Gestionnaire' ? 'border-color:#ef4444;color:#ef4444;' : 'background:#6366f1;color:white;border:none;'}" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
+                        ${role === 'admin' || role === 'Gestionnaire' ? '🚫 Retirer droits' : '🤝 Déléguer Admin'}
+                    </button>
+                    <button class="btn-sec-sm" style="font-size:11px;padding:4px 10px;border-color:#ef4444;color:#ef4444;" onclick="deleteMember('${escapeHTML(m.id)}','${escapeHTML(name)}')">
+                        🗑️ Supprimer
+                    </button>
+                </div>
             </td>
         </tr>`;
     }).join('');
+}
+
+function deleteMember(memberId, memberName) {
+    if (state.user && state.user.id === memberId) {
+        if (typeof showToast === 'function') showToast("Vous ne pouvez pas supprimer votre propre compte admin.", "error");
+        return;
+    }
+    
+    if (!confirm(`🗑️ SUPPRESSION : Êtes-vous sûr de vouloir supprimer définitivement le membre "${memberName}" ? \n\nCette action est irréversible.`)) return;
+
+    // 1. Suppression locale
+    let members = state.extendedMembers || extendedMembers || [];
+    const index = members.findIndex(m => m.id === memberId);
+    
+    if (index !== -1) {
+        members.splice(index, 1);
+        state.extendedMembers = members;
+        extendedMembers = members;
+        
+        localStorage.setItem('tontine_extended_members', JSON.stringify(members));
+
+        // 2. Suppression dans Supabase
+        if (typeof getSupabaseClient === 'function') {
+            const client = getSupabaseClient();
+            if (client) {
+                client.from('profiles').delete().eq('id', memberId).then(({ error }) => {
+                    if (error) console.error("Erreur suppression Supabase:", error);
+                }).catch(() => {});
+            }
+        }
+
+        // 3. Mise à jour de l'interface
+        if (typeof showToast === 'function') showToast(`✅ Le membre "${memberName}" a été supprimé avec succès.`, 'success');
+        
+        // Rafraîchir l'onglet Admin
+        const searchInput = document.getElementById('admin-search-members');
+        if (typeof renderAdminMembers === 'function') renderAdminMembers(searchInput ? searchInput.value : '');
+        
+        // Rafraîchir l'onglet Membres si on y retourne plus tard
+        if (typeof renderMembersTab === 'function') renderMembersTab();
+    }
 }
 
 function toggleMemberRole(memberId, memberName, currentRole) {
