@@ -250,6 +250,8 @@ async function loadDynamicData() {
                     const { data: { user } } = await client.auth.getUser();
                     if (user) {
                         state.user.name = user.user_metadata?.full_name || user.email || 'Utilisateur';
+                        state.user.id = user.id;
+                        state.user.email = user.email;
                     }
                 } catch (e) {}
             }
@@ -4158,8 +4160,13 @@ function toggleMemberRole(memberId, memberName, currentRole) {
         found.role = newRole;
         showToast(`🤝 Délégation mise à jour pour ${memberName} : ${newRole === 'admin' ? '🛡 Administrateur (Intérim)' : '👤 Simple Membre'}`, 'success');
         
-        // Sauvegarder dans localStorage pour persister les rôles
+        // Sauvegarder dans localStorage pour persister les rôles (local)
         localStorage.setItem('tontine_extended_members', JSON.stringify(members));
+
+        // Mettre à jour dans Supabase pour synchroniser entre les appareils
+        if (window.SupabaseService && window.SupabaseService.updateMemberRole) {
+            window.SupabaseService.updateMemberRole(memberId, newRole).catch(() => {});
+        }
 
         renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
         

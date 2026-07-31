@@ -436,3 +436,22 @@ async function updateUserAvatar(base64Image) {
 }
 
 window.SupabaseService.updateUserAvatar = updateUserAvatar;
+
+async function updateMemberRoleInDB(memberId, newRole) {
+    const client = getSupabaseClient();
+    if (!client) return { error: new Error('Non connecté') };
+    
+    try {
+        const { data, error } = await client
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('id', memberId)
+            .select();
+            
+        return { data, error };
+    } catch (e) {
+        return { error: e.message };
+    }
+}
+
+window.SupabaseService.updateMemberRole = updateMemberRoleInDB;
