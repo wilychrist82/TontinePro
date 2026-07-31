@@ -301,7 +301,52 @@ async function insertMember(memberData) {
     const client = getSupabaseClient();
     if (!client) return { error: "Non connecté" };
     
-    // Fallback uuid generator simple si crypto.randomUUID n'est pas dispo
+    // 1. L'admin a fourni un email et un mot de passe -> on crée un vrai compte Auth
+    if (memberData.email && memberData.password) {
+        try {
+            // Créer un client temporaire pour ne pas déconnecter l'admin actuel
+            const tempClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: { persistSession: false }
+            });
+            
+            const { data, error } = await tempClient.auth.signUp({
+                email: memberData.email,
+                password: memberData.password,
+                options: {
+                    data: {
+                        full_name: memberData.name
+                    }
+                }
+            });
+            
+            if (error) return { error: error.message };
+            if (!data.user) return { error: "Erreur lors de la création du compte." };
+            
+            // Le trigger de Supabase va créer le profil automatiquement.
+            // On renvoie juste le profil qu'on vient de générer.
+            const userId = data.user.id;
+            
+            // Mettre à jour le téléphone dans la table profiles
+            if (memberData.phone) {
+                await client.from('profiles').update({ phone: memberData.phone }).eq('id', userId);
+            }
+            
+            return { data: [{
+                id: userId,
+                full_name: memberData.name,
+                phone: memberData.phone,
+                email: memberData.email,
+                is_active: memberData.status === 'Actif',
+                reliability_score: 100,
+                total_contributed: 0
+            }], error: null };
+            
+        } catch (err) {
+            return { error: err.message };
+        }
+    }
+    
+    // 2. L'admin veut juste ajouter un membre fictif sans compte (Email optionnel, pas de mot de passe)
     const id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now();
     const payload = {
         id: id,

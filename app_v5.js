@@ -762,6 +762,16 @@ function setupQuickActions() {
         });
     }
 
+    const emailInput = document.getElementById('member-email-input');
+    if (emailInput) {
+        emailInput.addEventListener('input', (e) => {
+            const pwdGroup = document.getElementById('member-password-group');
+            if (pwdGroup) {
+                pwdGroup.style.display = e.target.value.trim().length > 0 ? 'block' : 'none';
+            }
+        });
+    }
+
     const btnSubmitAddMember = document.getElementById('btn-submit-add-member');
     if (btnSubmitAddMember) {
         btnSubmitAddMember.addEventListener('click', async () => {
@@ -775,6 +785,7 @@ function setupQuickActions() {
             const name = document.getElementById('member-name-input').value.trim();
             const phone = document.getElementById('member-phone-input').value.trim();
             const email = document.getElementById('member-email-input').value.trim();
+            const password = document.getElementById('member-password-input') ? document.getElementById('member-password-input').value.trim() : '';
             const status = document.getElementById('member-status-input').value;
 
             if (!name) {
@@ -801,6 +812,7 @@ function setupQuickActions() {
                 name: name,
                 phone: phone,
                 email: email,
+                password: password,
                 status: status
             });
             hideGlobalLoader();
@@ -814,6 +826,10 @@ function setupQuickActions() {
                 document.getElementById('member-name-input').value = '';
                 document.getElementById('member-phone-input').value = '';
                 document.getElementById('member-email-input').value = '';
+                if (document.getElementById('member-password-input')) {
+                    document.getElementById('member-password-input').value = '';
+                    document.getElementById('member-password-group').style.display = 'none';
+                }
                 
                 showToast("Membre ajouté avec succès !", "success");
                 
