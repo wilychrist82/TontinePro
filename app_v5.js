@@ -4210,21 +4210,17 @@ function applyRoleRestrictions() {
     const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
     let dbRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : '';
     
-    let finalRole = 'membre'; // Par défaut
+    let finalRole = 'membre';
 
-    if (dbRole === 'admin' || dbRole === 'gestionnaire' || dbRole === 'administrateur') {
-        // 1. Explicitement Admin dans la base de données (ex: droit délégué)
+    if (!isInvitedMember) {
+        // Règle d'or de l'utilisateur : Le grand lien = Admin (Toujours)
         finalRole = 'admin';
-    } else if (dbRole === 'membre') {
-        // 2. Explicitement Membre dans la base de données (ex: droit retiré)
-        finalRole = 'membre';
     } else {
-        // 3. Pas de rôle explicite (nouveau compte, ou "Membre actif" par défaut)
-        // On se fie au lien utilisé !
-        if (isInvitedMember) {
-            finalRole = 'membre'; // Lien d'invitation copié
+        // Lien d'invitation : Membre, SAUF si l'admin lui a délégué les droits
+        if (dbRole === 'admin' || dbRole === 'gestionnaire' || dbRole === 'administrateur') {
+            finalRole = 'admin';
         } else {
-            finalRole = 'admin'; // Grand lien
+            finalRole = 'membre';
         }
     }
 
