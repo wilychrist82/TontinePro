@@ -121,7 +121,7 @@ async function init() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('role') === 'membre' || urlParams.get('invite') !== null || urlParams.get('ref') !== null) {
         localStorage.setItem('tontine_invited_member_mode', 'true');
-    } else if (urlParams.get('role') === 'admin' || urlParams.get('admin') === 'true') {
+    } else {
         localStorage.removeItem('tontine_invited_member_mode');
     }
     if (localStorage.getItem('tontine_invited_member_mode') === 'true') {
