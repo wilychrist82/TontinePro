@@ -4208,18 +4208,22 @@ function checkPermission(action) {
 
 function applyRoleRestrictions() {
     const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
-    let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : 'membre';
+    let role = (state.user && state.user.role) ? state.user.role.toLowerCase() : null;
     
     if (isInvitedMember) {
         role = 'membre';
         if (state.user) state.user.role = 'Membre';
     } else {
-        // Règle utilisateur: Si connecté sur le grand lien principal (sans invitation), forcer le rôle Admin.
-        role = 'admin';
-        if (state.user) state.user.role = 'admin';
+        // Règle utilisateur: Sur le grand lien principal, on force Admin SAUF si l'utilisateur a été explicitement rétrogradé à 'membre'
+        if (role !== 'membre') {
+            role = 'admin';
+            if (state.user) state.user.role = 'admin';
+        }
     }
     
     if (role === 'administrateur') role = 'admin';
+    if (!role) role = 'membre'; // Sécurité finale
+    
     const isAdmin = (role === 'admin' || role === 'gestionnaire') && !isInvitedMember;
 
     // Afficher/masquer les onglets Administration et Audit Trail dans la sidebar
