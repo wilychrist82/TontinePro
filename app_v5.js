@@ -4280,7 +4280,7 @@ function applyRoleRestrictions() {
     const roleEl = document.querySelector('.sb-urole');
     if (roleEl) {
         if (isAdmin) {
-            roleEl.innerHTML = `<span style="color:#6366f1;font-weight:700;">🛡 ${role === 'admin' ? 'Admin' : 'Gestionnaire'}</span>`;
+            roleEl.innerHTML = `<span style="color:#6366f1;font-weight:700;">🛡 ${finalRole === 'admin' ? 'Admin' : 'Gestionnaire'}</span>`;
         } else {
             roleEl.innerHTML = `<span style="color:#f59e0b;font-weight:700;">👤 Membre</span>`;
         }
