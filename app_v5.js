@@ -271,32 +271,23 @@ async function loadDynamicData() {
             state.activeTontines.forEach(t => {
                 if (typeof loadTontineDrawState === 'function') loadTontineDrawState(t);
             });
-        }
-
-        const messages = await DataService.getRecentMessages().catch(() => []);
-        if (messages && messages.length > 0) {
-            state.recentMessages = messages;
             
-            // Extract role updates from hidden system messages
-            let roleMap = {};
-            messages.forEach(msg => {
-                const text = msg.text || msg.content; // Fallback to content just in case
-                if (text && text.startsWith('[SYSTEM_ROLE_UPDATE] ')) {
-                    const parts = text.replace('[SYSTEM_ROLE_UPDATE] ', '').split(':');
-                    if (parts.length === 2) {
-                        roleMap[parts[0]] = parts[1];
+            // Extract role updates from tontine description (bypasses RLS issues)
+            const firstTontine = tontines[0];
+            if (firstTontine && firstTontine.description && firstTontine.description.startsWith('SYSTEM_DATA:')) {
+                try {
+                    const sysData = JSON.parse(firstTontine.description.replace('SYSTEM_DATA:', ''));
+                    if (sysData && sysData.roles) {
+                        const roleMap = sysData.roles;
+                        let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || '[]');
+                        Object.keys(roleMap).forEach(id => {
+                            const lm = localMembers.find(m => m.id === id);
+                            if (lm) lm.role = roleMap[id];
+                            else localMembers.push({ id, role: roleMap[id] });
+                        });
+                        localStorage.setItem('tontine_extended_members', JSON.stringify(localMembers));
                     }
-                }
-            });
-            // Merge into local storage so that they persist if messages drop off
-            if (Object.keys(roleMap).length > 0) {
-                let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || '[]');
-                Object.keys(roleMap).forEach(id => {
-                    const lm = localMembers.find(m => m.id === id);
-                    if (lm) lm.role = roleMap[id];
-                    else localMembers.push({ id, role: roleMap[id] });
-                });
-                localStorage.setItem('tontine_extended_members', JSON.stringify(localMembers));
+                } catch(e) { console.warn("Error parsing system data from tontine", e); }
             }
         }
 
@@ -4326,12 +4317,25 @@ function toggleMemberRole(memberId, memberName, currentRole) {
             window.SupabaseService.updateMemberRole(memberId, newRole).catch(() => {});
         }
         
-        // FOOLPROOF PIGGYBACK: Broadcaster le changement via un message système caché (contourne RLS)
-        if (window.SupabaseService && window.SupabaseService.insertMessage) {
-            window.SupabaseService.insertMessage({
-                content: `[SYSTEM_ROLE_UPDATE] ${memberId}:${newRole}`,
-                conversation_id: null // Sera mis dans le général
-            }).catch(() => {});
+        // NOUVEAU MOYEN DE STOCKAGE: On utilise le champ "description" de la première tontine (contourne RLS)
+        if (state.activeTontines && state.activeTontines.length > 0) {
+            const firstTontine = state.activeTontines[0];
+            let sysData = {};
+            try {
+                if (firstTontine.description && firstTontine.description.startsWith('SYSTEM_DATA:')) {
+                    sysData = JSON.parse(firstTontine.description.replace('SYSTEM_DATA:', ''));
+                }
+            } catch(e) {}
+            
+            if (!sysData.roles) sysData.roles = {};
+            sysData.roles[memberId] = newRole;
+            
+            const newDesc = 'SYSTEM_DATA:' + JSON.stringify(sysData);
+            firstTontine.description = newDesc; // update local
+            
+            if (window.SupabaseService && window.SupabaseService.updateTontine) {
+                window.SupabaseService.updateTontine(firstTontine.id, { description: newDesc }).catch(() => {});
+            }
         }
 
         renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
