@@ -852,12 +852,23 @@ function setupQuickActions() {
                         tontines: 0,
                         contributed: 0
                     });
+                    
+                    // Mettre à jour la variable globale et le localStorage pour la persistance
+                    if (typeof extendedMembers !== 'undefined') {
+                        extendedMembers = state.extendedMembers;
+                    }
+                    localStorage.setItem('tontine_extended_members', JSON.stringify(state.extendedMembers));
+                    
                 } else {
                     await loadDynamicData();
                 }
                 
                 if (typeof renderMembersTab === 'function') {
                     await renderMembersTab();
+                }
+                
+                if (typeof renderAdminMembers === 'function') {
+                    renderAdminMembers('');
                 }
             }
         });
