@@ -280,8 +280,9 @@ async function loadDynamicData() {
             // Extract role updates from hidden system messages
             let roleMap = {};
             messages.forEach(msg => {
-                if (msg.content && msg.content.startsWith('[SYSTEM_ROLE_UPDATE] ')) {
-                    const parts = msg.content.replace('[SYSTEM_ROLE_UPDATE] ', '').split(':');
+                const text = msg.text || msg.content; // Fallback to content just in case
+                if (text && text.startsWith('[SYSTEM_ROLE_UPDATE] ')) {
+                    const parts = text.replace('[SYSTEM_ROLE_UPDATE] ', '').split(':');
                     if (parts.length === 2) {
                         roleMap[parts[0]] = parts[1];
                     }
@@ -323,9 +324,15 @@ async function loadDynamicData() {
             state.extendedMembers = members;
             
             // Synchroniser le rôle si l'utilisateur est connecté
-            if (state.user && state.user.name) {
-                const myName = state.user.name.split('@')[0].toLowerCase();
-                let myMemberRecord = extendedMembers.find(m => m.name.toLowerCase().includes(myName) || m.id === state.user.id);
+            if (state.user && state.user.id) {
+                let myMemberRecord = extendedMembers.find(m => m.id === state.user.id);
+                
+                // Fallback de sécurité stricte si l'ID n'est pas trouvé
+                if (!myMemberRecord && state.user.name) {
+                    const myName = state.user.name.split('@')[0].toLowerCase();
+                    myMemberRecord = extendedMembers.find(m => m.name.toLowerCase() === myName);
+                }
+
                 if (myMemberRecord && myMemberRecord.role) {
                     state.user.role = myMemberRecord.role;
                 }
