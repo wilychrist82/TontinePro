@@ -309,7 +309,7 @@ async function loadDynamicData() {
                 members = [...localMembers];
             } else {
                 localMembers.forEach(localM => {
-                    const existing = members.find(m => m.id === localM.id || m.name === localM.name);
+                    const existing = members.find(m => m.id === localM.id || (m.name && localM.name && m.name === localM.name));
                     if (!existing) {
                         members.push(localM);
                     } else if (localM.role) {
@@ -327,10 +327,11 @@ async function loadDynamicData() {
             if (state.user && state.user.id) {
                 let myMemberRecord = extendedMembers.find(m => m.id === state.user.id);
                 
-                // Fallback de sécurité stricte si l'ID n'est pas trouvé
+                // Fallback de sécurité stricte si l'ID n'est pas trouvé (ex: id Supabase différent du id mock)
                 if (!myMemberRecord && state.user.name) {
                     const myName = state.user.name.split('@')[0].toLowerCase();
-                    myMemberRecord = extendedMembers.find(m => m.name.toLowerCase() === myName);
+                    // On cherche une correspondance partielle sécurisée
+                    myMemberRecord = extendedMembers.find(m => m.name && m.name.toLowerCase().includes(myName));
                 }
 
                 if (myMemberRecord && myMemberRecord.role) {
