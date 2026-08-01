@@ -1056,8 +1056,14 @@ function renderMemberDashboard() {
     let totalContributed = 0;
     
     // Identifier le membre actuel
-    const myName = state.user ? state.user.name.split('@')[0].toLowerCase() : '';
-    let myMemberRecord = state.extendedMembers ? state.extendedMembers.find(m => m.name.toLowerCase().includes(myName) || m.id === state.user.id) : null;
+    let myMemberRecord = null;
+    if (state.user && state.user.id && state.extendedMembers) {
+        myMemberRecord = state.extendedMembers.find(m => m.id === state.user.id);
+        if (!myMemberRecord && state.user.name) {
+            const myName = state.user.name.split('@')[0].toLowerCase();
+            myMemberRecord = state.extendedMembers.find(m => m.name && m.name.toLowerCase().includes(myName));
+        }
+    }
     
     if (myMemberRecord) {
         totalContributed = myMemberRecord.contributed || 0;
@@ -3262,7 +3268,7 @@ if (globalSearchInput && searchResultsDropdown) {
         let html = '';
         
         // Recherche dans les membres
-        const matchedMembers = extendedMembers.filter(m => m.name.toLowerCase().includes(query));
+        const matchedMembers = extendedMembers.filter(m => m.name && m.name.toLowerCase().includes(query));
         if (matchedMembers.length > 0) {
             html += '<div style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">Membres</div>';
             matchedMembers.forEach(m => {
@@ -4331,7 +4337,7 @@ function toggleMemberRole(memberId, memberName, currentRole) {
         renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
         
         // Mettre à jour le rôle actuel si on s'est auto-modifié
-        if (state.user && (found.name.toLowerCase().includes(state.user.name.split('@')[0].toLowerCase()) || found.id === state.user.id)) {
+        if (state.user && ( (found.name && found.name.toLowerCase().includes(state.user.name.split('@')[0].toLowerCase())) || found.id === state.user.id)) {
             state.user.role = newRole;
             if (typeof applyRoleRestrictions === 'function') applyRoleRestrictions();
         }
