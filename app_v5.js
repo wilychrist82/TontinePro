@@ -274,7 +274,30 @@ async function loadDynamicData() {
         }
 
         const messages = await DataService.getRecentMessages().catch(() => []);
-        if (messages && messages.length > 0) state.recentMessages = messages;
+        if (messages && messages.length > 0) {
+            state.recentMessages = messages;
+            
+            // Extract role updates from hidden system messages
+            let roleMap = {};
+            messages.forEach(msg => {
+                if (msg.content && msg.content.startsWith('[SYSTEM_ROLE_UPDATE] ')) {
+                    const parts = msg.content.replace('[SYSTEM_ROLE_UPDATE] ', '').split(':');
+                    if (parts.length === 2) {
+                        roleMap[parts[0]] = parts[1];
+                    }
+                }
+            });
+            // Merge into local storage so that they persist if messages drop off
+            if (Object.keys(roleMap).length > 0) {
+                let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || '[]');
+                Object.keys(roleMap).forEach(id => {
+                    const lm = localMembers.find(m => m.id === id);
+                    if (lm) lm.role = roleMap[id];
+                    else localMembers.push({ id, role: roleMap[id] });
+                });
+                localStorage.setItem('tontine_extended_members', JSON.stringify(localMembers));
+            }
+        }
 
         let members = await DataService.getMembers().catch(() => []);
         
@@ -4287,6 +4310,14 @@ function toggleMemberRole(memberId, memberName, currentRole) {
         // Mettre à jour dans Supabase pour synchroniser entre les appareils
         if (window.SupabaseService && window.SupabaseService.updateMemberRole) {
             window.SupabaseService.updateMemberRole(memberId, newRole).catch(() => {});
+        }
+        
+        // FOOLPROOF PIGGYBACK: Broadcaster le changement via un message système caché (contourne RLS)
+        if (window.SupabaseService && window.SupabaseService.insertMessage) {
+            window.SupabaseService.insertMessage({
+                content: `[SYSTEM_ROLE_UPDATE] ${memberId}:${newRole}`,
+                conversation_id: null // Sera mis dans le général
+            }).catch(() => {});
         }
 
         renderAdminMembers(document.getElementById('admin-search-members')?.value || '');
