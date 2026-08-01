@@ -281,9 +281,16 @@ async function loadDynamicData() {
                         const roleMap = sysData.roles;
                         let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || '[]');
                         Object.keys(roleMap).forEach(id => {
+                            const data = roleMap[id];
+                            const role = typeof data === 'string' ? data : data.role;
+                            const name = typeof data === 'string' ? '' : data.name;
+                            
                             const lm = localMembers.find(m => m.id === id);
-                            if (lm) lm.role = roleMap[id];
-                            else localMembers.push({ id, role: roleMap[id] });
+                            if (lm) {
+                                lm.role = role;
+                                if (name && !lm.name) lm.name = name;
+                            }
+                            else localMembers.push({ id, role, name });
                         });
                         localStorage.setItem('tontine_extended_members', JSON.stringify(localMembers));
                     }
@@ -318,11 +325,14 @@ async function loadDynamicData() {
             if (state.user && state.user.id) {
                 let myMemberRecord = extendedMembers.find(m => m.id === state.user.id);
                 
-                // Fallback de sécurité stricte si l'ID n'est pas trouvé (ex: id Supabase différent du id mock)
-                if (!myMemberRecord && state.user.name) {
-                    const myName = state.user.name.split('@')[0].toLowerCase();
-                    // On cherche une correspondance partielle sécurisée
-                    myMemberRecord = extendedMembers.find(m => m.name && m.name.toLowerCase().includes(myName));
+                // Héritage de rôle: Si le compte UUID n'a pas de rôle, chercher si l'Admin a délégué le droit à un profil "fictif" (mock) portant le même nom
+                const myName = state.user.name ? state.user.name.split('@')[0].toLowerCase() : '';
+                if (myName && (!myMemberRecord || (myMemberRecord.role !== 'admin' && myMemberRecord.role !== 'gestionnaire' && myMemberRecord.role !== 'administrateur'))) {
+                    const mockRecord = extendedMembers.find(m => m.name && m.name.toLowerCase().includes(myName) && (m.role === 'admin' || m.role === 'gestionnaire' || m.role === 'administrateur'));
+                    if (mockRecord) {
+                        if (!myMemberRecord) myMemberRecord = mockRecord;
+                        else myMemberRecord.role = mockRecord.role;
+                    }
                 }
 
                 if (myMemberRecord && myMemberRecord.role) {
@@ -4328,7 +4338,7 @@ function toggleMemberRole(memberId, memberName, currentRole) {
             } catch(e) {}
             
             if (!sysData.roles) sysData.roles = {};
-            sysData.roles[memberId] = newRole;
+            sysData.roles[memberId] = { role: newRole, name: memberName };
             
             const newDesc = 'SYSTEM_DATA:' + JSON.stringify(sysData);
             firstTontine.description = newDesc; // update local
