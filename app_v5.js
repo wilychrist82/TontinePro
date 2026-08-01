@@ -1460,6 +1460,16 @@ function renderTontinesTable() {
     
     if (window.feather) feather.replace();
     applyRoleRestrictions();
+
+    // Injecter un indicateur de version pour être sûr que le téléphone n'utilise pas le cache
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar && !document.getElementById('app-version-indicator')) {
+        const v = document.createElement('div');
+        v.id = 'app-version-indicator';
+        v.style.cssText = 'position:absolute; bottom:5px; left:10px; font-size:10px; color:var(--text-3); opacity:0.5; z-index:100;';
+        v.innerHTML = 'v6.0 - Anti-Cache Actif';
+        sidebar.appendChild(v);
+    }
 }
 
 async function deleteTontineAction(id) {
