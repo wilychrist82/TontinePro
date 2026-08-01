@@ -145,6 +145,12 @@ async function init() {
             
             // Mise à jour basique du nom (en attendant le chargement du profil)
             const username = session.user.email.split('@')[0];
+            
+            if (!state.user) state.user = {};
+            state.user.id = session.user.id;
+            state.user.email = session.user.email;
+            state.user.name = session.user.user_metadata?.full_name || username;
+            
             document.querySelectorAll('.sb-uname').forEach(el => el.textContent = username);
             document.querySelectorAll('.tb-title').forEach(el => el.innerHTML = `Bienvenue, ${username} ! &#x1F44B;`);
         }
