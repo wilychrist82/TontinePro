@@ -338,6 +338,12 @@ async function loadDynamicData() {
                 if (myMemberRecord && myMemberRecord.role) {
                     state.user.role = myMemberRecord.role;
                 }
+                
+                // GARANTIE ABSOLUE: Le créateur de la tontine est TOUJOURS admin
+                if (state.activeTontines && state.activeTontines.some(t => t.created_by === state.user.id)) {
+                    state.user.role = 'admin';
+                    if (myMemberRecord) myMemberRecord.role = 'admin';
+                }
             }
         }
 
@@ -4389,6 +4395,12 @@ function checkPermission(action) {
 function applyRoleRestrictions() {
     const isInvitedMember = localStorage.getItem('tontine_invited_member_mode') === 'true';
     let dbRole = (state.user && state.user.role) ? state.user.role.toLowerCase() : '';
+    
+    // GARANTIE ABSOLUE: Le créateur de la tontine est TOUJOURS admin, même s'il a cliqué sur son propre lien d'invitation
+    const isCreator = state.user && state.activeTontines && state.activeTontines.some(t => t.created_by === state.user.id);
+    if (isCreator) {
+        dbRole = 'admin';
+    }
     
     let finalRole = 'membre';
 
