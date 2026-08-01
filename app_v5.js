@@ -270,7 +270,25 @@ async function loadDynamicData() {
         const messages = await DataService.getRecentMessages().catch(() => []);
         if (messages && messages.length > 0) state.recentMessages = messages;
 
-        const members = await DataService.getMembers().catch(() => []);
+        let members = await DataService.getMembers().catch(() => []);
+        
+        // FOOLPROOF MERGE: Force merge locally added members from localStorage to avoid issues with old data-service.js versions
+        let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || '[]');
+        if (localMembers.length > 0) {
+            if (!members || members.length === 0) {
+                members = [...localMembers];
+            } else {
+                localMembers.forEach(localM => {
+                    const existing = members.find(m => m.id === localM.id || m.name === localM.name);
+                    if (!existing) {
+                        members.push(localM);
+                    } else if (localM.role) {
+                        existing.role = localM.role;
+                    }
+                });
+            }
+        }
+        
         if (members && members.length > 0) {
             extendedMembers = members;
             state.extendedMembers = members;
@@ -2353,6 +2371,23 @@ async function renderMembersTab(searchQuery = '') {
     grid.innerHTML = '<p style="padding:20px;color:var(--color-text-muted)">Chargement...</p>';
 
     let members = await DataService.getMembers().catch(() => []);
+    
+    // FOOLPROOF MERGE: Ensure locally added members show up in the Members tab instantly and after refresh
+    let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || '[]');
+    if (localMembers.length > 0) {
+        if (!members || members.length === 0) {
+            members = [...localMembers];
+        } else {
+            localMembers.forEach(localM => {
+                const existing = members.find(m => m.id === localM.id || m.name === localM.name);
+                if (!existing) {
+                    members.push(localM);
+                } else if (localM.role) {
+                    existing.role = localM.role;
+                }
+            });
+        }
+    }
     
     const customAvatar = localStorage.getItem('user_profile_avatar');
     if (customAvatar) {
