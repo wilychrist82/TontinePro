@@ -414,15 +414,12 @@ async function loadDynamicData() {
                     return acc + (parseInt(parts[1]) || parseInt(parts[0]) || 0);
                 }, 0);
             }
-            }
         }
         
         // Appliquer les restrictions de rôle MAINTENANT que le vrai rôle a été chargé de la BDD
         if (typeof applyRoleRestrictions === 'function') {
             applyRoleRestrictions();
         }
-    } catch(err) {
-        console.warn('Erreur lors du chargement des données dynamiques:', err);
     }
 }
 
