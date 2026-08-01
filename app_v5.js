@@ -325,10 +325,17 @@ async function loadDynamicData() {
             if (state.user && state.user.id) {
                 let myMemberRecord = extendedMembers.find(m => m.id === state.user.id);
                 
-                // Héritage de rôle: Si le compte UUID n'a pas de rôle, chercher si l'Admin a délégué le droit à un profil "fictif" (mock) portant le même nom
-                const myName = state.user.name ? state.user.name.split('@')[0].toLowerCase() : '';
-                if (myName && (!myMemberRecord || (myMemberRecord.role !== 'admin' && myMemberRecord.role !== 'gestionnaire' && myMemberRecord.role !== 'administrateur'))) {
-                    const mockRecord = extendedMembers.find(m => m.name && m.name.toLowerCase().includes(myName) && (m.role === 'admin' || m.role === 'gestionnaire' || m.role === 'administrateur'));
+                // Héritage de rôle: Si le compte UUID n'a pas de rôle, chercher si l'Admin a délégué le droit à un profil "fictif" (mock) portant un nom similaire
+                const myRawName = (state.user.name || '').toLowerCase();
+                const myNameParts = myRawName.split(/[\s@\.\-_]+/);
+                
+                if (myNameParts.length > 0 && (!myMemberRecord || (myMemberRecord.role !== 'admin' && myMemberRecord.role !== 'gestionnaire' && myMemberRecord.role !== 'administrateur'))) {
+                    const mockRecord = extendedMembers.find(m => {
+                        if (!m.name || (m.role !== 'admin' && m.role !== 'gestionnaire' && m.role !== 'administrateur')) return false;
+                        const mockNameParts = m.name.toLowerCase().split(/[\s@\.\-_]+/);
+                        // On cherche si au moins un mot de plus de 2 lettres correspond (ex: "alice" dans alice.dupont@... et "Alice K.")
+                        return myNameParts.some(part => part.length > 2 && mockNameParts.includes(part));
+                    });
                     if (mockRecord) {
                         if (!myMemberRecord) myMemberRecord = mockRecord;
                         else myMemberRecord.role = mockRecord.role;
