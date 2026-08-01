@@ -4502,7 +4502,7 @@ async function updateUserPassword(btnEl) {
     }
 
     const userEmail = (state && state.user && state.user.email) ? state.user.email.trim().toLowerCase() : (localStorage.getItem('tontine_last_login_email') || 'user@tontine.pro');
-    const storedPwd = localStorage.getItem('tontine_user_pwd_' + userEmail) || localStorage.getItem('tontine_user_pwd_general');
+    const storedPwd = localStorage.getItem('tontine_user_pwd_' + userEmail);
     
     if (storedPwd && currVal !== storedPwd) {
         showToast("⚠ Erreur : Le mot de passe actuel saisi est incorrect !", "error");
@@ -4538,12 +4538,6 @@ async function updateUserPassword(btnEl) {
         localStorage.setItem('tontine_user_pwd_general', newVal);
         if (localStorage.getItem('tontine_last_login_email')) {
             localStorage.setItem('tontine_user_pwd_' + localStorage.getItem('tontine_last_login_email'), newVal);
-        }
-        for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (k && k.startsWith('tontine_user_pwd_')) {
-                localStorage.setItem(k, newVal);
-            }
         }
 
         // Réinitialiser les champs
