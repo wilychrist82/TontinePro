@@ -5512,3 +5512,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sidebarAvatar) sidebarAvatar.src = savedAvatar;
     }
 });
+
+// --- Responsive Tables Auto-Labeler ---
+// Injecte automatiquement l'attribut data-label sur chaque <td> des tableaux .data-tbl pour le mode mobile "Card View"
+function applyResponsiveTableLabels() {
+    document.querySelectorAll('table.data-tbl, table#payments-table').forEach(table => {
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+        if(headers.length === 0) return;
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            Array.from(tr.children).forEach((td, index) => {
+                if(td.tagName === 'TD' && headers[index] && !td.hasAttribute('data-label')) {
+                    td.setAttribute('data-label', headers[index]);
+                }
+            });
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(applyResponsiveTableLabels, 500);
+    const observer = new MutationObserver((mutations) => {
+        let shouldApply = false;
+        for (let m of mutations) {
+            if (m.addedNodes.length > 0) {
+                shouldApply = true;
+                break;
+            }
+        }
+        if(shouldApply) applyResponsiveTableLabels();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+});

@@ -278,7 +278,7 @@
     <div class="bot-grid">
         <div class="card tontines-card">
             <div class="card-hd"><h3 class="card-title">Mes tontines actives</h3></div>
-            <div class="tbl-wrap"><table class="data-tbl"><thead><tr><th>Nom de la tontine</th><th>Montant</th><th>Frequence</th><th>Membres</th><th>Progression</th><th>Santé (Score)</th><th style="width: 40px;"></th></tr></thead><tbody id="tontines-table-body"></tbody></table></div>
+            <div class="tbl-wrap"><table class="data-tbl"><thead><tr><th style="width: 25%;">Nom de la tontine</th><th style="width: 15%;">Montant</th><th style="width: 15%;">Frequence</th><th style="width: 10%;">Membres</th><th style="width: 15%;">Progression</th><th style="width: 15%;">Santé (Score)</th><th style="width: 5%;"></th></tr></thead><tbody id="tontines-table-body"></tbody></table></div>
             <a href="#" class="card-link btn-go-to-tontines" onclick="switchTab('circle'); return false;">Voir toutes mes tontines &rarr;</a>
         </div>
         <div class="right-col">
@@ -322,7 +322,7 @@
     <div id="members-trust-container"></div>
 </section>
 <section id="tab-register" class="tab-pane">
-    <div class="card"><div class="card-hd"><h3 class="card-title">Registre general des transactions</h3></div><div class="tbl-wrap"><table class="data-tbl"><thead><tr><th>Date</th><th>Tontine</th><th>Membre</th><th>Type</th><th>Montant</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="master-registry-table-body"></tbody></table></div></div>
+    <div class="card"><div class="card-hd"><h3 class="card-title">Registre general des transactions</h3></div><div class="tbl-wrap"><table class="data-tbl"><thead><tr><th style="width:15%;">Date</th><th style="width:20%;">Tontine</th><th style="width:20%;">Membre</th><th style="width:15%;">Type</th><th style="width:15%;">Montant</th><th style="width:10%;">Statut</th><th style="width:5%;">Actions</th></tr></thead><tbody id="master-registry-table-body"></tbody></table></div></div>
 </section>
 <section id="tab-members" class="tab-pane">
     <div class="members-ph" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
@@ -825,7 +825,7 @@
         </div>
         <!-- Tableau -->
         <div class="card tbl-wrap" style="padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch;">
-            <table style="width:100%;border-collapse:collapse;min-width:550px;" id="payments-table">
+            <table class="data-tbl" style="width:100%;border-collapse:collapse;min-width:550px;" id="payments-table">
                 <thead>
                     <tr style="background:var(--content-bg);">
                         <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">Membre</th>
@@ -922,7 +922,7 @@
                 <div style="font-size:14px;font-weight:700;color:var(--text-1);">Gestion des membres & Délégation de pouvoir</div>
                 <input type="text" id="admin-search-members" placeholder="Rechercher..." style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text-1);outline:none;" oninput="renderAdminMembers(this.value)">
             </div>
-            <table style="width:100%;border-collapse:collapse;min-width:600px;">
+            <table class="data-tbl" style="width:100%;border-collapse:collapse;min-width:600px;">
                 <thead>
                     <tr style="background:var(--content-bg);">
                         <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);">Membre</th>

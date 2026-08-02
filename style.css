@@ -322,7 +322,7 @@ a { text-decoration:none; color:inherit; }
 .double-avatar img:last-child { position:absolute; bottom:-3px; right:-6px; width:22px; height:22px; border-radius:50%; object-fit:cover; border:2px solid white; }
 
 /* Actions Rapides */
-.qa-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
 .qa-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:12px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid transparent; transition:all 0.2s; }
 .qa-btn:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.05); }
 .qa-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
@@ -368,7 +368,7 @@ a { text-decoration:none; color:inherit; }
 .highlight-sender { color:var(--text-1); font-weight:600; }
 
 /* Quick Actions */
-.qa-grid,.actions-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.qa-grid,.actions-grid { display:flex; flex-direction:column; gap:10px; }
 .qa-btn,.action-btn-item {
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px;
   padding:14px 8px; border-radius:10px; font-size:12px; font-weight:600; color:var(--text-1);
@@ -493,7 +493,7 @@ a { text-decoration:none; color:inherit; }
 .notif-unread-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); }
 
 /* Calendar */
-.cal-layout { display:grid; grid-template-columns:1fr 290px; gap:16px; }
+.cal-layout { display:grid; grid-template-columns:1fr; gap:20px; max-width: 1000px; margin: 0 auto; }
 .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
 .cal-nav h3 { font-size:14px; font-weight:700; }
 .cal-nav-btn { width:30px; height:30px; border-radius:7px; background:var(--content-bg); border:1px solid var(--border); font-size:18px; display:flex; align-items:center; justify-content:center; color:var(--text-1); transition:background 0.15s; cursor:pointer; }
@@ -678,6 +678,17 @@ table { width: 100%; }
   .tontines-grid { grid-template-columns: 1fr; }
   .members-grid { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  
+  /* Tableaux responsifs en Cartes (Card View) - Élimine le scroll horizontal */
+  table[style*="min-width"], .data-tbl[style*="min-width"] { min-width: 0 !important; }
+  .data-tbl thead { display: none; }
+  .data-tbl, .data-tbl tbody, .data-tbl tr, .data-tbl td { display: block; width: 100%; box-sizing: border-box; }
+  .data-tbl tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+  .data-tbl td { text-align: right; padding: 12px 16px 12px 45%; position: relative; border-bottom: 1px solid var(--border); min-height: 44px; display: flex; justify-content: flex-end; align-items: center; white-space: normal !important; gap: 10px; }
+  .data-tbl td::before { content: attr(data-label); position: absolute; left: 16px; width: 40%; text-align: left; font-weight: 700; color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; top: 50%; transform: translateY(-50%); }
+  .data-tbl td:last-child { border-bottom: none; }
+  
+  /* Cacher certains wrappers sur mobile si nécessaire, mais on laisse tbl-wrap intact */
   
   /* Adaptation Modal - ni trop large ni encombrante */
   .modal-box { width: 95% !important; max-width: 480px !important; margin: 15px auto !important; max-height: 85vh !important; overflow-y: auto !important; border-radius: 16px !important; }
