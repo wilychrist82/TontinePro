@@ -153,6 +153,20 @@ async function init() {
             
             document.querySelectorAll('.sb-uname').forEach(el => el.textContent = username);
             document.querySelectorAll('.tb-title').forEach(el => el.innerHTML = `Bienvenue, ${username} ! &#x1F44B;`);
+
+            // Synchronisation : Création automatique du profil (Google Auth)
+            if (window.supabase && typeof window.ENV !== 'undefined') {
+                const tempClient = window.supabase.createClient(window.ENV.NEXT_PUBLIC_SUPABASE_URL, window.ENV.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+                tempClient.from('profiles').select('id').eq('id', session.user.id).single().then(({data}) => {
+                    if (!data) {
+                        tempClient.from('profiles').insert([{
+                            id: session.user.id,
+                            full_name: state.user.name,
+                            email: session.user.email
+                        }]).then(() => console.log("[Auth] Profil synchronisé."));
+                    }
+                }).catch(e => console.log(e));
+            }
         }
     }
 
