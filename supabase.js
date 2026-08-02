@@ -29,7 +29,7 @@ function getSupabaseClient() {
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
-                detectSessionInUrl: false
+                detectSessionInUrl: true
             }
         });
         console.log('[Supabase] Client initialisé avec succès.');
