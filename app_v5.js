@@ -151,8 +151,14 @@ async function init() {
             state.user.email = session.user.email;
             state.user.name = session.user.user_metadata?.full_name || username;
             
-            document.querySelectorAll('.sb-uname').forEach(el => el.textContent = username);
-            document.querySelectorAll('.tb-title').forEach(el => el.innerHTML = `Bienvenue, ${username} ! &#x1F44B;`);
+            document.querySelectorAll('.sb-uname').forEach(el => el.textContent = state.user.name);
+            document.querySelectorAll('.tb-title').forEach(el => el.innerHTML = `Bienvenue, ${state.user.name} ! &#x1F44B;`);
+            
+            const googleAvatar = session.user.user_metadata?.avatar_url;
+            const sidebarAvatar = document.getElementById('sidebar-avatar-img');
+            if (sidebarAvatar) {
+                sidebarAvatar.src = googleAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(state.user.name)}&background=5C60F5&color=fff`;
+            }
 
             // Synchronisation : Création automatique du profil (Google Auth)
             if (window.supabase && typeof window.ENV !== 'undefined') {
@@ -4275,8 +4281,9 @@ function renderAdminMembers(query) {
         const status = m.status === 'À jour' || m.status === 'actif'
             ? `<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">✓ À jour</span>`
             : `<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">⚠ En retard</span>`;
-        const role = m.role || 'membre';
-        const roleLabel = role === 'admin' || role === 'Gestionnaire'
+        const role = (m.role || 'membre').toLowerCase();
+        const isAdmin = role === 'admin' || role === 'gestionnaire' || role === 'administrateur';
+        const roleLabel = isAdmin
             ? `<span style="background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">🛡 Admin</span>`
             : `<span style="background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">👤 Membre</span>`;
         
@@ -4301,7 +4308,7 @@ function renderAdminMembers(query) {
                     <div class="action-dropdown" id="dropdown-member-${escapeHTML(m.id)}" style="text-align:left;">
                         <a class="action-dropdown-item" onclick="toggleMemberRole('${escapeHTML(m.id)}','${escapeHTML(name)}','${role}')">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            ${role === 'admin' || role === 'Gestionnaire' ? 'Retirer droits' : 'Déléguer Admin'}
+                            ${isAdmin ? 'Retirer droits' : 'Déléguer Admin'}
                         </a>
                         <a class="action-dropdown-item danger" onclick="deleteMember('${escapeHTML(m.id)}','${escapeHTML(name)}')">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -4356,7 +4363,9 @@ function deleteMember(memberId, memberName) {
 }
 
 function toggleMemberRole(memberId, memberName, currentRole) {
-    const newRole = (currentRole === 'admin' || currentRole === 'Gestionnaire') ? 'membre' : 'admin';
+    const roleLower = (currentRole || '').toLowerCase();
+    const isCurrentAdmin = roleLower === 'admin' || roleLower === 'gestionnaire' || roleLower === 'administrateur';
+    const newRole = isCurrentAdmin ? 'membre' : 'admin';
     const action = newRole === 'admin' ? `déléguer les droits d'administration (Intérim) à "${memberName}"` : `retirer les droits d'administration à "${memberName}"`;
     if (!confirm(`🤝 DÉLÉGATION DE POUVOIR : Êtes-vous sûr de vouloir ${action} ? \n\n${newRole === 'admin' ? 'Ce membre aura le pouvoir complet de gérer la tontine (tirages, paiements, clôtures) pendant votre absence !' : 'Ce membre redeviendra un simple participant sans accès à la gestion.'}`)) return;
 
@@ -5230,7 +5239,7 @@ window.updateProfilePhoto = function(input) {
                     });
                 }
                 
-                const sidebarAvatar = document.querySelector('.user-avatar img');
+                const sidebarAvatar = document.getElementById('sidebar-avatar-img');
                 if(sidebarAvatar) sidebarAvatar.src = compressedDataUrl;
                 
                 if(typeof renderMembersTab === 'function') {
