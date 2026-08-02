@@ -170,15 +170,23 @@
         // Inscription avec Google
         const googleBtn = document.getElementById('google-signup-btn');
         if (googleBtn) {
-            googleBtn.addEventListener('click', async () => {
-                const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: window.location.origin + '/dashboard.html'
+            googleBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log("Clic sur Google détecté !");
+                alert("Le bouton Google a bien été cliqué ! Lancement de Supabase...");
+                
+                try {
+                    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: {
+                            redirectTo: window.location.origin + '/dashboard.html'
+                        }
+                    });
+                    if (error) {
+                        alert("Erreur lors de la connexion avec Google : " + error.message);
                     }
-                });
-                if (error) {
-                    alert("Erreur lors de la connexion avec Google : " + error.message);
+                } catch (err) {
+                    alert("Erreur critique (catch) : " + err.message);
                 }
             });
         }
