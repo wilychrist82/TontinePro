@@ -98,13 +98,7 @@
     </nav>
     <div class="sb-footer">
         <div class="sb-user" id="btn-user-profile-toggle" style="cursor: pointer;" onclick="switchTab('profile')">
-            <div style="position: relative; display: inline-block; margin-right: 10px;">
-                <img src="https://ui-avatars.com/api/?name=Utilisateur&background=5C60F5&color=fff" alt="Utilisateur" class="sb-avatar" id="sidebar-avatar-img" style="margin-right: 0;">
-                <button onclick="event.stopPropagation(); document.getElementById('sidebar-photo-input').click()" style="position: absolute; bottom: -2px; right: -2px; background: #6366f1; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" title="Changer la photo">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                </button>
-            </div>
-            <input type="file" id="sidebar-photo-input" accept="image/*" style="display:none;" onchange="updateProfilePhoto(this)">
+            <img src="https://ui-avatars.com/api/?name=Utilisateur&background=5C60F5&color=fff" alt="Utilisateur" class="sb-avatar" id="sidebar-avatar-img">
             <div class="sb-user-info"><span class="sb-uname">Utilisateur</span><span class="sb-urole">-</span></div>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
