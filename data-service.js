@@ -139,7 +139,9 @@ const DataService = (() => {
                     drawOrder: t.draw_order,
                     type: t.type || 'Rotative',
                     goalAmount: t.goal_amount || 0,
-                    goalTitle: t.goal_title || ''
+                    goalTitle: t.goal_title || '',
+                    description: t.description,
+                    created_by: t.created_by
                 }));
             }
         }
@@ -178,16 +180,22 @@ const DataService = (() => {
         // Si la liste est vide (aucun membre dans la base de données), on renvoie une liste vide
         // au lieu d'injecter de faux membres, pour que l'utilisateur puisse vider son application.
 
-        // Overlay roles from localStorage to ensure delegated roles persist locally
-        if (!isSupabaseConnected) {
+        // Overlay roles and merge members from localStorage to ensure delegated roles and local additions persist
+        if (!isSupabaseConnected || membersList.length === 0 || true) {
             let localMembers = JSON.parse(localStorage.getItem('tontine_extended_members') || 'null');
             if (localMembers && localMembers.length > 0) {
-                membersList.forEach(m => {
-                    const localMatch = localMembers.find(lm => lm.id === m.id || lm.name === m.name);
-                    if (localMatch && localMatch.role) {
-                        m.role = localMatch.role;
-                    }
-                });
+                if (membersList.length === 0) {
+                    membersList = [...localMembers];
+                } else {
+                    localMembers.forEach(lm => {
+                        const existingIdx = membersList.findIndex(m => m.id === lm.id || m.name === lm.name);
+                        if (existingIdx !== -1) {
+                            if (lm.role) membersList[existingIdx].role = lm.role;
+                        } else {
+                            membersList.push(lm);
+                        }
+                    });
+                }
             }
         }
 

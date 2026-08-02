@@ -5498,13 +5498,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(renderNotifications, 1000);
     
+    // Vider le champ de recherche globale au chargement
+    const globalSearch = document.getElementById('global-search-input');
+    if (globalSearch) globalSearch.value = '';
+    
     // Restaurer l'avatar personnalisé s'il existe
     const savedAvatar = localStorage.getItem('user_profile_avatar');
     if (savedAvatar) {
         const profileImg = document.getElementById('profile-avatar-img');
         if (profileImg) profileImg.src = savedAvatar;
         
-        const sidebarAvatar = document.querySelector('.user-avatar img');
+        const sidebarAvatar = document.getElementById('sidebar-avatar-img');
         if (sidebarAvatar) sidebarAvatar.src = savedAvatar;
     }
 });
