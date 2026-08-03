@@ -518,7 +518,7 @@
             <h2 class="page-title" style="margin-bottom: 4px;">Calendrier des événements</h2>
             <p style="color:var(--text-3); font-size:14px;">Gérez vos échéances et réunions à venir.</p>
         </div>
-        <button class="btn-primary" style="background:#6366f1; border:none; padding:10px 20px; border-radius:10px; font-weight:600;">+ Nouvel événement</button>
+        <button class="btn-primary" onclick="if(typeof showToast === 'function') showToast('Le module de création d\'événement manuel est en cours de développement.', 'info'); else alert('Module en cours de développement.');" style="background:#6366f1; border:none; padding:10px 20px; border-radius:10px; font-weight:600;">+ Nouvel événement</button>
     </div>
     <div class="cal-layout" style="gap:25px; align-items:start;">
         <div class="card cal-card" style="padding:0; overflow:hidden; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.03); border:1px solid var(--border);">
