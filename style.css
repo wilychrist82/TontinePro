@@ -680,10 +680,11 @@ table { width: 100%; }
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
   
   /* Tableaux responsifs en Cartes (Card View) - Élimine le scroll horizontal */
+  .tbl-wrap { overflow: visible !important; }
   table[style*="min-width"], .data-tbl[style*="min-width"] { min-width: 0 !important; }
   .data-tbl thead { display: none; }
   .data-tbl, .data-tbl tbody, .data-tbl tr, .data-tbl td { display: block; width: 100%; box-sizing: border-box; }
-  .data-tbl tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+  .data-tbl tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; overflow: visible; background: var(--surface); box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
   .data-tbl td { 
     display: flex; 
     justify-content: flex-start; 
@@ -910,7 +911,7 @@ body.readonly-mode::before { content:"Mode Démo - Lecture seule"; position:fixe
     border-radius: 8px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     min-width: 150px;
-    z-index: 100;
+    z-index: 9999;
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);

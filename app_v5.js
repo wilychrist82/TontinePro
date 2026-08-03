@@ -5151,12 +5151,23 @@ function renderNotifications() {
 
 window.toggleNotificationDropdown = function(event) {
     if (event) event.stopPropagation();
+    
+    // Au lieu d'afficher le dropdown (qui superpose le texte sur mobile),
+    // on redirige directement vers l'onglet Notifications (recommandé par l'utilisateur).
+    if (typeof switchTab === 'function') {
+        switchTab('notifications');
+        
+        // Fermer le menu latéral sur mobile s'il est ouvert
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+        }
+    }
+    
+    // S'assurer que le dropdown reste masqué
     const dropdown = document.getElementById('notifications-dropdown');
     if (dropdown) {
-        dropdown.classList.toggle('hidden');
-        if (!dropdown.classList.contains('hidden')) {
-            renderNotifications();
-        }
+        dropdown.classList.add('hidden');
     }
 };
 
